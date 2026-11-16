@@ -1,6 +1,6 @@
 # Decisions
 
-One line per decision, written at the moment it is settled. Newest at the bottom of each table. Decisions made before 2026-11-13 are in [tech-plan.md](tech-plan.md) section 3.
+One line per decision, written at the moment it is settled. Newest at the bottom of each table. Decisions made before 2026-11-13 are in [tech-plan.md](tech-plan.md) section 3. Task numbers follow the 53-task list of 2026-11-16 in [tech-plan.md](tech-plan.md) section 8.
 
 ## How we work
 
@@ -11,17 +11,34 @@ One line per decision, written at the moment it is settled. Newest at the bottom
 | 2026-11-13 | Every task follows the eight-step workflow in `CLAUDE.md`, with two go-aheads: one for the plan and one to start building. | The user wants discussion and a reviewed plan before any code is touched. |
 | 2026-11-13 | No decision is made on an assumption. The list of what must be confirmed first is in `CLAUDE.md` under "Decisions". Small details that follow from the plan or an existing pattern need no question but are listed in the Explain step. | The user wants to confirm every real decision, without being stopped for variable names. |
 | 2026-11-13 | After every task, small or big, the work is explained in simple words, with the steps to validate it. | The user wants to understand how each task was built and how it works. |
-| 2026-11-13 | A developer guide, `docs/developer-guide.md`, is kept up to date in every wrap-up. It is organised by part of the product and describes what exists now. It is created at the end of Task 1. | A new developer needs one place to learn the product. Before Task 1 there is nothing real to write in it. |
+| 2026-11-13 | A developer guide, `docs/developer-guide.md`, is kept up to date in every wrap-up. It is organised by part of the product and describes what exists now. It is created at the end of task 4, when the API, worker and web app all exist. | A new developer needs one place to learn the product. Before that there is nothing real to write in it. |
 | 2026-11-13 | Docs are synced only after the user confirms the task works. Decisions are the exception: they are written when settled. | Docs should never describe something broken, and a decision recorded late can be missed. |
 | 2026-11-13 | At the start of every session the status is compared with the git state. | It catches a wrap-up that was missed. |
 | 2026-11-13 | No separate change log. Code changes are recorded in git commit messages. | A second copy would fall out of date. |
-| 2026-11-13 | No rules files, skills, subagents or hooks for now. A hook for the type check is added if it is ever skipped. A permission list in `.claude/settings.json` is considered after Task 1. | The docs cover the need, and each extra is one more thing to maintain. |
+| 2026-11-13 | No rules files, skills, subagents or hooks for now. A hook for the type check is added if it is ever skipped. A permission list in `.claude/settings.json` is considered after task 4. | The docs cover the need, and each extra is one more thing to maintain. |
 | 2026-11-13 | Commits are made only when the user asks. The InstantBot and mailsift repos are treated as read-only unless the user says otherwise. | Both keep changes under the user's control. |
-| 2026-11-13 | If `tech-plan.md` sections 2 or 7 differ from `CLAUDE.md`, `CLAUDE.md` wins. `tech-plan.md` is kept as the plan agreed on 2026-11-12. | Each rule should have one place where it is current. |
+| 2026-11-13 | If `tech-plan.md` sections 2 or 7 differ from `CLAUDE.md`, `CLAUDE.md` wins. `tech-plan.md` is the plan agreed on 2026-11-12 and revised on 2026-11-16. | Each rule should have one place where it is current. |
+| 2026-11-16 | Task size rule: one new idea per task, one result that can be seen, and a diff that can be read in one sitting. Code copied from InstantBot counts toward the size and is explained as if the user has never seen InstantBot. | The user wants to understand 100% of what each task builds before moving to the next one. |
+| 2026-11-16 | The table map (table names, what each holds, how they link) is one doc-only task before any code. Each table's SQL is written in the task that first needs it, not all up front. | A table is easier to review beside the code that uses it, and the map stops an early task from saving data in a shape a later task must rewrite. |
+| 2026-11-16 | A small mailbox check is added early, as task 5: run mailsift over HTTP and list a few emails from the development mailbox. | The Google setup and token expiry are the biggest unknowns and would otherwise first appear at the mailbox tasks (20 onward). |
+| 2026-11-16 | Tests and evals are written for the major items only, not for the whole codebase. Which items, and in which tasks, is settled when the task list is drafted. This replaces "no tests until the pilot readiness task". | People ask how the product was validated before production, and the scoring and AI parts are where a silent mistake hurts most. |
+| 2026-11-16 | Rules for a task: (1) one result that can be checked, with a one-sentence "how to check it"; (2) one main new idea; (3) ceiling of one sitting, starting at about 400 lines to read and about 10 files, adjusted after the first tasks; (4) no setup-only tasks, setup joins the first thing that uses it; (5) thin slices through database, API and screen, not layers, except pure-code pieces that show a result alone; (6) the product runs and the type check passes after every task; (7) a task that is too big is split in the plan step, not during the build. | Tasks must be small enough to discuss and review fully, but big enough to deliver something that can be validated. |
+| 2026-11-16 | Three kinds of task: build (code that runs), design (a doc the user approves) and decision (a choice that affects several tasks or needs a test to answer). Other choices are settled in the discuss step of the build task that needs them. | Giving every small choice its own task would double the list and add no value. |
+| 2026-11-16 | Scope of tests: scorer, masking, proof-line check, company separation. Scope of evals: requirements draft, the CV check and fact sheet, ticks with proof lines, hidden instructions in a CV, and the top five against HR's pick. Tests go inside the task that builds the piece. The eval runner is its own task, and each later eval is a small task after its feature. Everything else is checked by hand. | These are the parts with one right answer or where AI quality must be measured. Screens and routes do not need it for a pilot. |
+| 2026-11-16 | The task list is renumbered from 1 instead of using letters. | The user's choice. |
+| 2026-11-16 | No test CVs exist yet. They must be gathered before the mailbox tasks, and the same set serves the test mailbox, the evals and the model comparison. | Checked with the user. |
+| 2026-11-16 | The test CV set is a mix: about 30 AI-written CVs, each made from a fact card written first; about 10 real CVs collected by the user with permission; about 10 junk and hard cases (invoice PDF, newsletter, scanned CV, `.doc` file, duplicate, a CV with a hidden instruction). Two or three job descriptions sit behind the set. Gathering it is its own task before the mailbox tasks. | Fact cards give the right answers for free, real CVs bring real layouts, and the hard cases cover the free checks. The set proves the product works as designed; real quality is proven on the first pilot mailbox. |
+| 2026-11-16 | The 22-task list in `tech-plan.md` section 8 is replaced by 53 smaller tasks (49 build, 2 design, 2 decision), approved by the user. The task rules and kinds are written at the top of that section. `tech-plan.md` sections 2 to 11 were revised to match the new list and the BullMQ queue. | The old tasks packed several new ideas each and did not count copied code, so they were too big to discuss and review fully. |
+| 2026-11-16 | Three choices inside the new list: HR's notes are built with the shortlist (task 36); the retry on "slow down" and the side-by-side limit are built in task 30, not in the AI wrapper (task 13); the dashboard shell is its own task (8). | The old plan kept HR's notes at closing but no task built them. The limits are first needed in task 30. Sign-in plus the shell came to about 500 lines. |
 
 ## Product and code
 
-None yet.
+| Date | Decision | Why |
+|---|---|---|
+| 2026-11-16 | The work queue is BullMQ on Redis, not a `work_queue` table in Postgres polled by the worker. RabbitMQ is not used. InstantBot's queue code (`channel-message-queue.ts`, `worker-loop.ts`) is no longer copied. This changes `tech-plan.md` sections 3 to 7 and the task list. | The user wants to learn Redis and BullMQ, which most Node teams use. Postgres polling was simpler for a pilot and was the earlier recommendation. RabbitMQ is made for passing messages between many services and has no natural place here. |
+| 2026-11-16 | What HR sees (status, progress, skip reasons) is saved in Postgres, never read from Redis. A work item is added to the queue after its Postgres row is saved, the row is marked failed if adding throws, and every handler is safe to run twice. | With a queue outside the database, the row and the queued item can disagree if one write fails. |
+| 2026-11-16 | Background work is still called a "work item" in our code and screens, although BullMQ calls it a "job". | "Job" already means a hiring job. |
+| 2026-11-16 | Redis is installed on the development machine from Redis's official package source, by the user, in the first queue task. | Ubuntu 22.04's own package gives Redis 6.0.16, which is older than the version BullMQ is remembered to recommend. The exact minimum is checked in the BullMQ docs in that task. |
 
 ## Open points for later tasks
 
@@ -29,13 +46,16 @@ Raised in discussion and **not decided**. Each is settled inside its task.
 
 | Task | Point | Recommended so far |
 |---|---|---|
-| 1 | Package manager | npm workspaces, the same as InstantBot, so copied code fits without changes. |
-| 1 | Ports | Web 3100, API 4100, mailsift 4200 later. InstantBot uses 3001 and 4000, and mailsift defaults to 3000. |
-| 1 | How `packages/core` is consumed in development | Compiled to `dist` with a watch script, the same as InstantBot's `platform-core`. |
-| 1 | Logger | pino. InstantBot has no logger library to copy. |
-| 2 | How migrations are applied | The Supabase CLI and Docker are not installed on the development machine. The simplest option is to paste the SQL files into the Supabase SQL editor after a go-ahead. |
-| 12 | Table shape for candidates | "One fact sheet per candidate, ticks per candidate per job" should be in the tables from task 12 on, or task 21 (saved candidates) becomes a rewrite. |
-| 12, 13 | Masking and the proof-line check | The AI sees masked CV text, so the proof-line check must compare against the masked text, not the original. |
-| 12 | Hiding names | Code can find emails and phone numbers by pattern, but not names. |
-| 14 | Scoring gaps | "Mentioned only" has no point value yet. It is not stated whether an "unclear" must counts as the one missed must in lenient mode. |
-| 5, 7, 19 | AI SDK details | InstantBot uses AI SDK v6. Check the current docs for tool calling and the MCP client before building, not memory. |
+| 2 | Package manager | npm workspaces, the same as InstantBot, so copied code fits without changes. |
+| 2, 4, 5 | Ports | Web 3100, API 4100, mailsift 4200 later. InstantBot uses 3001 and 4000, and mailsift defaults to 3000. |
+| 3 | How `packages/core` is consumed in development | Compiled to `dist` with a watch script, the same as InstantBot's `platform-core`. Its trap: if the watch script is not running, the API runs old core code. The other option is to read the core source directly with no compile step. |
+| 2 | Logger | pino. InstantBot has no logger library to copy. |
+| 6 | How migrations are applied | The Supabase CLI and Docker are not installed on the development machine. The simplest option is to paste the SQL files into the Supabase SQL editor after a go-ahead. |
+| 1, 29 | Table shape for candidates | "One fact sheet per candidate, ticks per candidate per job" should be in the table map and in the tables from task 29 on, or task 49 (saved candidates) becomes a rewrite. |
+| 28, 33 | Masking and the proof-line check | The AI sees masked CV text, so the proof-line check must compare against the masked text, not the original. |
+| 28 | Hiding names | Code can find emails and phone numbers by pattern, but not names. |
+| 35 | Scoring gaps | "Mentioned only" has no point value yet. It is not stated whether an "unclear" must counts as the one missed must in lenient mode. |
+| 20, 26 | Using Redis directly | Besides BullMQ, Redis could hold the mailbox token cache and the per-mailbox speed limit, so plain Redis is learned too. Raised, not confirmed. |
+| 9 | Seeing queued items | A small dashboard library for BullMQ could show items while validating. Raised, not confirmed. |
+| 9 | Redis version | BullMQ is remembered to work on Redis 5 and up and to recommend 6.2 or newer. Check the BullMQ docs before installing. |
+| 13, 17, 47 | AI SDK details | InstantBot uses AI SDK v6. Check the current docs for tool calling and the MCP client before building, not memory. |

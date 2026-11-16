@@ -13,7 +13,7 @@ Two goals: a working pilot product, and learning tool calling, MCP and agent bui
 - Honest advice, including when an idea is weak or is more than a pilot needs.
 
 ## Workflow for every task
-The size follows the task. The two go-aheads (steps 3 and 5) always stay, even for a small fix.
+The rules for what makes a task (size, kinds, when to split) are at the top of docs/tech-plan.md section 8. The two go-aheads (steps 3 and 5) always stay, even for a small fix. For a design or decision task, the result is a doc or lines in docs/decisions.md, not code.
 
 1. **Prepare.** Read the task's row in docs/tech-plan.md section 8, the product-flow steps it names, docs/decisions.md, the related part of docs/developer-guide.md, and the code that will be touched or copied.
 2. **Discuss.** As two senior developers: options, trade-offs, scale, speed, cost, privacy, edge cases, likely bugs. Give a recommendation and disagree when needed. Write each decision into docs/decisions.md at the moment it is settled.
@@ -43,16 +43,17 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - Report what changed in each file and what is uncommitted. Commit only when asked.
 
 ## Rules for all code
-- "Job" means a hiring job. Background work is a "work item" in the `work_queue` table. Code says `tenant` and `tenant_id`; screens say "company".
+- "Job" means a hiring job. Background work is a "work item" in a BullMQ queue on Redis (BullMQ's own word for it is "job"; ours is not). Code says `tenant` and `tenant_id`; screens say "company".
 - Every table has `tenant_id`, taken from the signed-in user, never from the request. Every repository function filters by it. Database row rules are a second lock.
 - The browser talks only to the API, never to the database.
 - Every AI call goes through the one wrapper in packages/core: the result is checked by code before saving, tokens and cost are logged, CV text is masked first, and CV and email text is wrapped as data with an instruction to ignore commands inside it.
 - Mail is found and picked by code, never by AI. Mail access is read-only and goes through mailsift.
-- Long work is queued, never run inside an API request or a chat reply. Every work item has a retry limit.
+- Long work is queued, never run inside an API request or a chat reply. Every work item has a retry limit, and every handler is safe to run twice.
+- What HR sees (status, progress, skip reasons) is saved in Postgres, never read from Redis. A work item is queued after its Postgres row is saved.
 - Agent tools are thin wrappers around workflow actions that a screen button also calls. Actions that cost AI money or delete data need HR's confirm click.
 - No LangChain or LangGraph, no component library, no embeddings or vector search.
 - Structured logs carry a request ID or a work item ID.
-- No new tests for now. Tests that come with copied code are kept.
+- Tests and evals cover the major items only. Tests: the scorer, masking, the proof-line check and company separation. Evals: the requirements draft, the CV check and fact sheet, the ticks, hidden instructions in a CV, and the top five. Everything else is checked by hand. Tests that come with copied code are kept.
 - Database changes are SQL files in supabase/migrations/, forward only, applied only after an explicit go-ahead for that change.
 - Code is copied from InstantBot as listed in docs/tech-plan.md section 6. The InstantBot and mailsift repos are read-only unless the user says otherwise.
 
@@ -62,7 +63,7 @@ Built up task by task. Nothing is added outside this layout without asking.
 ```
 apps/web/              Next.js screens and chat panel
 services/api/          Express API: routes -> controllers -> services -> repositories
-services/worker/       Polls the work queue and runs handlers
+services/worker/       Takes work items from the queue and runs handlers
 packages/core/         Shared logic for the API and the worker: AI wrapper, prompts,
                        masking, proof check, scorer, work queue, mailsift client,
                        secret encryption
@@ -70,16 +71,16 @@ supabase/migrations/   SQL files
 docs/                  See "Docs" below
 ```
 
-Main flow: browser -> API (short requests and the chat agent) -> `work_queue` table -> worker -> mailsift (MCP over HTTP) -> Gmail. The API and the worker both use Supabase (Postgres and sign-in) and the AI model.
+Main flow: browser -> API (short requests and the chat agent) -> BullMQ queue on Redis -> worker -> mailsift (MCP over HTTP) -> Gmail. The API and the worker both use Supabase (Postgres and sign-in), Redis and the AI model.
 
 ## Commands
-Added in Task 1.
+Added in tasks 2 to 4.
 
 ## Docs
 - docs/product-flow.md: what the product does. Read the steps a task names.
 - docs/tech-plan.md: tools, structure, what is copied from InstantBot, the task list (section 8), mailsift facts (section 9).
 - docs/decisions.md: decisions made while working, and open points for later tasks.
-- docs/developer-guide.md: how the built product works, for a new developer. Created at the end of Task 1.
+- docs/developer-guide.md: how the built product works, for a new developer. Created at the end of task 4.
 
 If docs/tech-plan.md sections 2 or 7 differ from this file, this file wins.
 
