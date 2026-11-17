@@ -48,6 +48,7 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - "Job" means a hiring job. Background work is a "work item" in a BullMQ queue on Redis (BullMQ's own word for it is "job"; ours is not). Code says `tenant` and `tenant_id`; screens say "company".
 - Every table has `tenant_id`, taken from the signed-in user, never from the request. Every repository function filters by it. Database row rules are a second lock.
 - The browser talks only to the API, never to the database.
+- A secret never gets the `NEXT_PUBLIC_` prefix. Settings with that prefix are handed to the browser, where anyone can read them.
 - Every AI call goes through the one wrapper in packages/core: the result is checked by code before saving, tokens and cost are logged, CV text is masked first, and CV and email text is wrapped as data with an instruction to ignore commands inside it.
 - Mail is found and picked by code, never by AI. Mail access is read-only and goes through mailsift.
 - Long work is queued, never run inside an API request or a chat reply. Every work item has a retry limit, and every handler is safe to run twice.
@@ -76,11 +77,12 @@ docs/                  See "Docs" below
 Main flow: browser -> API (short requests and the chat agent) -> BullMQ queue on Redis -> worker -> mailsift (MCP over HTTP) -> Gmail. The API and the worker both use Supabase (Postgres and sign-in), Redis and the AI model.
 
 ## Commands
-Run from the repo root. More are added in task 4.
+Run from the repo root.
 
 - `npm install`: installs the libraries for every part.
 - `npm run dev:api`: starts the API on port 4100 and restarts it when a file changes. Health check: `http://localhost:4100/v1/health`.
 - `npm run dev:worker`: starts the worker and reruns it when a file changes. Until the queue exists (task 9) it logs one start line and waits.
+- `npm run dev:web`: starts the web app on `http://localhost:3100` and reloads it when a file changes.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
 
 Settings are listed in `.env.example`. A setting is added by the task that first uses it.
@@ -90,7 +92,7 @@ Settings are listed in `.env.example`. A setting is added by the task that first
 - docs/tech-plan.md: tools, structure, what is copied from InstantBot, the task list (section 8), mailsift facts (section 9).
 - docs/table-map.md: the database tables, what each keeps and how they link. Read it before any task that adds or changes a table.
 - docs/decisions.md: decisions made while working, and open points for later tasks.
-- docs/developer-guide.md: how the built product works, for a new developer. Created at the end of task 4.
+- docs/developer-guide.md: how the built product works, for a new developer: the parts, how to run them, the flow, the reasons and the traps.
 
 If docs/tech-plan.md sections 2 or 7 differ from this file, this file wins.
 

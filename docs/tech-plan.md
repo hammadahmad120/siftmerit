@@ -179,10 +179,10 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 | 1 | Table map | Design | none | The user approves a one-page doc of tables and how they link | The shape for candidates: one fact sheet per candidate, ticks per candidate per job. Where the status rows for queued work live |
 | 2 | Repo root and API: workspaces, env file, logger, health check | Build | none | The type check passes and the health URL answers | Local folder, package manager, API port, the logger |
 | 3 | Core package and worker | Build | 2 | The worker starts and logs a line using a core function | How `packages/core` is consumed in development: compiled to `dist` with a watch script, or read as source |
-| 4 | Web app | Build | 2 | A page shows the API's health | Web port |
+| 4 | Web app, and CORS in the API | Build | 2 | A page shows the API's health | Web port |
 | 5 | Mailbox check: Google setup, mailsift over HTTP | Decision | none | A script lists five emails from the test mailbox | Google setup, the 7-day expiry risk on personal Gmail, where mailsift runs, its port |
 | 6 | Supabase project, company tables, API sign-in check, separation test | Build | 1, 2 | A signed-in call returns the user's company and the test passes | How we create companies and users, how migrations are applied to the new project |
-| 7 | Web sign-in, sign-out, page protection | Build | 4, 6 | A user signs in, and a signed-out visitor is sent to the sign-in page | Where a signed-in user lands |
+| 7 | Web sign-in, sign-out, page protection. Also adds ESLint with the Next.js rules to the web app, and replaces the health page at `/` | Build | 4, 6 | A user signs in, and a signed-out visitor is sent to the sign-in page | Where a signed-in user lands. Whether the copied sign-in code needs changes for `cacheComponents` and `partialPrefetching` |
 | 8 | Dashboard shell: menu and company name | Build | 7 | Two HR users of one company see their company, and a user of another company sees nothing of the first | Menu items |
 | 9 | Redis and BullMQ basics: Redis installed, a demo work item queued by the API and run by the worker | Build | 3 | The demo item is shown as done | Redis version (check the BullMQ docs), queue names, how the demo result is shown, whether to add a BullMQ dashboard |
 | 10 | Queue safety: retry limit, killed worker, duplicates, a delayed item, Postgres status kept in step | Build | 6, 9 | Each of the five cases is seen | Retry count and the wait between tries, when a stuck item is taken back, the shape of the status row |
