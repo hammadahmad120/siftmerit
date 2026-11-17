@@ -9,7 +9,8 @@ Two goals: a working pilot product, and learning tool calling, MCP and agent bui
 - Say where we are and what is next before doing anything else.
 
 ## How we talk
-- Plain simple words.
+- Plain simple words. Explain with a small example.
+- Hold questions until the discussion is finished, then ask them one at a time.
 - Honest advice, including when an idea is weak or is more than a pilot needs.
 
 ## Workflow for every task
@@ -37,6 +38,7 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - docs/status.md: rewrite the "Now" part, and add one line under "Finished tasks" when a task is done.
 - docs/decisions.md: check that no decision from the session is missing.
 - docs/developer-guide.md: update it when the task changed how something works. It is organised by part of the product, describes what exists now, and covers the flow, the reasons and the traps, not every file.
+- docs/table-map.md: update it when a table is added or its links change.
 - CLAUDE.md: change it only if a rule for all code, a command or the structure changed.
 - docs/tech-plan.md and docs/product-flow.md: change them only if the plan or the product behaviour itself changed, and add a line to docs/decisions.md saying why.
 - Run `npm run typecheck` and say plainly if it fails.
@@ -79,6 +81,7 @@ Added in tasks 2 to 4.
 ## Docs
 - docs/product-flow.md: what the product does. Read the steps a task names.
 - docs/tech-plan.md: tools, structure, what is copied from InstantBot, the task list (section 8), mailsift facts (section 9).
+- docs/table-map.md: the database tables, what each keeps and how they link. Read it before any task that adds or changes a table.
 - docs/decisions.md: decisions made while working, and open points for later tasks.
 - docs/developer-guide.md: how the built product works, for a new developer. Created at the end of task 4.
 

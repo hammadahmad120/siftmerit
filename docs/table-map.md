@@ -1,0 +1,118 @@
+# Table map
+
+The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1).
+
+This is a map, not the SQL. Each table's SQL is written in the task that first needs it. The columns below are a first sketch; the exact columns are settled in that task. This doc is updated whenever a table is added or its links change.
+
+The examples use one story: the company **Acme**, its HR user **Sara**, the job **Accountant**, and an applicant called **Ali**.
+
+## 1. Who owns what
+
+Read each branch as "one has many". One company has many jobs. One job has many requirements.
+
+```
+tenants                      the company (Acme)
+ ├── tenant_members          Sara belongs to Acme
+ ├── mailbox_connections     Acme's Gmail (only one per company)
+ ├── candidates              Ali, a person known to Acme
+ └── jobs                    the Accountant job
+      ├── job_requirements   "3 years experience" (must)
+      ├── job_emails         every email we looked at for this job
+      ├── work_runs          "reading round 1: running"
+      ├── chat_messages      Sara's chat with the agent about this job
+      └── ai_calls           the cost of each AI call
+```
+
+Every table has `tenant_id`, the company it belongs to.
+
+## 2. The two joining tables
+
+Two tables do not sit under one owner. Each one joins other rows together.
+
+```
+candidates ───┐
+(Ali)         │
+              ├──>  applications  ───────┐
+jobs ─────────┤     "Ali applied to      │
+(Accountant)  │      Accountant"         ├──>  ticks
+              │                          │     "Ali, Accountant,
+job_emails ───┘                          │      3 years experience: met"
+(Ali's email)                            │
+                                         │
+job_requirements ────────────────────────┘
+("3 years experience")
+```
+
+- An **application** joins one candidate, one job, and the email it came from.
+- A **tick** joins one application and one requirement.
+
+## 3. What each table keeps
+
+| Table | Keeps | Example | Built in task |
+|---|---|---|---|
+| `tenants` | Company name, short name, settings | Acme | 6 |
+| `tenant_members` | Which user is in which company. One user belongs to one company | Sara is in Acme | 6 |
+| `mailbox_connections` | Mailbox address, the secret (encrypted), status, last error | hr@acme.com, connected | 21 |
+| `jobs` | Job description, subject words, posting date, strict or lenient, status, when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, strict, open | 11 |
+| `job_requirements` | Which job, the requirement text, must or nice to have, its place in the list | "3 years experience", must | 14 |
+| `job_emails` | Which job, Gmail's email ID, subject, sender, date, picked by HR or not, status, skip reason. No email body and no attachment | "Application for Accountant", 2 Nov, read | 22 |
+| `candidates` | The fact sheet (name, contact, city, total years, education, skills, current role, short summary, links), the CV text, the keep-until date | Ali, Lahore, 4 years | 26 to 29 |
+| `applications` | Which candidate, which job, where it came from (an email or a past job), date applied, reading status, HR's notes | Ali for Accountant, 2 Nov | 26 to 29 |
+| `ticks` | Which application, which requirement, the result (met, mentioned only, not met, unclear), the proof line, whether the proof was checked | met, "Worked 4 years as accountant at XYZ" | 32 |
+| `work_runs` | Which job (can be empty), kind of work, status, error, start and end time | reading round 1, running | 9 or 10 |
+| `chat_messages` | Which job, who wrote it (HR or the agent), the text, the time | "Why is Ali third?" | 19 |
+| `ai_calls` | Which job (can be empty), purpose, model, tokens used, cost, time | read one CV | 13 |
+
+Rules the database keeps:
+- The same email ID cannot be added twice to the same job.
+- A candidate has at most one application per job.
+- An application has at most one tick per requirement.
+
+## 4. Why it is shaped this way
+
+**Requirements are their own table.** Each tick points to one requirement. When Sara removes "Speaks Arabic", only the ticks for that requirement go. When she rewords "3 years" to "5 years", only that tick is done again. A list kept inside the job row could not do this, because the items would have no ID for a tick to point to.
+
+**Emails are not candidates.** Most emails never become a candidate: junk, duplicates, scanned files, and subject groups Sara did not pick. We still remember every one, with the reason, so nothing is read twice. The email list is also kept after weak candidates are deleted, so a reopened job does not read and pay for them again.
+
+**A list of emails, not only a bookmark.** A bookmark says "everything before this point is done". That breaks here: Sara picks groups, so there are gaps; CVs are read side by side, so they finish out of order; and some fail. With one row per email, the worker asks for "waiting emails for this job, oldest first", so people who applied early always go first. A "last checked" time on the job is used only to ask Gmail for new mail.
+
+**A candidate is stored once. An application is that person in one job.** Ali's name, city and CV are the same in every job. His date applied, ticks and Sara's notes are different in each job. When Sara brings saved candidates from a past job into a new one, each gets a new application row and new ticks. The person and the CV are not copied.
+
+```
+candidates:    1 | Ali | Lahore | CV text
+
+applications: 10 | Ali | Accountant        | 2 Nov  | from an email
+              11 | Ali | Senior Accountant | 15 Jan | from the past job
+```
+
+**Ticks are their own table.** Adding or removing one requirement changes one row per candidate and never rewrites the others.
+
+**`work_runs` holds status and errors only.** It says whether a piece of background work is waiting, running, finished or failed, and why it failed. The progress number ("120 of 200") is counted from the `job_emails` rows. It is a table and not a column on the job because one job has many pieces of work over time, and the queue tasks (9 and 10) need a status row before any job exists.
+
+**The mailbox secret has its own table.** A signed-in user can read their own `tenants` row, so the secret must not sit there.
+
+## 5. What happens when something is removed
+
+| Action | What goes | What stays |
+|---|---|---|
+| A requirement is removed | The requirement and its ticks, for every candidate | Everything else |
+| A job is closed | Applications and ticks of weak candidates. A candidate with no application left goes too | Strong candidates, the email list |
+| A candidate asks to be deleted | The candidate, their applications and ticks | The email ID, so it is not read again |
+
+## 6. Known trade-off
+
+The email list is kept per job. An email that matches two open jobs is read once for each job and makes two candidate rows. This is accepted for the pilot, where it should be rare.
+
+## 7. Left for later tasks
+
+| Task | Point |
+|---|---|
+| 11 | Whether a job has a title |
+| 24 | Where HR's remembered subject picks are kept |
+| 26, 29 | Where the CV text sits before the AI has said "this is a CV", and when the candidate row is made |
+| 29 | The exact fact sheet boxes |
+| 35, 36 | Whether the score is saved or worked out when shown |
+| 45 | How the "last checked" time is used so new mail is picked up once and only once |
+| 46 | How HR is told about a new strong candidate |
+| 48 | Whether closing a job wipes subject and sender from `job_emails` and keeps only the ID |
+| 49 | Whether candidates can be brought from a job that is still open, and whether ticks can be reused for unchanged requirements |

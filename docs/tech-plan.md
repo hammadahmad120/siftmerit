@@ -80,7 +80,8 @@ siftmerit/
   packages/core/         Shared logic: AI wrapper, prompts, masking, proof check,
                          scorer, work queue, mailsift client, secret encryption
   supabase/migrations/   SQL files, forward only
-  docs/                  product-flow.md, tech-plan.md, decisions.md, status.md
+  docs/                  product-flow.md, tech-plan.md, table-map.md, decisions.md,
+                         status.md
 ```
 
 **Naming rule.** "Job" always means a hiring job. Background work is called a "work item" and lives in a BullMQ queue, so the two are never confused. BullMQ's own word for a work item is "job"; our code and screens do not use it that way. Code keeps `tenant` and `tenant_id` for a company, because the copied InstantBot code uses those names. Screens say "company".
@@ -248,7 +249,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 | # | Task | Kind | Needs | How to check | Decide then |
 |---|---|---|---|---|---|
 | 48 | Close a job (section 6) | Build | 36 | Closing stops reading, keeps candidates above the bar with HR's notes, deletes those below it, keeps the email ID list, and sets a keep-until date | The score bar, the keep-until period, the same-person rule |
-| 49 | Saved candidates scored in a new job (step 3) | Build | 48 | Saved candidates are scored before any mail is read | How saved candidates are shown beside new ones |
+| 49 | Saved candidates scored in a new job (step 3) | Build | 48 | HR picks a past job and confirms, and its saved candidates are scored before any mail is read | How saved candidates are shown beside new ones, whether a job that is still open can be picked, whether ticks can be reused for unchanged requirements |
 | 50 | Reopen a job (section 5, more openings later) | Build | 48 | Unchanged ticks are kept, and only new requirements and new mail are processed | None so far |
 | 51 | Delete on request, and expiry (section 6) | Build | 48 | A candidate is deleted on request, and expired data is removed | When expired data is removed |
 | 52 | Model comparison and real cost per 200 CVs (section 7) | Decision | 34, 38 | The numbers are recorded and the stronger-model question is answered | Whether a stronger-model check is needed |

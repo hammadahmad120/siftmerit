@@ -40,8 +40,10 @@ HR enters:
 ### Step 2: Requirements are agreed
 The AI pulls the requirements out of the job description and marks each as **must** or **nice to have**. HR edits and confirms the list, and picks **strict** or **lenient**. No CV is read before HR confirms.
 
-### Step 3: Saved candidates are checked first
-Candidates kept from earlier jobs are scored against the new requirements before any mail is read.
+### Step 3: Saved candidates from past jobs (HR's choice)
+When creating a job, HR can pick past jobs to bring saved candidates from. HR confirms before any AI is used. Those candidates are then scored against the new requirements from their saved CV text, before any mail is read. Nothing is checked automatically.
+
+Changed on 2026-11-17. Before that, every saved candidate was checked against every new job. The reason is in [decisions.md](decisions.md).
 
 ### Step 4: Emails are picked (no AI)
 1. Code lists emails in the date range that have a PDF or Word attachment and whose subject **contains** the subject words. It is not an exact match. Only light details are fetched: subject, sender, date. No bodies, no attachments.
@@ -114,7 +116,7 @@ The rule behind this table: **the AI gives every tick, the code only adds up and
 
 **When HR closes the job:**
 - Reading stops.
-- **Kept:** candidates above the bar (all musts met, or one missed), with fact sheet, ticks, CV text and HR's notes. These are the saved candidates used in step 3 of future jobs.
+- **Kept:** candidates above the bar (all musts met, or one missed), with fact sheet, ticks, CV text and HR's notes. These are the saved candidates HR can bring into a future job in step 3.
 - **Deleted:** everyone below the bar.
 - **Also kept:** the email ID list, in case the job is reopened.
 - Kept data has a keep-until date (starting guess 12 months) and can be deleted on a candidate's request.
