@@ -19,14 +19,27 @@ export function errorMiddleware(
 ) {
   const requestId = req.requestId;
 
+  // One of our own errors. The log line holds the name and the code only:
+  // both are fixed words we write, so they can never hold personal data.
   if (error instanceof AppError) {
+    const code = error.code ?? "app_error";
+    req.log.warn("request refused", {
+      errorName: error.name,
+      code,
+      status: error.statusCode,
+    });
     res.status(error.statusCode).json({
-      error: { code: error.code ?? "app_error", message: error.message, requestId },
+      error: { code, message: error.message, requestId },
     });
     return;
   }
 
   if (error instanceof ZodError) {
+    req.log.warn("request refused", {
+      errorName: error.name,
+      code: "validation_error",
+      status: 400,
+    });
     res.status(400).json({
       error: {
         code: "validation_error",
@@ -41,6 +54,7 @@ export function errorMiddleware(
   // Anything else is a bug or an outside failure. The details go to the logs
   // only; the caller gets a plain message.
   req.log.error("request failed", {
+    errorName: error instanceof Error ? error.name : "unknown",
     error: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : undefined,
   });
