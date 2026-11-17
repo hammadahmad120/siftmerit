@@ -1,10 +1,14 @@
+import { createLogger } from "@siftmerit/core";
 import { createApp } from "./app.js";
 import { loadEnv } from "./config/env.js";
-import { createLogger } from "./lib/logger.js";
 
 function start() {
   const env = loadEnv();
-  const logger = createLogger(env);
+  const logger = createLogger({
+    service: "api",
+    level: env.LOG_LEVEL,
+    style: env.NODE_ENV === "production" ? "json" : "readable",
+  });
   const app = createApp(logger);
 
   app.listen(env.API_PORT, () => {

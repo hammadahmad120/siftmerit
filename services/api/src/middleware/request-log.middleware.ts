@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
-import type { Logger } from "../lib/logger.js";
+import type { Logger } from "@siftmerit/core";
 
 /**
  * Runs first for every request. Makes the request ID, attaches a logger that

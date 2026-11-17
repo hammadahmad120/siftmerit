@@ -1,5 +1,5 @@
 import express from "express";
-import type { Logger } from "./lib/logger.js";
+import type { Logger } from "@siftmerit/core";
 import { errorMiddleware, notFoundMiddleware } from "./middleware/error.middleware.js";
 import { createRequestLogMiddleware } from "./middleware/request-log.middleware.js";
 import { healthRoutes } from "./routes/v1/health.routes.js";

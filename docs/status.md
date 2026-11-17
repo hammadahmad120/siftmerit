@@ -5,7 +5,7 @@ Last updated: 2026-11-17
 ## Now
 - **Current task:** none started. Task 3 (core package and worker) is next.
 - **Built so far:** the repo root (npm workspaces, shared TypeScript settings, `.env.example`) and the API in `services/api`. The API has one address, `/v1/health`, a settings check, a winston logger with a request ID on every line, and clean error answers. The table map is in `docs/table-map.md`.
-- **Next step:** task 3, steps 1 and 2 of the workflow (prepare, then discuss). Its open point is how `packages/core` is used in development: compiled with a watch script, or read as source. The recommended answer is in `docs/decisions.md` under "Open points for later tasks" and is not confirmed. Already decided for task 3: the logger file moves from the API into `packages/core`.
+- **Next step:** task 3, steps 1 and 2 of the workflow (prepare, then discuss). Already decided for task 3: `packages/core` is read as TypeScript source in development and compiled only in the production build (no watch script), and the logger file moves from the API into `packages/core`.
 - **Waiting on the user:** nothing blocks task 3. Hand work that can start at any time: the Google setup for the test mailbox (task 5) and collecting about 10 real CVs with permission (task 12).
 - **Not created yet:** `docs/developer-guide.md` (end of task 4, when the API, worker and web app all exist) and a permission list in `.claude/settings.json` (after task 4, once the commands exist).
 - **Type check:** `npm run typecheck` passes.

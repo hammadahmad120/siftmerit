@@ -1,4 +1,4 @@
-import type { Logger } from "../lib/logger.js";
+import type { Logger } from "@siftmerit/core";
 
 // Tells TypeScript about the two things the request-log middleware adds to
 // every request.
