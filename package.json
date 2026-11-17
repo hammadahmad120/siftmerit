@@ -1,0 +1,15 @@
+{
+  "name": "siftmerit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Siftmerit: AI hiring tool. One repo with several parts (API, worker, web app, shared core).",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace @siftmerit/api",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}
