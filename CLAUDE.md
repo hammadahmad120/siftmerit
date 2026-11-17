@@ -76,10 +76,11 @@ docs/                  See "Docs" below
 Main flow: browser -> API (short requests and the chat agent) -> BullMQ queue on Redis -> worker -> mailsift (MCP over HTTP) -> Gmail. The API and the worker both use Supabase (Postgres and sign-in), Redis and the AI model.
 
 ## Commands
-Run from the repo root. More are added in tasks 3 and 4.
+Run from the repo root. More are added in task 4.
 
 - `npm install`: installs the libraries for every part.
 - `npm run dev:api`: starts the API on port 4100 and restarts it when a file changes. Health check: `http://localhost:4100/v1/health`.
+- `npm run dev:worker`: starts the worker and reruns it when a file changes. Until the queue exists (task 9) it logs one start line and waits.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
 
 Settings are listed in `.env.example`. A setting is added by the task that first uses it.
