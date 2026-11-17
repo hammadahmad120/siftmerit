@@ -11,6 +11,7 @@
   "scripts": {
     "dev:api": "npm run dev --workspace @siftmerit/api",
     "dev:worker": "npm run dev --workspace @siftmerit/worker",
+    "dev:web": "npm run dev --workspace @siftmerit/web",
     "typecheck": "npm run typecheck --workspaces --if-present"
   }
 }

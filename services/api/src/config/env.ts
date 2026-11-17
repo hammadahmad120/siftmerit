@@ -5,6 +5,9 @@ import { z } from "zod";
 // settings are listed here. A setting is added by the task that first uses it.
 const envSchema = sharedEnvSchema.extend({
   API_PORT: z.coerce.number().int().positive().default(4100),
+  // The one web address whose pages the browser lets read the API's answers.
+  // It must match the web app's address exactly: scheme, host and port.
+  CORS_ORIGIN: z.url().default("http://localhost:3100"),
 });
 
 export type Env = z.infer<typeof envSchema>;

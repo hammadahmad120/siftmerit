@@ -9,7 +9,7 @@ function start() {
     level: env.LOG_LEVEL,
     style: env.NODE_ENV === "production" ? "json" : "readable",
   });
-  const app = createApp(logger);
+  const app = createApp(env, logger);
 
   app.listen(env.API_PORT, () => {
     logger.info(`API listening on http://localhost:${env.API_PORT}`);
