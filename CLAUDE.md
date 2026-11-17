@@ -54,7 +54,7 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - What HR sees (status, progress, skip reasons) is saved in Postgres, never read from Redis. A work item is queued after its Postgres row is saved.
 - Agent tools are thin wrappers around workflow actions that a screen button also calls. Actions that cost AI money or delete data need HR's confirm click.
 - No LangChain or LangGraph, no component library, no embeddings or vector search.
-- Structured logs carry a request ID or a work item ID.
+- Structured logs carry a request ID or a work item ID. Log lines hold IDs only, never CV text, email content, names, contact details or secret keys. The app prints its logs and never writes log files.
 - Tests and evals cover the major items only. Tests: the scorer, masking, the proof-line check and company separation. Evals: the requirements draft, the CV check and fact sheet, the ticks, hidden instructions in a CV, and the top five. Everything else is checked by hand. Tests that come with copied code are kept.
 - Database changes are SQL files in supabase/migrations/, forward only, applied only after an explicit go-ahead for that change.
 - Code is copied from InstantBot as listed in docs/tech-plan.md section 6. The InstantBot and mailsift repos are read-only unless the user says otherwise.
@@ -76,7 +76,13 @@ docs/                  See "Docs" below
 Main flow: browser -> API (short requests and the chat agent) -> BullMQ queue on Redis -> worker -> mailsift (MCP over HTTP) -> Gmail. The API and the worker both use Supabase (Postgres and sign-in), Redis and the AI model.
 
 ## Commands
-Added in tasks 2 to 4.
+Run from the repo root. More are added in tasks 3 and 4.
+
+- `npm install`: installs the libraries for every part.
+- `npm run dev:api`: starts the API on port 4100 and restarts it when a file changes. Health check: `http://localhost:4100/v1/health`.
+- `npm run typecheck`: checks every part that has a `typecheck` script.
+
+Settings are listed in `.env.example`. A setting is added by the task that first uses it.
 
 ## Docs
 - docs/product-flow.md: what the product does. Read the steps a task names.
