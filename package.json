@@ -12,6 +12,8 @@
     "dev:api": "npm run dev --workspace @siftmerit/api",
     "dev:worker": "npm run dev --workspace @siftmerit/worker",
     "dev:web": "npm run dev --workspace @siftmerit/web",
+    "mailbox:connect": "npm run mailbox:connect --workspace @siftmerit/worker",
+    "mailbox:check": "npm run mailbox:check --workspace @siftmerit/worker",
     "typecheck": "npm run typecheck --workspaces --if-present"
   }
 }

@@ -84,6 +84,8 @@ Run from the repo root.
 - `npm run dev:worker`: starts the worker and reruns it when a file changes. Until the queue exists (task 9) it logs one start line and waits.
 - `npm run dev:web`: starts the web app on `http://localhost:3100` and reloads it when a file changes.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
+- `npm run mailbox:connect`: development only. Gets the test mailbox's secret with one Allow click and prints the line to paste into `.env`. Needed again when the secret ends (after 7 days while the Google project is in "Testing").
+- `npm run mailbox:check`: development only. Lists five emails from the test mailbox through mailsift. mailsift must be running first, in its own terminal, from its own folder: `npm run dev:env -- --http` (port 3000).
 
 Settings are listed in `.env.example`. A setting is added by the task that first uses it.
 

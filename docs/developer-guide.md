@@ -15,7 +15,7 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 |---|---|---|---|
 | Web app | `apps/web` | `@siftmerit/web` | One page that shows whether the API can be reached. |
 | API | `services/api` | `@siftmerit/api` | One address, `/v1/health`. |
-| Worker | `services/worker` | `@siftmerit/worker` | Starts, logs one line and finishes. There is no queue yet. |
+| Worker | `services/worker` | `@siftmerit/worker` | Starts, logs one line and finishes. There is no queue yet. It also holds the two mailbox scripts (section 7). |
 | Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger and the settings loader. |
 
 How they talk today:
@@ -26,7 +26,7 @@ Browser  --->  API (Express, port 4100)         the page's own calls
 API, Worker  --->  Core                         imported as a package
 ```
 
-The database, the queue, the mailbox and the AI model are not connected yet.
+The database, the queue and the AI model are not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet.
 
 ## 2. Running it
 
@@ -38,13 +38,15 @@ Run from the repo root, each in its own terminal.
 | `npm run dev:worker` | The worker. It logs one start line and then waits for file changes. |
 | `npm run dev:web` | The web app on `http://localhost:3100`. |
 | `npm run typecheck` | The type check for all four parts. It must pass after every task. |
+| `npm run mailbox:connect` | Development only. Gets the test mailbox's secret with one Allow click (section 7). |
+| `npm run mailbox:check` | Development only. Lists five emails from the test mailbox through mailsift (section 7). |
 
 All three `dev` commands restart their part when a file changes.
 
 ### Settings
 
 - There is one `.env` file, at the repo root, for every part. `.env.example` lists every setting.
-- Every setting has a default, so everything starts without a `.env` file.
+- Every setting the API, the worker and the web app use has a default, so all three start without a `.env` file. The mailbox settings have none and are needed only by the two mailbox scripts.
 - A setting already present in the shell wins over the file. For example, `LOG_LEVEL=debug npm run dev:api`.
 - A setting is added by the task that first uses it.
 
@@ -55,6 +57,10 @@ All three `dev` commands restart their part when a file changes.
 | `API_PORT` | API | `4100` |
 | `CORS_ORIGIN` | API | `http://localhost:3100` |
 | `NEXT_PUBLIC_API_URL` | Web app | `http://localhost:4100` |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Mailbox scripts | none |
+| `DEV_MAILBOX_REFRESH_TOKEN` | `mailbox:check` | none |
+| `MAILSIFT_URL` | `mailbox:check` | `http://127.0.0.1:3000/mcp` |
+| `MAILSIFT_SERVER_KEY` | `mailbox:check` | none |
 
 A bad setting stops the part at start with a message that names it, for example `API settings check failed. Fix these in the repo-root .env file or your shell: API_PORT (...)`.
 
@@ -127,6 +133,8 @@ Today the worker loads its settings, builds the logger with `service: "worker"`,
 
 Task 9 adds the BullMQ queue listener. That keeps the process running and brings the logger that carries a work item ID.
 
+The folder `src/scripts/` holds the two mailbox scripts. They are tools a developer runs by hand, not part of the running worker, and they have their own settings file so the worker starts without any mailbox setting. See section 7.
+
 ## 6. Web app (`apps/web`)
 
 A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` folder. It was created with the `create-next-app` generator (empty template) and then trimmed.
@@ -163,3 +171,68 @@ Every screen calls the API through `apiFetch(path, accessToken?, init?)`. It put
 - **Its TypeScript settings are Next's own.** `apps/web/tsconfig.json` does not extend the shared `tsconfig.base.json`, which is set up for Node.
 - **No lint tool yet.** ESLint with the Next.js rules is added in task 7.
 - **No look yet.** Fonts, brand colours and dark mode are decided with the dashboard shell in task 8.
+
+## 7. Mailbox (Gmail through mailsift)
+
+Nothing in the product reads mail yet. What exists is the setup and two scripts that prove the chain works. The real client is task 20, and storing a company's mailbox secret is task 21.
+
+### The chain
+
+```
+our code  --->  Google            swaps the mailbox secret for a one-hour pass
+our code  --->  mailsift (HTTP)   one request per question, with two keys
+mailsift  --->  Gmail             read only
+```
+
+- **mailsift** is a separate small server in its own repo (`/home/hammadahmad/Documents/mail-sift/mailsift`). It reads Gmail and returns clean data. It stores nothing and can only read.
+- **The mailbox secret** (Google calls it a refresh token) is the long-lived key to one mailbox. mailsift never sees it.
+- **The pass** (Google calls it an access token) is made from the secret, lasts one hour, and is what mailsift gets.
+- A request to mailsift carries two keys: `Authorization: Bearer <server key>` ("we may use this mailsift") and `X-Mail-Token: <pass>` ("this mailbox").
+- mailsift keeps no session. One `POST /mcp` with a `tools/call` message stands alone, and the data comes back as JSON inside a text field. A refusal comes back the same way, as `{ code, message, hint }` with `isError: true`.
+
+### The Google project
+
+Google lets a program read a mailbox only when the program is registered. The registration is a Google Cloud project, made by hand in the Google Cloud console. One project serves every mailbox.
+
+| Setting in the console | Value now | Why |
+|---|---|---|
+| Gmail API | switched on | |
+| User type | External | The mailboxes are outside any organisation of ours. |
+| Publishing status | Testing | "In production" needs a home page and a privacy policy on a domain we own. |
+| Test users | the test mailbox | In "Testing" only listed addresses can click Allow. |
+| Permission | `gmail.readonly` only | mailsift refuses a pass that allows more than reading. |
+| Client | type "Desktop app", AI agent box empty | The connect script runs on our own machine. |
+
+The client ID and client secret identify the app, not a mailbox. Google shows the client secret only once, when the client is created.
+
+### The two scripts
+
+Both are in `services/worker/src/scripts/` and are for the development machine only.
+
+**`npm run mailbox:connect`** gets the mailbox secret.
+
+1. It starts a tiny listener on `127.0.0.1`, on a free port.
+2. It prints a Google link. Open it, sign in as the test mailbox and click Allow.
+3. Google sends the browser back to the listener with a one-time code.
+4. The script swaps the code at Google for the mailbox secret and prints one line, `DEV_MAILBOX_REFRESH_TOKEN=...`, to paste into the root `.env`.
+
+**`npm run mailbox:check`** proves the chain. mailsift must be running first, in its own terminal, from its own folder:
+
+```
+npm run dev:env -- --http
+```
+
+The script makes a pass, asks mailsift which mailbox it is, and prints the date, sender and subject of the five newest emails.
+
+Both scripts use plain prints, not the logger. A secret or an email subject must never go through the logger.
+
+### Traps
+
+- **The mailbox secret ends after 7 days** while the Google project is in "Testing". The check then says the secret has ended; run `npm run mailbox:connect` again and replace the line in `.env`.
+- **A password change on the mailbox also ends the secret.** So does removing the app's access in the Google account.
+- **mailsift uses port 3000,** the port a new Next.js project picks by default. If another program holds it, mailsift stops at once with a clear error.
+- **mailsift is run from source,** not from its `dist` folder, which can be older than its code.
+- **Use `127.0.0.1`, not `localhost`, for mailsift.** It listens on `127.0.0.1` only.
+- **mailsift refuses a search with no filter** and allows a date range of at most 365 days.
+- **After a failed script, npm prints several lines starting with `npm error`.** The script's own message is the line above them.
+- **"In production" is not tried yet.** Google's pages do not agree on whether an unreviewed app may read mail there. See the open points in [decisions.md](decisions.md).

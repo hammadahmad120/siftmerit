@@ -7,10 +7,13 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "mailbox:connect": "tsx src/scripts/mailbox-connect.ts",
+    "mailbox:check": "tsx src/scripts/mailbox-check.ts"
   },
   "dependencies": {
-    "@siftmerit/core": "*"
+    "@siftmerit/core": "*",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^24",
