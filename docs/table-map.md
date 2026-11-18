@@ -1,6 +1,6 @@
 # Table map
 
-The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1).
+The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist.
 
 This is a map, not the SQL. Each table's SQL is written in the task that first needs it. The columns below are a first sketch; the exact columns are settled in that task. This doc is updated whenever a table is added or its links change.
 
@@ -23,7 +23,7 @@ tenants                      the company (Acme)
       └── ai_calls           the cost of each AI call
 ```
 
-Every table has `tenant_id`, the company it belongs to.
+Every table that holds company data has `tenant_id`, the company it belongs to. The one table without it is the housekeeping table `applied_migrations` (section 8).
 
 ## 2. The two joining tables
 
@@ -50,8 +50,8 @@ job_requirements ─────────────────────
 
 | Table | Keeps | Example | Built in task |
 |---|---|---|---|
-| `tenants` | Company name, short name, settings | Acme | 6 |
-| `tenant_members` | Which user is in which company. One user belongs to one company | Sara is in Acme | 6 |
+| `tenants` | Company name and short name (`slug`: lower case with dashes, allowed only once). A `settings` column is added when something first uses it, probably the limits in task 39 | Acme Trading, `acme-trading` | 6 (exists) |
+| `tenant_members` | Which sign-in account is in which company, and its role: `owner` or `member`. One user belongs to one company. Nothing is restricted by the role yet | Sara is in Acme, owner | 6 (exists) |
 | `mailbox_connections` | Mailbox address, the secret (encrypted), status, last error | hr@acme.com, connected | 21 |
 | `jobs` | Job description, subject words, posting date, strict or lenient, status, when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, strict, open | 11 |
 | `job_requirements` | Which job, the requirement text, must or nice to have, its place in the list | "3 years experience", must | 14 |
@@ -116,3 +116,21 @@ The email list is kept per job. An email that matches two open jobs is read once
 | 46 | How HR is told about a new strong candidate |
 | 48 | Whether closing a job wipes subject and sender from `job_emails` and keeps only the ID |
 | 49 | Whether candidates can be brought from a job that is still open, and whether ticks can be reused for unchanged requirements |
+
+## 8. Housekeeping: `applied_migrations`
+
+A 13th table that is not part of the product's data. It lists every SQL file that was applied: its name and the time. Built in task 6.
+
+- Every SQL file starts by adding its own name. A name is allowed only once, so a file run a second time stops at that line and changes nothing.
+- It has no `tenant_id`, because it holds file names only.
+- Nobody reaches it through the API, not even the server key. Only Supabase's SQL editor touches it.
+
+## 9. Who may reach the tables
+
+The same three lines go into the SQL file of every table:
+
+1. Row level security is switched on.
+2. The browser-side roles (`anon` and `authenticated`) get no rights and no policies.
+3. The server role (`service_role`, used by the secret key) gets its rights written out.
+
+So only our API and worker reach the data. They hold the secret key, which goes past the row rules, and that is why every repository function filters by `tenant_id` itself. Deleting a company row removes everything the company owns; deleting a sign-in account removes its member row, never the company.

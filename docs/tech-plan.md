@@ -98,7 +98,7 @@ Copied code counts toward a task's size and is explained as if the user has neve
 |---|---|
 | Sign-in form, sign-out, page protection | `apps/web-app/src/components/auth-form.tsx`, `sign-out-button.tsx`, `apps/web-app/src/proxy.ts`, `apps/web-app/src/lib/supabase/*` |
 | API sign-in check and company lookup | `services/platform-api/src/middleware/auth.middleware.ts`, `services/auth.service.ts`, `repositories/tenant*.repository.ts` |
-| Company tables and row rules | The tenancy part only of `supabase/migrations/20260611000000_platform_foundation.sql` (`tenants`, `tenant_members`, `current_tenant_ids()`, `set_updated_at()`) |
+| Company tables | The tenancy part only of `supabase/migrations/20260611000000_platform_foundation.sql` (`tenants`, `tenant_members`, `set_updated_at()`). Its row policies and `current_tenant_ids()` are not copied: our row rules let nobody but the server in (decided in task 6) |
 | Secret encryption | `packages/platform-core/src/channels/credentials-crypto.ts` |
 | API skeleton | `services/platform-api/src/app.ts`, `index.ts`, `config/env.ts`, `lib/errors.ts`, `lib/supabase.ts`, `middleware/error.middleware.ts`, `lib/rate-limiter.ts` |
 | Retry helper | `packages/platform-core/src/lib/retry.ts` |
@@ -181,7 +181,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 | 3 | Core package and worker | Build | 2 | The worker starts and logs a line using a core function | How `packages/core` is consumed in development: compiled to `dist` with a watch script, or read as source |
 | 4 | Web app, and CORS in the API | Build | 2 | A page shows the API's health | Web port |
 | 5 | Mailbox check: Google setup, mailsift over HTTP | Decision | none | A script lists five emails from the test mailbox | Google setup, the 7-day expiry risk on personal Gmail, where mailsift runs, its port |
-| 6 | Supabase project, company tables, API sign-in check, separation test | Build | 1, 2 | A signed-in call returns the user's company and the test passes | How we create companies and users, how migrations are applied to the new project |
+| 6 | Supabase project, company tables, the script that creates companies and users, API sign-in check | Build | 1, 2 | One command creates a company with its owner, and a signed-in call returns the user's company | How we create companies and users, how migrations are applied to the new project |
 | 7 | Web sign-in, sign-out, page protection. Also adds ESLint with the Next.js rules to the web app, and replaces the health page at `/` | Build | 4, 6 | A user signs in, and a signed-out visitor is sent to the sign-in page | Where a signed-in user lands. Whether the copied sign-in code needs changes for `cacheComponents` and `partialPrefetching` |
 | 8 | Dashboard shell: menu and company name | Build | 7 | Two HR users of one company see their company, and a user of another company sees nothing of the first | Menu items |
 | 9 | Redis and BullMQ basics: Redis installed, a demo work item queued by the API and run by the worker | Build | 3 | The demo item is shown as done | Redis version (check the BullMQ docs), queue names, how the demo result is shown, whether to add a BullMQ dashboard |
@@ -191,7 +191,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 | # | Task | Kind | Needs | How to check | Decide then |
 |---|---|---|---|---|---|
-| 11 | Create a job (step 1): form, list, job page | Build | 8 | A new job with a description, subject words and a posting date appears in the list and opens | Job statuses |
+| 11 | Create a job (step 1): form, list, job page. Also the company separation test, moved here from task 6 | Build | 8 | A new job with a description, subject words and a posting date appears in the list and opens, and the separation test passes | Job statuses. A helper that always adds the company filter. How the separation test stays safe beside real data |
 | 12 | Test set: job descriptions, fact cards, CVs, junk files | Design | none | A folder of files with an answer sheet, and the emails sent to the test mailbox | Which jobs, where the files live (real CVs stay out of git), the form of the answer sheet |
 | 13 | AI wrapper: forced form, code check, cost log | Build | 3, 6 | A test call shows in the cost log | Starting model, the "no training on our data" provider rule, cost log columns. Check the current AI SDK docs first |
 | 14 | AI drafts requirements (step 2, first half) | Build | 11, 13 | The job page shows requirements, each marked must or nice to have | Inline call or work item |
@@ -284,7 +284,7 @@ Checked in the mailsift code on 2026-11-12 (`/home/hammadahmad/Documents/mail-si
 - `docs/status.md` is updated in the wrap-up.
 
 **Tests and evals**
-- Tests are written inside the task that builds the piece (tasks 6, 28, 33, 35).
+- Tests are written inside the task that builds the piece (tasks 28, 33, 35). The company separation test is written in task 11, with the first table that holds company data.
 - The eval runner is built in task 15. Later evals are tasks 31, 34 and 38.
 
 **Company separation (from task 8 on)**

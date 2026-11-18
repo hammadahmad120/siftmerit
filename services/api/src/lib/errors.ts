@@ -23,6 +23,14 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+/** The caller is signed in, but may not do this. */
+export class ForbiddenError extends AppError {
+  constructor(message = "Forbidden", code?: string) {
+    super(403, message, code ?? "forbidden");
+    this.name = "ForbiddenError";
+  }
+}
+
 export class ValidationError extends AppError {
   constructor(message: string) {
     super(400, message, "validation_error");

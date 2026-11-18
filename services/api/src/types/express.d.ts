@@ -1,7 +1,7 @@
 import type { Logger } from "@siftmerit/core";
+import type { TenantRole } from "../repositories/tenant-member.repository.js";
 
-// Tells TypeScript about the two things the request-log middleware adds to
-// every request.
+// Tells TypeScript what our middleware adds to a request.
 declare global {
   namespace Express {
     interface Request {
@@ -9,6 +9,12 @@ declare global {
       requestId: string;
       /** Logger that adds `requestId` to every line it prints. */
       log: Logger;
+      /** The signed-in user's ID. Set by the sign-in check. */
+      userId?: string;
+      /** The user's company. Set from `tenant_members`, never from the request. */
+      tenantId?: string;
+      /** The user's role in that company. Nothing is restricted by it yet. */
+      tenantRole?: TenantRole;
     }
   }
 }

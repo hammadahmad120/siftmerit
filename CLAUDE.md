@@ -46,7 +46,7 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 
 ## Rules for all code
 - "Job" means a hiring job. Background work is a "work item" in a BullMQ queue on Redis (BullMQ's own word for it is "job"; ours is not). Code says `tenant` and `tenant_id`; screens say "company".
-- Every table has `tenant_id`, taken from the signed-in user, never from the request. Every repository function filters by it. Database row rules are a second lock.
+- Every table that holds company data has `tenant_id`, taken from the signed-in user, never from the request. Every repository function filters by it: the API and the worker use Supabase's secret key, which goes past the database's row rules, so our code is what keeps companies apart. The row rules keep everyone else out: every table has row level security on, no rights for the browser-side roles, and written-out rights for the server role. The one table without `tenant_id` is `applied_migrations`.
 - The browser talks only to the API, never to the database.
 - A secret never gets the `NEXT_PUBLIC_` prefix. Settings with that prefix are handed to the browser, where anyone can read them.
 - Every AI call goes through the one wrapper in packages/core: the result is checked by code before saving, tokens and cost are logged, CV text is masked first, and CV and email text is wrapped as data with an instruction to ignore commands inside it.
@@ -57,7 +57,7 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - No LangChain or LangGraph, no component library, no embeddings or vector search.
 - Structured logs carry a request ID or a work item ID. Log lines hold IDs only, never CV text, email content, names, contact details or secret keys. The app prints its logs and never writes log files.
 - Tests and evals cover the major items only. Tests: the scorer, masking, the proof-line check and company separation. Evals: the requirements draft, the CV check and fact sheet, the ticks, hidden instructions in a CV, and the top five. Everything else is checked by hand. Tests that come with copied code are kept.
-- Database changes are SQL files in supabase/migrations/, forward only, applied only after an explicit go-ahead for that change.
+- Database changes are SQL files in supabase/migrations/, forward only, applied only after an explicit go-ahead for that change. The user pastes the file into Supabase's SQL editor. Every file is wrapped in `begin` and `commit` and starts by adding its own name to `applied_migrations`, so it applies completely or not at all and never twice.
 - Code is copied from InstantBot as listed in docs/tech-plan.md section 6. The InstantBot and mailsift repos are read-only unless the user says otherwise.
 
 ## Structure
@@ -84,6 +84,8 @@ Run from the repo root.
 - `npm run dev:worker`: starts the worker and reruns it when a file changes. Until the queue exists (task 9) it logs one start line and waits.
 - `npm run dev:web`: starts the web app on `http://localhost:3100` and reloads it when a file changes.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
+- `npm run company:create -- --company "<name>" --email <email>`: creates a company and its first user, the owner. `--test` marks a test company, `--password` sets the password by hand, `--slug` sets the short name by hand.
+- `npm run company:add-user -- --company <short name> --email <email>`: adds a user to a company as a member.
 - `npm run mailbox:connect`: development only. Gets the test mailbox's secret with one Allow click and prints the line to paste into `.env`. Needed again when the secret ends (after 7 days while the Google project is in "Testing").
 - `npm run mailbox:check`: development only. Lists five emails from the test mailbox through mailsift. mailsift must be running first, in its own terminal, from its own folder: `npm run dev:env -- --http` (port 3000).
 

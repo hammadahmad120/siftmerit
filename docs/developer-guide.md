@@ -14,7 +14,7 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
 | Web app | `apps/web` | `@siftmerit/web` | One page that shows whether the API can be reached. |
-| API | `services/api` | `@siftmerit/api` | One address, `/v1/health`. |
+| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Two addresses: `/v1/health` and `/v1/me`. Also holds the script that creates companies and users. |
 | Worker | `services/worker` | `@siftmerit/worker` | Starts, logs one line and finishes. There is no queue yet. It also holds the two mailbox scripts (section 7). |
 | Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger and the settings loader. |
 
@@ -24,9 +24,10 @@ How they talk today:
 Browser  --->  Web app (Next.js, port 3100)     sends the page
 Browser  --->  API (Express, port 4100)         the page's own calls
 API, Worker  --->  Core                         imported as a package
+API  --->  Supabase                             the database and the sign-in check
 ```
 
-The database, the queue and the AI model are not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet.
+The queue and the AI model are not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The web app has no sign-in yet (task 7), so `/v1/me` is called by hand or by a script for now.
 
 ## 2. Running it
 
@@ -38,6 +39,8 @@ Run from the repo root, each in its own terminal.
 | `npm run dev:worker` | The worker. It logs one start line and then waits for file changes. |
 | `npm run dev:web` | The web app on `http://localhost:3100`. |
 | `npm run typecheck` | The type check for all four parts. It must pass after every task. |
+| `npm run company:create` | Creates a company and its first user (section 8). |
+| `npm run company:add-user` | Adds a user to a company (section 8). |
 | `npm run mailbox:connect` | Development only. Gets the test mailbox's secret with one Allow click (section 7). |
 | `npm run mailbox:check` | Development only. Lists five emails from the test mailbox through mailsift (section 7). |
 
@@ -46,7 +49,7 @@ All three `dev` commands restart their part when a file changes.
 ### Settings
 
 - There is one `.env` file, at the repo root, for every part. `.env.example` lists every setting.
-- Every setting the API, the worker and the web app use has a default, so all three start without a `.env` file. The mailbox settings have none and are needed only by the two mailbox scripts.
+- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The mailbox settings have none either and are needed only by the two mailbox scripts. The worker and the web app still start without a `.env` file.
 - A setting already present in the shell wins over the file. For example, `LOG_LEVEL=debug npm run dev:api`.
 - A setting is added by the task that first uses it.
 
@@ -57,6 +60,7 @@ All three `dev` commands restart their part when a file changes.
 | `API_PORT` | API | `4100` |
 | `CORS_ORIGIN` | API | `http://localhost:3100` |
 | `NEXT_PUBLIC_API_URL` | Web app | `http://localhost:4100` |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` | API, company scripts | none |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Mailbox scripts | none |
 | `DEV_MAILBOX_REFRESH_TOKEN` | `mailbox:check` | none |
 | `MAILSIFT_URL` | `mailbox:check` | `http://127.0.0.1:3000/mcp` |
@@ -84,7 +88,7 @@ Core is a workspace package: a folder in the repo that the API and the worker im
 
 ## 4. API (`services/api`)
 
-The layout is routes -> controllers -> services -> repositories. Only routes and controllers exist so far.
+The layout is routes -> controllers -> services -> repositories. A route names the address and the steps in front of it, a controller reads the request and writes the answer, a service holds the rules, and a repository is the only code that talks to a table. `src/app.ts` builds these pieces once at start and wires them together.
 
 ### The path of a request
 
@@ -92,7 +96,7 @@ The layout is routes -> controllers -> services -> repositories. Only routes and
 
 1. **Request log.** Makes a request ID, attaches a logger that carries it (`req.log`), sends the ID back as the `x-request-id` header, and prints one "request finished" line when the answer has been sent.
 2. **CORS.** Tells browsers which web address may read the API's answers. See below.
-3. **Routes.** Everything is under `/v1`.
+3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below).
 4. **Not found.** An unknown address becomes a normal "not found" error.
 5. **Error step.** Turns any error into a clean JSON answer.
 
@@ -107,7 +111,26 @@ Every error answer has the same shape, so the web app handles them all the same 
 - **One of our own errors** (the classes in `src/lib/errors.ts`): the log gets a "request refused" line with the error name, code and status, never the message. The caller gets the code, the message and the request ID.
 - **An unexpected error:** the log gets a "request failed" line with the name, message and trace. The caller gets only "Internal server error" and the request ID.
 
+- **A failed database call** (`DatabaseError`): the log gets a "request failed" line with the table and action in fixed words we write, such as "tenant_members find by user", and the database's error code. The database's own wording can repeat the data that caused the error, so it is added in development only (`NODE_ENV=development`). The caller gets only "Internal server error" and the request ID.
+
 A reported error is found in the logs by its request ID.
+
+### Sign-in check
+
+Two steps in `src/middleware/auth.middleware.ts` run in front of every address that needs a signed-in user:
+
+1. **Who is calling?** The token is read from the `Authorization: Bearer ...` header and checked by `AuthService`. Supabase signs each token with a private key; the library fetches the matching public key once, keeps it, and checks the signature and expiry inside the API, with no call to Supabase per request. Missing or not valid: 401, code `unauthorized`.
+2. **Which company?** The user's row in `tenant_members` is looked up. This is the only place a request gets its company from: never from the address, the body or a header. No row: 403, code `no_company`.
+
+After step 2 the request carries `req.userId`, `req.tenantId` and `req.tenantRole`, and every log line of that request also carries the user ID and the company ID.
+
+`GET /v1/me` answers with `{ "user": { "id", "role" }, "tenant": { "id", "name", "slug" } }`.
+
+**Traps**
+
+- **A token of a removed user still passes step 1 until it runs out.** Step 2 is what refuses it, because removing the account removes the `tenant_members` row. So step 2 must never be skipped or cached carelessly.
+- **If the public key cannot be fetched, the answer is 500, not 401.** A 401 would tell the web app "sign in again" when the fault is on our side.
+- **Nothing is restricted by the role yet.** `owner` and `member` can do the same things until a task adds a check.
 
 ### CORS
 
@@ -236,3 +259,55 @@ Both scripts use plain prints, not the logger. A secret or an email subject must
 - **mailsift refuses a search with no filter** and allows a date range of at most 365 days.
 - **After a failed script, npm prints several lines starting with `npm error`.** The script's own message is the line above them.
 - **"In production" is not tried yet.** Google's pages do not agree on whether an unreviewed app may read mail there. See the open points in [decisions.md](decisions.md).
+
+## 8. Database and companies (Supabase)
+
+One hosted Supabase project holds the Postgres database and the sign-in service. Its region is Singapore.
+
+### The two keys
+
+| | Publishable key | Secret key |
+|---|---|---|
+| Who has it | Any browser, once sign-in is built | Only the API, the worker and our scripts |
+| What it is | The project's public name | The master key |
+| What it reaches | Only what the row rules allow, which for our tables is nothing | Everything. It goes past the row rules |
+
+The API makes one client with each (`src/lib/supabase.ts`): the secret one for all data, the publishable one only for checking tokens.
+
+### Who keeps companies apart
+
+- **Our code.** The secret key can read every company's rows, and the database does not know which user a request is for. So every repository function filters by `tenant_id`, and that ID always comes from the sign-in check. One forgotten filter would show a user another company's rows.
+- **The row rules keep everyone else out.** Supabase gives the database its own web address, which our API uses too. Every table has row level security switched on, no rights and no policies for the browser-side roles, and written-out rights for the server role. Someone who asks that address directly with only the publishable key and a user's token gets nothing.
+
+A helper that always adds the company filter, and the automatic separation test, are planned for task 11, when the first table with company data arrives.
+
+### SQL files
+
+- A database change is one file in `supabase/migrations/`, named with a date and time.
+- It is applied by pasting it into Supabase's SQL editor, after the go-ahead for that file.
+- It is wrapped in `begin` and `commit`, so it applies completely or not at all.
+- It starts by adding its own name to `applied_migrations`. A name is allowed only once, so a second run stops there and changes nothing. That table also shows which files were applied and when.
+
+### Creating companies and users
+
+There is no public sign-up; it is switched off in the Supabase project. `src/scripts/company.ts` is the only way a company or a user comes into being:
+
+```
+npm run company:create -- --company "Acme Trading" --email sara@acme.com
+npm run company:add-user -- --company acme-trading --email omar@acme.com
+```
+
+- `company:create` makes the company row, the sign-in account and the row that joins them, with the role `owner`. `company:add-user` adds a `member`.
+- The short name is made from the company name. `--slug` sets it by hand, which is needed for a name with no Latin letters.
+- `--test` makes the short name start with `test-`, so test companies are easy to find and remove.
+- Without `--password` a strong random password is made and printed once. With it, that password is used and not printed again.
+- The three things cannot be saved in one step, because the sign-in account is made by Supabase's sign-in service and not by our database. When a later step fails, the earlier ones are removed again.
+
+### Traps
+
+- **The API does not start without the three Supabase settings.** The message names the missing one.
+- **A table made by hand in Supabase's website skips our SQL files** and may get rights we did not choose. Always use a SQL file.
+- **There is no command to delete a company yet.** A test company is removed by hand: delete its users under Authentication, then its row in `tenants`.
+- **A password typed on the command line stays in the terminal's history.** Leave `--password` out for a real user.
+- **A free Supabase project is paused when it sits idle.** It is switched back on from Supabase's website.
+- **The region cannot be changed in place.** It means a new project. Pick from the "specific regions" list; a "general region" lets Supabase choose the data centre.
