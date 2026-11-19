@@ -20,7 +20,7 @@ The rules for what makes a task (size, kinds, when to split) are at the top of d
 2. **Discuss.** As two senior developers: options, trade-offs, scale, speed, cost, privacy, edge cases, likely bugs. Give a recommendation and disagree when needed. Write each decision into docs/decisions.md at the moment it is settled.
 3. **Plan.** Only when the user asks for the plan. It lists the files to add or change, tables and SQL, the flow, what is copied from InstantBot, what is left out, how to check it, and a "Decisions in this plan" list.
 4. **Review.** Update the plan as the user asks. Do not touch the codebase.
-5. **Build.** Only when the user says to start. `npm run typecheck` must pass. Anything outside the plan: stop and ask.
+5. **Build.** Only when the user says to start. `npm run typecheck` and `npm run lint` must pass. Anything outside the plan: stop and ask.
 6. **Explain.** In simple words: what was built, the files added or changed and the job of each, the path of one real request step by step, why it was done this way, the small choices made without asking, any new idea (tool calling, MCP, agents) explained plainly, and the exact steps for the user to validate it.
 7. **Validate.** The user runs the steps. Fix and repeat until the user confirms it works.
 8. **Wrap up.** Only after the user confirms. See the checklist below.
@@ -41,13 +41,13 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - docs/table-map.md: update it when a table is added or its links change.
 - CLAUDE.md: change it only if a rule for all code, a command or the structure changed.
 - docs/tech-plan.md and docs/product-flow.md: change them only if the plan or the product behaviour itself changed, and add a line to docs/decisions.md saying why.
-- Run `npm run typecheck` and say plainly if it fails.
+- Run `npm run typecheck` and `npm run lint`, and say plainly if either fails.
 - Report what changed in each file and what is uncommitted. Commit only when asked.
 
 ## Rules for all code
 - "Job" means a hiring job. Background work is a "work item" in a BullMQ queue on Redis (BullMQ's own word for it is "job"; ours is not). Code says `tenant` and `tenant_id`; screens say "company".
 - Every table that holds company data has `tenant_id`, taken from the signed-in user, never from the request. Every repository function filters by it: the API and the worker use Supabase's secret key, which goes past the database's row rules, so our code is what keeps companies apart. The row rules keep everyone else out: every table has row level security on, no rights for the browser-side roles, and written-out rights for the server role. The one table without `tenant_id` is `applied_migrations`.
-- The browser talks only to the API, never to the database.
+- The browser talks only to the API, never to the database. The one exception is sign-in: the browser signs in and out with Supabase's sign-in service directly, and sends the token it gets to the API with every call.
 - A secret never gets the `NEXT_PUBLIC_` prefix. Settings with that prefix are handed to the browser, where anyone can read them.
 - Every AI call goes through the one wrapper in packages/core: the result is checked by code before saving, tokens and cost are logged, CV text is masked first, and CV and email text is wrapped as data with an instruction to ignore commands inside it.
 - Mail is found and picked by code, never by AI. Mail access is read-only and goes through mailsift.
@@ -84,6 +84,7 @@ Run from the repo root.
 - `npm run dev:worker`: starts the worker and reruns it when a file changes. Until the queue exists (task 9) it logs one start line and waits.
 - `npm run dev:web`: starts the web app on `http://localhost:3100` and reloads it when a file changes.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
+- `npm run lint`: checks the web app's code with ESLint and the Next.js rules. A warning fails it. When a rule flags something that is fine, the line gets a short comment saying why, or that one rule is switched off after asking the user.
 - `npm run company:create -- --company "<name>" --email <email>`: creates a company and its first user, the owner. `--test` marks a test company, `--password` sets the password by hand, `--slug` sets the short name by hand.
 - `npm run company:add-user -- --company <short name> --email <email>`: adds a user to a company as a member.
 - `npm run mailbox:connect`: development only. Gets the test mailbox's secret with one Allow click and prints the line to paste into `.env`. Needed again when the secret ends (after 7 days while the Google project is in "Testing").

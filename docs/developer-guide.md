@@ -13,7 +13,7 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
-| Web app | `apps/web` | `@siftmerit/web` | One page that shows whether the API can be reached. |
+| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a home page at `/` that shows the signed-in user's company, and a placeholder page at `/jobs`. |
 | API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Two addresses: `/v1/health` and `/v1/me`. Also holds the script that creates companies and users. |
 | Worker | `services/worker` | `@siftmerit/worker` | Starts, logs one line and finishes. There is no queue yet. It also holds the two mailbox scripts (section 7). |
 | Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger and the settings loader. |
@@ -22,12 +22,13 @@ How they talk today:
 
 ```
 Browser  --->  Web app (Next.js, port 3100)     sends the page
-Browser  --->  API (Express, port 4100)         the page's own calls
+Browser  --->  Supabase                         sign-in and sign-out only
+Browser  --->  API (Express, port 4100)         the page's own calls, with the token
 API, Worker  --->  Core                         imported as a package
 API  --->  Supabase                             the database and the sign-in check
 ```
 
-The queue and the AI model are not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The web app has no sign-in yet (task 7), so `/v1/me` is called by hand or by a script for now.
+The queue and the AI model are not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The browser never reads the database: Supabase gives it a sign-in token, and every piece of data comes from the API.
 
 ## 2. Running it
 
@@ -39,6 +40,7 @@ Run from the repo root, each in its own terminal.
 | `npm run dev:worker` | The worker. It logs one start line and then waits for file changes. |
 | `npm run dev:web` | The web app on `http://localhost:3100`. |
 | `npm run typecheck` | The type check for all four parts. It must pass after every task. |
+| `npm run lint` | ESLint for the web app, with the Next.js rules. A warning fails it. It must pass after every task. |
 | `npm run company:create` | Creates a company and its first user (section 8). |
 | `npm run company:add-user` | Adds a user to a company (section 8). |
 | `npm run mailbox:connect` | Development only. Gets the test mailbox's secret with one Allow click (section 7). |
@@ -49,7 +51,7 @@ All three `dev` commands restart their part when a file changes.
 ### Settings
 
 - There is one `.env` file, at the repo root, for every part. `.env.example` lists every setting.
-- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The mailbox settings have none either and are needed only by the two mailbox scripts. The worker and the web app still start without a `.env` file.
+- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker still starts without a `.env` file.
 - A setting already present in the shell wins over the file. For example, `LOG_LEVEL=debug npm run dev:api`.
 - A setting is added by the task that first uses it.
 
@@ -61,6 +63,7 @@ All three `dev` commands restart their part when a file changes.
 | `CORS_ORIGIN` | API | `http://localhost:3100` |
 | `NEXT_PUBLIC_API_URL` | Web app | `http://localhost:4100` |
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` | API, company scripts | none |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Web app (sign-in) | none. The same values as `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Mailbox scripts | none |
 | `DEV_MAILBOX_REFRESH_TOKEN` | `mailbox:check` | none |
 | `MAILSIFT_URL` | `mailbox:check` | `http://127.0.0.1:3000/mcp` |
@@ -119,7 +122,7 @@ A reported error is found in the logs by its request ID.
 
 Two steps in `src/middleware/auth.middleware.ts` run in front of every address that needs a signed-in user:
 
-1. **Who is calling?** The token is read from the `Authorization: Bearer ...` header and checked by `AuthService`. Supabase signs each token with a private key; the library fetches the matching public key once, keeps it, and checks the signature and expiry inside the API, with no call to Supabase per request. Missing or not valid: 401, code `unauthorized`.
+1. **Who is calling?** The token is read from the `Authorization: Bearer ...` header and checked by `AuthService`. Supabase signs each token with a private key; the library fetches the matching public key once, keeps it, and checks the signature and expiry inside the API, with no call to Supabase per request. Missing or not valid: 401, code `unauthorized`. Before the library sees it, the token's shape is checked (three parts joined by dots, the first two being JSON objects), because the library throws on text it cannot read at all, such as `abc.def.ghi`, and a thrown error would be answered as 500.
 2. **Which company?** The user's row in `tenant_members` is looked up. This is the only place a request gets its company from: never from the address, the body or a header. No row: 403, code `no_company`.
 
 After step 2 the request carries `req.userId`, `req.tenantId` and `req.tenantRole`, and every log line of that request also carries the user ID and the company ID.
@@ -165,34 +168,73 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 ### What exists
 
 - `src/app/layout.tsx`: the outer frame of every page.
-- `src/app/page.tsx`: the page at `/`. It shows the heading and the health check. Task 7 replaces it with the redirect to sign-in or the dashboard.
-- `src/components/api-health.tsx`: asks `/v1/health` once when the page opens and shows one of three states: "Checking the API...", "API: ok", or a failure line.
+- `src/app/signin/page.tsx`: the sign-in page at `/signin`. It is the one page that needs no signed-in user.
+- `src/app/(dashboard)/layout.tsx`: puts the guard around every page in the `(dashboard)` folder. A folder name in brackets is not part of the address.
+- `src/app/(dashboard)/page.tsx`: the home page at `/`, where a signed-in user lands. It shows the company, a "Jobs" section and the sign-out button.
+- `src/app/(dashboard)/jobs/page.tsx`: the page at `/jobs`, a placeholder until task 11.
+- `src/components/auth-guard.tsx`: the guard.
+- `src/components/sign-in-form.tsx`, `sign-out-button.tsx`, `signed-in-company.tsx`: the form, the button, and the part that asks `/v1/me`.
+- `src/lib/supabase.ts`: the one Supabase client for the browser.
 - `src/lib/api.ts`: the call helper.
 
 ### Server part and browser part
 
-In Next.js a file runs on the server unless it starts with `"use client"`. `page.tsx` is a server part. `api-health.tsx` starts with `"use client"`, so it runs in the browser. Calls to the API are made from browser parts, because the rule of the product is that the browser talks to the API.
+In Next.js a file runs on the server unless it starts with `"use client"`. The page files are server parts. The guard, the form, the button and the company line start with `"use client"`, so they run in the browser. Sign-in and every call to the API are made from browser parts.
+
+### Sign-in
+
+The session is kept in the browser, not on the Next.js server. The Supabase library saves it in local storage as one entry, `sb-<project>-auth-token`, which holds the access token (about an hour), the refresh token, the expiry time and the user's ID and email. The library refreshes the token by itself. Our code never reads that entry by hand.
+
+**The path of a sign-in**
+
+1. The form sends the email and password to Supabase, not to our API. Supabase answers with a session.
+2. The form asks our API `GET /v1/me` with the new token. The API says which company the user belongs to.
+3. If the API says `no_company`, or cannot be reached, the form signs the user out again and shows a message. Nobody is ever half signed in.
+4. Otherwise the form empties its fields and goes to `/`.
+
+**The guard** (`auth-guard.tsx`) sits in the `(dashboard)` layout, so a page added to that folder is protected without anyone remembering to do it.
+
+- It listens to the library with `onAuthStateChange`. The library calls it once straight away with the session it finds, and again on every change: sign-in, sign-out, and a refresh that Supabase refuses.
+- With a session it shows the page. Without one it goes to `/signin`. Until it knows, it shows a start screen with the product's name.
+- A sign-out in another tab of the same browser reaches it too, because the library tells its other tabs.
+- It is the only code that goes to the sign-in page after a sign-out.
+- It draws the page under a key made of the user's ID, so a different user signing in on the same browser starts with an empty page.
+
+**The guard is a convenience, not the lock.** The page frame it hides holds no data. The lock is the API's sign-in check: every piece of data comes from an API call.
+
+**Sign-out** ends the session in this browser only (`scope: "local"`). Other devices stay signed in. The library removes the session before it tells Supabase, so it works without a network too.
 
 ### The call helper
 
-Every screen calls the API through `apiFetch(path, accessToken?, init?)`. It puts the API's address in front of the path, attaches the sign-in token when one is given, and returns the JSON answer.
+Every screen calls the API through `apiFetch(path, init?)`, or a small function built on it such as `getMe()`. A screen never handles a token.
 
+- The helper asks the Supabase library for the current token on every call and does not keep it, because the token is swapped for a new one about once an hour.
 - An error answer from the API is thrown as an `ApiError` with the status, the code, the message and the request ID.
-- If the API cannot be reached at all (it is stopped, or the browser blocked the call), `fetch` itself throws and that error is passed on. A screen tells the two apart with `error instanceof ApiError`.
+- If the API cannot be reached at all (it is stopped, or the browser blocked the call), `fetch` itself throws and that error is passed on. `apiFailureMessage(error)` turns either kind into the line a screen shows.
+- A session the API no longer accepts is handled here, in one place: on a 401 the user is signed out, and on the code `no_company` the user is signed out with a message for the sign-in page. The guard then leaves the page. The error is still thrown.
+- The sign-in form is the one caller that passes a token in (`getMeAtSignIn`), because it asks before the user is let in and must not be signed out by the helper.
 
 ### Settings in the web app
 
 - The web app reads the root `.env`, through a few lines at the top of `next.config.ts`. It has no `.env` of its own.
 - Next.js hands a setting to the browser only when its name starts with `NEXT_PUBLIC_`. Such a setting is copied into the code sent to the browser, so anyone can read it. **A secret never gets the `NEXT_PUBLIC_` prefix.**
 - A `NEXT_PUBLIC_` value is fixed when the web app is started or built. Restart `npm run dev:web` after changing one.
+- The two `NEXT_PUBLIC_SUPABASE_` values must be the same as the API's `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. They are written twice on purpose, so that only names with the prefix ever reach the browser.
 
 ### Traps
 
 - **Next.js 16 differs from older versions.** `apps/web/AGENTS.md` (written by Next.js itself, and written back by `next dev` if removed) says to read the docs shipped in `node_modules/next/dist/docs/` before writing web code. Do that instead of working from memory.
-- **`cacheComponents` and `partialPrefetching` are on** in `next.config.ts`. They change how the Next.js server prepares and caches pages. InstantBot runs with both off, so server-side code copied from it (first in task 7) must be checked against them.
+- **`cacheComponents` and `partialPrefetching` are on** in `next.config.ts`. They change how the Next.js server prepares and caches pages. Nothing on our server reads the session, so they have little to act on, but two effects matter:
+  - **A page that was left stays alive in the background,** with what was typed into it. That is why the sign-in form empties its fields after a sign-in, and why the guard draws the page under the user's ID.
+  - **Reading the address in a browser part (`useSearchParams`) needs a `<Suspense>` around it,** or the build fails. The sign-in form does this for its notice.
+- **The automatic "instant navigation" check is switched off** (`experimental.instantInsights` in `next.config.ts`). Under `npm run dev` it draws each page on the server, and the guard draws no page there, so every page behind the guard was reported as "dropped from rendering". Writing `export const instant = false` in the `(dashboard)` layout did not remove the message; only the page file or this setting does.
+- **Signed in, then thrown straight back to the sign-in page:** the two `NEXT_PUBLIC_SUPABASE_` values probably differ from the API's pair. The API answers 401 to a token from another project, and the call helper signs out on any 401.
+- **`localhost:3100` and `127.0.0.1:3100` are different sites to the browser.** Local storage is kept per site, so signing in on one does not sign in on the other. Use `localhost:3100`, which is also what CORS allows.
+- **A removed session can still work for up to an hour.** Sign-out removes the session from the browser, but an access token already handed out is accepted by the API until it runs out.
+- **The session can be read by scripts on the page.** That is how Supabase's browser library works. So CV and email text must never be shown as HTML. Keeping the token in a cookie that scripts cannot read is an open point in [decisions.md](decisions.md).
 - **The web type check is `next typegen && tsc --noEmit`.** Next.js generates some types first, such as `LayoutProps`. Plain `tsc` alone fails on a fresh clone.
 - **Its TypeScript settings are Next's own.** `apps/web/tsconfig.json` does not extend the shared `tsconfig.base.json`, which is set up for Node.
-- **No lint tool yet.** ESLint with the Next.js rules is added in task 7.
+- **ESLint reports success when there are only warnings.** Several React rules, such as an effect that misses a value it uses, are warnings. The lint command therefore runs with `--max-warnings 0`. It covers the web app only.
 - **No look yet.** Fonts, brand colours and dark mode are decided with the dashboard shell in task 8.
 
 ## 7. Mailbox (Gmail through mailsift)
@@ -268,7 +310,7 @@ One hosted Supabase project holds the Postgres database and the sign-in service.
 
 | | Publishable key | Secret key |
 |---|---|---|
-| Who has it | Any browser, once sign-in is built | Only the API, the worker and our scripts |
+| Who has it | Any browser. The web app's sign-in uses it | Only the API, the worker and our scripts |
 | What it is | The project's public name | The master key |
 | What it reaches | Only what the row rules allow, which for our tables is nothing | Everything. It goes past the row rules |
 

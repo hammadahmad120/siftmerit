@@ -96,7 +96,7 @@ Copied code counts toward a task's size and is explained as if the user has neve
 
 | Piece | Source |
 |---|---|
-| Sign-in form, sign-out, page protection | `apps/web-app/src/components/auth-form.tsx`, `sign-out-button.tsx`, `apps/web-app/src/proxy.ts`, `apps/web-app/src/lib/supabase/*` |
+| Sign-in form, sign-out | `apps/web-app/src/components/auth-form.tsx`, `sign-out-button.tsx`. InstantBot's page protection (`apps/web-app/src/proxy.ts`, `apps/web-app/src/lib/supabase/*`) is not copied: the session is kept in the browser and a guard written new protects the pages (decided in task 7) |
 | API sign-in check and company lookup | `services/platform-api/src/middleware/auth.middleware.ts`, `services/auth.service.ts`, `repositories/tenant*.repository.ts` |
 | Company tables | The tenancy part only of `supabase/migrations/20260611000000_platform_foundation.sql` (`tenants`, `tenant_members`, `set_updated_at()`). Its row policies and `current_tenant_ids()` are not copied: our row rules let nobody but the server in (decided in task 6) |
 | Secret encryption | `packages/platform-core/src/channels/credentials-crypto.ts` |
@@ -116,7 +116,7 @@ Copied code counts toward a task's size and is explained as if the user has neve
 | Dashboard shell | `apps/web-app/src/components/dashboard-shell.tsx`, `dashboard-nav.tsx` | New menu items |
 | Candidate card look | The result card in `apps/web-app/src/components/collection-view.tsx` | Visual pattern only |
 
-**Write new.** The BullMQ queue setup, the daily check, the chat agent, the mailsift client, the "is this a CV" check, the masking step, the scorer, the eval runner, and protection against instructions hidden in CV or email text. None of these exist in InstantBot in a form we can copy.
+**Write new.** The page guard in the web app, the BullMQ queue setup, the daily check, the chat agent, the mailsift client, the "is this a CV" check, the masking step, the scorer, the eval runner, and protection against instructions hidden in CV or email text. None of these exist in InstantBot in a form we can copy.
 
 **Leave behind.** InstantBot's Postgres queue and worker loop (`channel-message-queue.ts`, `worker-loop.ts`), chunks, embeddings, the reranker, both Python services, Scout's search and match service, collections tables, chat, widget, WhatsApp and analytics.
 
