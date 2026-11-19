@@ -13,6 +13,10 @@ import { getSupabase, signOutHere, supabaseSettingsProblem } from "@/lib/supabas
 /** Where a signed-in user lands: the home page. */
 const HOME = "/";
 
+/** The look of the two fields. A field in use gets a purple outline. */
+const FIELD_CLASSES =
+  "mt-1 w-full rounded-lg border border-brand-navy/30 bg-white px-3 py-2 font-normal text-brand-navy focus:outline-2 focus:outline-brand-purple";
+
 const NO_COMPANY_MESSAGE =
   "This account is not linked to a company. Contact the person who set up your account.";
 
@@ -111,12 +115,12 @@ export function SignInForm() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-      <h1 className="text-2xl font-semibold text-slate-900">Sign in</h1>
-      <p className="mt-2 text-sm text-slate-600">Welcome back to Siftmerit.</p>
+    <div className="mx-auto w-full max-w-md rounded-xl border border-brand-navy/15 bg-white p-8 shadow-sm">
+      <h1 className="text-2xl font-semibold">Sign in</h1>
+      <p className="mt-2 text-sm text-brand-light-navy">Welcome back to Siftmerit.</p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
-        <label className="block text-sm font-medium text-slate-700">
+        <label className="block text-sm font-medium">
           Email
           <input
             type="email"
@@ -124,11 +128,11 @@ export function SignInForm() {
             autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+            className={FIELD_CLASSES}
           />
         </label>
 
-        <label className="block text-sm font-medium text-slate-700">
+        <label className="block text-sm font-medium">
           Password
           <input
             type="password"
@@ -136,7 +140,7 @@ export function SignInForm() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+            className={FIELD_CLASSES}
           />
         </label>
 
@@ -153,7 +157,10 @@ export function SignInForm() {
         <button
           type="submit"
           disabled={busy || settingsProblem !== null}
-          className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+          // The colour guide's button: purple with a cream label. On hover
+          // and focus it gets a navy outline; the purple is never lightened,
+          // because the label would then be too faint to read.
+          className="w-full rounded-lg bg-brand-purple px-4 py-2.5 text-sm font-medium text-brand-cream outline-offset-2 outline-brand-navy hover:outline-2 focus-visible:outline-2 disabled:opacity-60"
         >
           {busy ? "Please wait..." : "Sign in"}
         </button>

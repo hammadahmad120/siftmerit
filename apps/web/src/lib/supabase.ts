@@ -53,6 +53,16 @@ export async function getAccessToken(): Promise<string | null> {
   return data.session?.access_token ?? null;
 }
 
+/**
+ * The signed-in user's email, for the top bar, or null when nobody is signed
+ * in. It is read from the session the browser already holds, so it costs no
+ * call to our API. It is only shown; the API never trusts it.
+ */
+export async function getSignedInEmail(): Promise<string | null> {
+  const { data } = await getSupabase().auth.getSession();
+  return data.session?.user.email ?? null;
+}
+
 /** Why a user was signed out by us. The sign-in page shows a message for it. */
 export type SignInNotice = "no_company";
 

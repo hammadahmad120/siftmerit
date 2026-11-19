@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+/*
+ * The look, written once. Every screen uses these names, so changing a colour
+ * here changes it everywhere.
+ *
+ * The colours come from the NexRhino colour guide (10 Nov 2026), the same
+ * colours as on nexrhino.com. A name here
+ * becomes a set of Tailwind classes: `--color-brand-navy` gives `text-brand-navy`,
+ * `bg-brand-navy`, `border-brand-navy` and so on.
+ *
+ *   navy        headings and body text
+ *   cream       the page background, and the label on a purple button
+ *   purple      buttons, links and the active menu item
+ *   light navy  small, less important text. The guide's grey is too faint on
+ *               cream (1.46:1) and is not used for text.
+ *
+ * Red is outside this list on purpose. It is Tailwind's own red and is used
+ * for error messages only.
+ */
+@theme {
+  --color-brand-navy: #0f1b3d;
+  --color-brand-cream: #f3eee3;
+  --color-brand-purple: #b100cd;
+  --color-brand-light-navy: #2b3d73;
+}
+
+/*
+ * The font. `--font-geist-sans` is set by Next.js's font tool in
+ * `app/layout.tsx`. Tailwind uses `--font-sans` for all text by default.
+ * `inline` is needed because the value is another variable.
+ */
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+}
+
+/*
+ * Light mode only. This line tells the browser to draw its own parts (form
+ * fields, scroll bars) in light colours even when the computer is set to dark.
+ */
+:root {
+  color-scheme: light;
+}

@@ -64,8 +64,8 @@ export function AuthGuard({ children }: { children: ReactNode }) {
  */
 function StartScreen() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50">
-      <p className="text-lg font-semibold text-slate-400">Siftmerit</p>
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-lg font-semibold text-brand-light-navy">Siftmerit</p>
     </div>
   );
 }
