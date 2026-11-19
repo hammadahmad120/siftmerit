@@ -113,7 +113,7 @@ Copied code counts toward a task's size and is explained as if the user has neve
 | Requirements from a job description | `packages/platform-core/src/matching/brief-split.ts` | Real must and nice to have. Scout's "essential" means something else. Field mapping is dropped |
 | Fact sheet | `packages/platform-core/src/matching/field-extraction.ts` (prompt, `verifyFieldValues`, list and typed-value checks) | Fixed boxes instead of admin-defined fields. The 12,000 character trimming is not copied, because every CV is read in full |
 | Ticks | `packages/platform-core/src/matching/requirement-check.ts` (prompt reading rules, `verifyRequirementChecks`) | One CV per call, four statuses (met, mentioned only, not met, unclear), must and nice to have |
-| Dashboard shell | `apps/web-app/src/components/dashboard-shell.tsx`, `dashboard-nav.tsx` | New menu items |
+| Dashboard shell | `apps/web-app/src/components/dashboard-shell.tsx`, `dashboard-nav.tsx` | A top bar, not a sidebar, with our own menu items. Only the "which link is active" check and the two file names are taken; the sidebar frame, the icons and the folding group are not (decided in task 8) |
 | Candidate card look | The result card in `apps/web-app/src/components/collection-view.tsx` | Visual pattern only |
 
 **Write new.** The page guard in the web app, the BullMQ queue setup, the daily check, the chat agent, the mailsift client, the "is this a CV" check, the masking step, the scorer, the eval runner, and protection against instructions hidden in CV or email text. None of these exist in InstantBot in a form we can copy.

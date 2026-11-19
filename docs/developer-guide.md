@@ -13,7 +13,7 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
-| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a home page at `/` that shows the signed-in user's company, and a placeholder page at `/jobs`. |
+| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and a placeholder page at `/jobs`. |
 | API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Two addresses: `/v1/health` and `/v1/me`. Also holds the script that creates companies and users. |
 | Worker | `services/worker` | `@siftmerit/worker` | Starts, logs one line and finishes. There is no queue yet. It also holds the two mailbox scripts (section 7). |
 | Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger and the settings loader. |
@@ -167,19 +167,23 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 
 ### What exists
 
-- `src/app/layout.tsx`: the outer frame of every page.
+- `src/app/layout.tsx`: the outer frame of every page. It loads the font and sets the cream background and navy text.
+- `src/app/globals.css`: the colours and the font, written once.
 - `src/app/signin/page.tsx`: the sign-in page at `/signin`. It is the one page that needs no signed-in user.
-- `src/app/(dashboard)/layout.tsx`: puts the guard around every page in the `(dashboard)` folder. A folder name in brackets is not part of the address.
-- `src/app/(dashboard)/page.tsx`: the home page at `/`, where a signed-in user lands. It shows the company, a "Jobs" section and the sign-out button.
+- `src/app/(dashboard)/layout.tsx`: puts the guard, and inside it the shell, around every page in the `(dashboard)` folder. A folder name in brackets is not part of the address.
+- `src/app/(dashboard)/page.tsx`: the home page at `/`, where a signed-in user lands. It holds a "Jobs" section.
 - `src/app/(dashboard)/jobs/page.tsx`: the page at `/jobs`, a placeholder until task 11.
 - `src/components/auth-guard.tsx`: the guard.
-- `src/components/sign-in-form.tsx`, `sign-out-button.tsx`, `signed-in-company.tsx`: the form, the button, and the part that asks `/v1/me`.
+- `src/components/dashboard-shell.tsx`, `dashboard-nav.tsx`: the top bar with the page area below it, and the menu.
+- `src/components/me-context.tsx`: asks `/v1/me` once and shares the answer.
+- `src/components/sign-in-form.tsx`, `sign-out-button.tsx`: the form and the button.
 - `src/lib/supabase.ts`: the one Supabase client for the browser.
 - `src/lib/api.ts`: the call helper.
+- `src/lib/styles.ts`: looks that more than one screen uses, such as the button.
 
 ### Server part and browser part
 
-In Next.js a file runs on the server unless it starts with `"use client"`. The page files are server parts. The guard, the form, the button and the company line start with `"use client"`, so they run in the browser. Sign-in and every call to the API are made from browser parts.
+In Next.js a file runs on the server unless it starts with `"use client"`. The page files are server parts. The guard, the shell, the menu, the form and the button start with `"use client"`, so they run in the browser. Sign-in and every call to the API are made from browser parts.
 
 ### Sign-in
 
@@ -203,6 +207,37 @@ The session is kept in the browser, not on the Next.js server. The Supabase libr
 **The guard is a convenience, not the lock.** The page frame it hides holds no data. The lock is the API's sign-in check: every piece of data comes from an API call.
 
 **Sign-out** ends the session in this browser only (`scope: "local"`). Other devices stay signed in. The library removes the session before it tells Supabase, so it works without a network too.
+
+### The shell
+
+Every page in the `(dashboard)` folder is drawn inside the shell (`dashboard-shell.tsx`): a top bar, and the page below it. The bar holds the product's name, the menu, and on the right the company name, the user's email and "Sign out". The shell owns the page's `<main>` and its width, so a page file holds only its own content.
+
+**Who is signed in is asked once.** `MeProvider` (`me-context.tsx`) wraps the shell. It asks the API `GET /v1/me` one time and reads the email from the session the browser holds. It shares both through a React context: a value put in at one point of the page that any part below can take out, without passing it down by hand. A part calls `useMe()` and gets `{ email, company }`, where `company` is `loading`, `ok` with the answer, or `failed` with a message. A page that needs the company uses `useMe()` and never asks `/v1/me` itself.
+
+- The bar and the page are drawn at once. The company name and email fill in when they arrive; until then their two lines hold a space, so the bar keeps its height.
+- Moving between pages keeps the shell, so `/v1/me` is not asked again.
+- If `/v1/me` fails, the bar stays and the page area shows the failure line with the request ID.
+- The shell sits inside the guard. The guard draws its content under the user's ID, so when another user signs in on the same browser the shell starts again from "loading".
+- The email is only shown. The API never trusts it; the company always comes from the API's own lookup.
+
+**The menu** (`dashboard-nav.tsx`) is one list, `MENU_ITEMS`. A new screen adds one line. "Jobs" stays marked on a page below it, such as `/jobs/123`; "Home" is marked only on `/` itself, because every address starts with `/`.
+
+### The look
+
+Light mode only. The colours come from the NexRhino colour guide and are written once, in `globals.css`, as `brand-navy`, `brand-cream`, `brand-purple` and `brand-light-navy`. Each name gives Tailwind classes such as `text-brand-navy` and `bg-brand-cream`.
+
+| Colour | Used for |
+|---|---|
+| Navy `#0F1B3D` | Headings, body text, every button |
+| Cream `#F3EEE3` | The page background, the label on a button |
+| Purple `#B100CD` | Links, and the active menu item with the line under it. Never the border or outline of a button, a field or a card |
+| Light navy `#2B3D73` | Small, less important text, and a button under the mouse |
+| Red (Tailwind's own) | Error messages only |
+
+- The bar and the cards are white on the cream page.
+- Every button uses `BUTTON_CLASSES` from `src/lib/styles.ts` and adds only its own size.
+- The font is Geist, loaded in `app/layout.tsx` with Next.js's font tool. It is downloaded when the app is built and served from our own site, so a user's browser never calls Google.
+- The guide and the live nexrhino.com differ in two places: the guide says purple buttons and the site has navy ones (we follow the site), and the site's navy is `#06173A` (we use the guide's).
 
 ### The call helper
 
@@ -235,7 +270,9 @@ Every screen calls the API through `apiFetch(path, init?)`, or a small function 
 - **The web type check is `next typegen && tsc --noEmit`.** Next.js generates some types first, such as `LayoutProps`. Plain `tsc` alone fails on a fresh clone.
 - **Its TypeScript settings are Next's own.** `apps/web/tsconfig.json` does not extend the shared `tsconfig.base.json`, which is set up for Node.
 - **ESLint reports success when there are only warnings.** Several React rules, such as an effect that misses a value it uses, are warnings. The lint command therefore runs with `--max-warnings 0`. It covers the web app only.
-- **No look yet.** Fonts, brand colours and dark mode are decided with the dashboard shell in task 8.
+- **The page shows no colours, black text and a plain font:** the running web app is serving an old stylesheet. Seen once in task 8: the styles file had changed, but `npm run dev:web` kept serving styles made from the old one, while a production build of the same code was right. Stop it, delete `apps/web/.next/dev` and start it again. The cause was not proven. A production build had been run in `apps/web` in the same minute the web app started, and both write into `.next`, so do not run `next build` there while `npm run dev:web` is running.
+- **The menu reads the current address (`usePathname`), so it sits in a `<Suspense>`.** With `cacheComponents` on, the Next.js docs say the build can fail without it once a page has a part of its address not known at build time, such as `/jobs/123`.
+- **A colour that is not in `globals.css` does nothing.** A class such as `bg-brand-blue` gives no error and no style. Add the colour there first.
 
 ## 7. Mailbox (Gmail through mailsift)
 
