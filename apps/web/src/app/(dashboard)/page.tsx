@@ -12,7 +12,7 @@ export default function HomePage() {
       <section className="mt-6 max-w-xl">
         <Link
           href="/jobs"
-          className="block rounded-xl border border-brand-navy/15 bg-white p-5 hover:border-brand-purple"
+          className="block rounded-xl border border-brand-navy/15 bg-white p-5 hover:border-brand-navy"
         >
           <h2 className="font-medium">Jobs</h2>
           <p className="mt-1 text-sm text-brand-light-navy">Open the job list.</p>

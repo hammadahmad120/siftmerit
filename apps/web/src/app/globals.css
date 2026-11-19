@@ -9,11 +9,13 @@
  * becomes a set of Tailwind classes: `--color-brand-navy` gives `text-brand-navy`,
  * `bg-brand-navy`, `border-brand-navy` and so on.
  *
- *   navy        headings and body text
- *   cream       the page background, and the label on a purple button
- *   purple      buttons, links and the active menu item
- *   light navy  small, less important text. The guide's grey is too faint on
- *               cream (1.46:1) and is not used for text.
+ *   navy        headings, body text and every button
+ *   cream       the page background, and the label on a button
+ *   purple      links, and the active menu item with the line under it. Never
+ *               the border or outline of a button, a field or a card.
+ *   light navy  small, less important text, and a button under the mouse.
+ *               The guide's grey is too faint on cream (1.46:1) and is not
+ *               used for text.
  *
  * Red is outside this list on purpose. It is Tailwind's own red and is used
  * for error messages only.
