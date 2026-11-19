@@ -15,6 +15,12 @@ loadEnvConfig(repoRoot, process.env.NODE_ENV !== "production", console, true);
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  // The home address has no page of its own. A visitor is sent on to the job
+  // list, and the guard there sends a signed-out visitor to the sign-in page.
+  // `permanent: false` stops browsers from remembering this for good.
+  async redirects() {
+    return [{ source: "/", destination: "/jobs", permanent: false }];
+  },
   turbopack: {
     rules: {
       "*.css": {

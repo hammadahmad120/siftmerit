@@ -69,3 +69,30 @@ export async function apiFetch<T>(
 
   return (await res.json()) as T;
 }
+
+/**
+ * The line a screen shows when a call to the API failed. An error answer
+ * gives the API's own message with its request ID. Anything else means no
+ * answer came at all: the API is stopped, or the browser blocked the call.
+ */
+export function apiFailureMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    const id = error.requestId ? ` (request ID ${error.requestId})` : "";
+    return `${error.message}${id}`;
+  }
+  return "The API cannot be reached";
+}
+
+/** The answer of `GET /v1/me`. Code says "tenant"; screens say "company". */
+export type Me = {
+  user: { id: string; role: "owner" | "member" };
+  tenant: { id: string; name: string; slug: string };
+};
+
+/**
+ * Who the signed-in user is and which company they belong to. A user with no
+ * company gets an `ApiError` with status 403 and the code `no_company`.
+ */
+export function getMe(accessToken: string): Promise<Me> {
+  return apiFetch<Me>("/v1/me", accessToken);
+}

@@ -16,6 +16,7 @@
     "company:add-user": "npm run company:add-user --workspace @siftmerit/api --",
     "mailbox:connect": "npm run mailbox:connect --workspace @siftmerit/worker",
     "mailbox:check": "npm run mailbox:check --workspace @siftmerit/worker",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
   }
 }
