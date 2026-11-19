@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ApiError, apiFailureMessage, getMe, type Me } from "@/lib/api";
-import { getAccessToken, signOutHere } from "@/lib/supabase";
+import { apiFailureMessage, getMe, type Me } from "@/lib/api";
 
 type CompanyState =
   | { kind: "loading" }
@@ -22,26 +21,12 @@ export function SignedInCompany() {
     let left = false;
 
     async function load() {
-      const accessToken = await getAccessToken();
-      // No session: the guard around the page is already sending the visitor
-      // to the sign-in page.
-      if (!accessToken) return;
-
       try {
-        const me = await getMe(accessToken);
+        const me = await getMe();
         if (!left) setState({ kind: "ok", me });
       } catch (error) {
-        // The API no longer accepts this session, or the user's company is
-        // gone. Either way the session is of no use: sign out, and the guard
-        // goes to the sign-in page.
-        if (error instanceof ApiError && error.status === 401) {
-          await signOutHere();
-          return;
-        }
-        if (error instanceof ApiError && error.code === "no_company") {
-          await signOutHere("no_company");
-          return;
-        }
+        // A session the API no longer accepts was already dealt with by the
+        // call helper: the user is signed out and the guard leaves this page.
         if (!left) setState({ kind: "failed", message: apiFailureMessage(error) });
       }
     }

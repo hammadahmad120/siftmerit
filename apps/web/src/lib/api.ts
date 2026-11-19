@@ -1,6 +1,9 @@
-// The one helper every screen uses to call the API. Copied from InstantBot's
-// `platformFetch` and `PlatformApiError`, with two changes: the sign-in token
-// is optional, and the error keeps the request ID.
+// The one helper every screen uses to call the API. It started as a copy of
+// InstantBot's `platformFetch` and `PlatformApiError`. Three things changed:
+// the error keeps the request ID, the helper gets the sign-in token by
+// itself, and it deals in one place with a session the API no longer accepts.
+
+import { getAccessToken, signOutHere } from "@/lib/supabase";
 
 /** An error answer from the API. `requestId` finds the matching line in the API logs. */
 export class ApiError extends Error {
@@ -41,18 +44,17 @@ async function parseError(res: Response): Promise<ApiError> {
 }
 
 /**
- * Calls the API and returns the JSON answer.
+ * One call to the API with the token the caller hands in. This is the inner
+ * step. Screens use `apiFetch` below; only the sign-in form calls this one
+ * directly, because it asks the API before the user is let in.
  *
  * - An error answer from the API is thrown as an `ApiError`.
  * - If the API cannot be reached at all (it is stopped, or the browser blocked
  *   the call), `fetch` itself throws, and that error is passed on unchanged.
- *
- * `accessToken` is the signed-in user's token. Addresses that need no sign-in,
- * such as `/v1/health`, are called without it.
  */
-export async function apiFetch<T>(
+async function apiFetchWithToken<T>(
   path: string,
-  accessToken?: string,
+  accessToken: string | null,
   init?: RequestInit,
 ): Promise<T> {
   const res = await fetch(`${apiBaseUrl()}${path}`, {
@@ -68,6 +70,36 @@ export async function apiFetch<T>(
   }
 
   return (await res.json()) as T;
+}
+
+/**
+ * Calls the API as the signed-in user and returns the JSON answer. Every
+ * screen uses this, and no screen ever handles a token.
+ *
+ * The token is asked from the Supabase library on every call and never kept
+ * here: it lives about an hour, and the library swaps it for a new one. Asking
+ * is cheap. The library answers from memory and goes to the network only when
+ * the token has run out.
+ *
+ * When the API says the session is no longer good, the user is signed out
+ * here, in one place: a 401 (the token is not accepted) or the code
+ * `no_company` (the user's company is gone). The guard around the page then
+ * goes to the sign-in page. The error is still thrown, so the screen stops
+ * what it was doing.
+ */
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const accessToken = await getAccessToken();
+
+  try {
+    return await apiFetchWithToken<T>(path, accessToken, init);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      await signOutHere();
+    } else if (error instanceof ApiError && error.code === "no_company") {
+      await signOutHere("no_company");
+    }
+    throw error;
+  }
 }
 
 /**
@@ -89,10 +121,17 @@ export type Me = {
   tenant: { id: string; name: string; slug: string };
 };
 
+/** Who the signed-in user is and which company they belong to. */
+export function getMe(): Promise<Me> {
+  return apiFetch<Me>("/v1/me");
+}
+
 /**
- * Who the signed-in user is and which company they belong to. A user with no
- * company gets an `ApiError` with status 403 and the code `no_company`.
+ * The same question, asked by the sign-in form straight after Supabase
+ * accepted the password, with the token from that answer. Nothing is signed
+ * out here: the form decides what to do and which message to show. A user
+ * with no company gets an `ApiError` with status 403 and the code `no_company`.
  */
-export function getMe(accessToken: string): Promise<Me> {
-  return apiFetch<Me>("/v1/me", accessToken);
+export function getMeAtSignIn(accessToken: string): Promise<Me> {
+  return apiFetchWithToken<Me>("/v1/me", accessToken);
 }

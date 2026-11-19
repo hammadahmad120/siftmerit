@@ -3,7 +3,7 @@
 import { isAuthRetryableFetchError, type AuthError } from "@supabase/supabase-js";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { ApiError, apiFailureMessage, getMe } from "@/lib/api";
+import { ApiError, apiFailureMessage, getMeAtSignIn } from "@/lib/api";
 import { getSupabase, signOutHere, supabaseSettingsProblem } from "@/lib/supabase";
 
 // Copied from InstantBot's `auth-form.tsx` and cut down to sign-in only.
@@ -89,7 +89,7 @@ export function SignInForm() {
       // no company, or an API that cannot be asked, is signed out again, so
       // nobody is ever half signed in.
       try {
-        await getMe(data.session.access_token);
+        await getMeAtSignIn(data.session.access_token);
       } catch (apiError) {
         await signOutHere();
         const noCompany = apiError instanceof ApiError && apiError.code === "no_company";
