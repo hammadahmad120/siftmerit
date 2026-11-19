@@ -10,8 +10,8 @@ import { getSupabase, signOutHere, supabaseSettingsProblem } from "@/lib/supabas
 // Sign-up, the workspace name and "retry workspace setup" are left out:
 // accounts and companies are created by us, with `npm run company:create`.
 
-/** Where a signed-in user lands. */
-const HOME = "/jobs";
+/** Where a signed-in user lands: the home page. */
+const HOME = "/";
 
 const NO_COMPANY_MESSAGE =
   "This account is not linked to a company. Contact the person who set up your account.";

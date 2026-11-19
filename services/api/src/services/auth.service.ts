@@ -5,6 +5,32 @@ import { createPublishableClient } from "../lib/supabase.js";
 export type SignedInUser = { id: string };
 
 /**
+ * True when the text has the shape of a sign-in token: three parts joined by
+ * dots, where the first two are small JSON objects written in base64url.
+ *
+ * The library hands back an error for most bad tokens, but it throws when it
+ * cannot even read these two parts, for example for `abc.def.ghi`. Thrown
+ * errors are answered as 500, so such text is turned away here and gets the
+ * 401 it should. Whether a well-shaped token is real is still the library's
+ * job: this checks the shape only, never the signature.
+ */
+function isTokenShaped(token: string): boolean {
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+
+  return parts.slice(0, 2).every((part) => {
+    try {
+      // `fatal` makes bytes that are not text an error, as the library does.
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(Buffer.from(part, "base64url"));
+      const value: unknown = JSON.parse(text);
+      return typeof value === "object" && value !== null && !Array.isArray(value);
+    } catch {
+      return false;
+    }
+  });
+}
+
+/**
  * Checks sign-in tokens.
  *
  * Supabase signs every token with a private key. The library fetches the
@@ -25,6 +51,8 @@ export class AuthService {
 
   /** Returns the signed-in user, or null when the token is not valid. */
   async verifyAccessToken(accessToken: string): Promise<SignedInUser | null> {
+    if (!isTokenShaped(accessToken)) return null;
+
     const { data, error } = await this.client.auth.getClaims(accessToken);
 
     if (error) {

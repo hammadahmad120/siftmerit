@@ -12,7 +12,7 @@ type GuardState =
 /**
  * Runs in the browser, around every page that needs a signed-in user. It
  * shows the page only when there is a session, and sends everyone else to the
- * sign-in page.
+ * sign-in page. Until it knows, it shows the start screen below.
  *
  * This is a convenience, not the lock. The page frame it hides holds no data.
  * Every piece of data comes from the API, which checks the token on each call.
@@ -54,5 +54,18 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     return <Fragment key={state.userId}>{children}</Fragment>;
   }
 
-  return <p className="p-8 text-slate-600">Loading...</p>;
+  return <StartScreen />;
+}
+
+/**
+ * What a visitor sees for the short moment before the guard knows whether
+ * there is a session: the product's name in the middle of the screen. It has
+ * the same background as the sign-in page, so going there does not flash.
+ */
+function StartScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <p className="text-lg font-semibold text-slate-400">Siftmerit</p>
+    </div>
+  );
 }

@@ -15,11 +15,14 @@ loadEnvConfig(repoRoot, process.env.NODE_ENV !== "production", console, true);
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
-  // The home address has no page of its own. A visitor is sent on to the job
-  // list, and the guard there sends a signed-out visitor to the sign-in page.
-  // `permanent: false` stops browsers from remembering this for good.
-  async redirects() {
-    return [{ source: "/", destination: "/jobs", permanent: false }];
+  // Under `npm run dev`, Next.js inspects every page to see whether it would
+  // appear at once on navigation, by drawing it on the server. Our guard draws
+  // no page on the server (only the browser knows whether there is a session),
+  // so every page behind it was reported as "dropped from rendering".
+  // "manual-warning" limits the inspection to pages that ask for it with
+  // `export const instant = true`. It changes nothing for users.
+  experimental: {
+    instantInsights: { validationLevel: "manual-warning" },
   },
   turbopack: {
     rules: {
