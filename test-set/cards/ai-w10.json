@@ -1,0 +1,80 @@
+{
+  "id": "ai-w10",
+  "job": "ai-engineer",
+  "file": "ai-w10.docx",
+  "source": "written",
+  "group": "listed-only",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Daniyal Raza"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Daniyal Raza",
+      "city": "Multan",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "AI Engineer, Sutlej Labs",
+      "education": "BS Computer Science, Bahauddin Zakariya University, 2021",
+      "links": []
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Python Developer, Sutlej Labs"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Sutlej Labs"
+      },
+      "ai-3": {
+        "result": "mentioned_only",
+        "proof": "Languages: Python, TypeScript, SQL",
+        "alsoAccept": [
+          "unclear"
+        ],
+        "note": "Python is used in every role. TypeScript appears only in the skills list."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built a multi-agent workflow in Python (LangGraph) for invoice checking: one agent extracts, one validates against the ERP through function calls, one writes the summary."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Multan, Pakistan"
+      },
+      "ai-6": {
+        "result": "mentioned_only",
+        "proof": "AI: Claude API, MCP, OpenAI, LangGraph"
+      },
+      "ai-7": {
+        "result": "mentioned_only",
+        "proof": "AI: Claude API, MCP, OpenAI, LangGraph"
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "PostgreSQL reporting queries."
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Good agent work in Python, but TypeScript is only listed. The Python and TypeScript must is mentioned only."
+}

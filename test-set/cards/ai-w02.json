@@ -1,0 +1,78 @@
+{
+  "id": "ai-w02",
+  "job": "ai-engineer",
+  "file": "ai-w02.pdf",
+  "source": "written",
+  "group": "strong",
+  "email": {
+    "subject": "AI Engineer - Maria Santos",
+    "senderName": "Maria Santos"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Maria Santos",
+      "city": "Cebu City",
+      "country": "Philippines",
+      "totalYears": 6,
+      "currentRole": "AI Automation Engineer, Brightline Outsourcing",
+      "education": "BS Information Technology, University of San Carlos, 2020",
+      "links": [
+        "linkedin.com/in/maria-santos-dev"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Full Stack Developer, Isla Digital"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Automation Engineer, Brightline Outsourcing"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Developed client portals in JavaScript and TypeScript (Next.js) with a Python (Django) back end."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built LLM agents with function calling that read incoming client emails, look up the account and draft the reply for a person to approve."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Cebu City, Philippines"
+      },
+      "ai-6": {
+        "result": "mentioned_only",
+        "proof": "AI: OpenAI API, Gemini, Claude, LangChain"
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Chose Gemini Flash for sorting and GPT-4o for drafting after testing both on 500 real tickets."
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "met",
+        "proof": "Connected Google Workspace, Slack and Zoho CRM through their APIs and webhooks so status updates post themselves."
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Wrote SQL reports and maintained the MySQL databases behind them."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Trained 60 non-technical staff to use the tools, with short videos and a weekly open hour."
+      },
+      "ai-12": {
+        "result": "met",
+        "proof": "Reduced average handling time per ticket from 11 minutes to 4."
+      }
+    }
+  },
+  "why": "Strong match from the Philippines. Claude is only in the skills list, and n8n, Make and Zapier are not mentioned."
+}

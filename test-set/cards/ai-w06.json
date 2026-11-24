@@ -1,0 +1,76 @@
+{
+  "id": "ai-w06",
+  "job": "ai-engineer",
+  "file": "ai-w06.pdf",
+  "source": "written",
+  "group": "borderline",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Usman Tariq"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Usman Tariq",
+      "city": "Faisalabad",
+      "country": "Pakistan",
+      "totalYears": 6,
+      "currentRole": "AI Engineer, Chenab Soft",
+      "education": "BS Software Engineering, GC University Faisalabad, 2020",
+      "links": []
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Chenab Soft"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Chenab Soft"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "LLM agents with tool calling for a logistics client. Python + TypeScript."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "LLM agents with tool calling for a logistics client. Python + TypeScript."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Faisalabad, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "The shortest CV of the set, half a page. Every must is met in a few words and nothing else is said."
+}

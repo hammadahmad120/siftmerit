@@ -1,0 +1,79 @@
+{
+  "id": "ai-w12",
+  "job": "ai-engineer",
+  "file": "ai-w12.pdf",
+  "source": "written",
+  "group": "silent-on-a-must",
+  "email": {
+    "subject": "Applying for the open position",
+    "senderName": "Hira Baig"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Hira Baig",
+      "city": "Peshawar",
+      "country": "Pakistan",
+      "totalYears": 6,
+      "currentRole": "AI Engineer, Khyber Analytics",
+      "education": "BS Computer Science, University of Peshawar, 2020",
+      "links": [
+        "linkedin.com/in/hira-baig-ai"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer (Data), Khyber Analytics"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Khyber Analytics"
+      },
+      "ai-3": {
+        "result": "unclear",
+        "proof": null,
+        "note": "Python is used in every role. TypeScript and JavaScript are not mentioned anywhere, the same gap three of the real CVs have."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built report-writing agents in Python with tool use: they query the warehouse, run the checks and write the weekly summary."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Peshawar, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Tried three OpenAI models and kept the smallest one that passed our checks."
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Built data pipelines in Python and SQL into a Redshift warehouse."
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Silent on one must: no TypeScript or JavaScript anywhere. The email subject does not name the job, so it also belongs on the did-not-match list."
+}

@@ -1,0 +1,1646 @@
+[
+  {
+    "id": "ai-w01",
+    "group": "strong",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Bilal Ahmed",
+    "headline": "Senior AI Engineer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "bilal.ahmed@example.com",
+    "phone": "+92 300 0000101",
+    "links": [
+      "github.com/bilal-ahmed-dev"
+    ],
+    "summary": "AI engineer with seven years in software, the last four building LLM tools that whole teams use every day.",
+    "roles": [
+      {
+        "title": "Senior AI Engineer",
+        "company": "Northwind Labs",
+        "place": "Lahore (remote)",
+        "dates": "Feb 2023 - Present",
+        "bullets": [
+          "Built a multi-step research agent on the Claude API with tool use and function calling; it drafts client briefings and cut analyst prep time from 3 hours to 25 minutes.",
+          "Set up Claude Projects and Skills for the sales and support teams, and wrote MCP connectors to the CRM and the ticket system.",
+          "Compared Claude, GPT-4o and Gemini on our own test set and routed each task to the cheapest model that passed, lowering monthly model spend by 38%.",
+          "Automated client onboarding and approval steps in n8n, with webhooks into HubSpot, Slack and Google Sheets.",
+          "Ran monthly demos for the operations and finance teams and wrote plain-language guides for each tool."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Indus Softworks",
+        "place": "Lahore",
+        "dates": "Jul 2019 - Jan 2023",
+        "bullets": [
+          "Built internal web apps and dashboards in TypeScript (React, Node.js) and Python (FastAPI) for the delivery teams.",
+          "Designed PostgreSQL schemas and nightly pipelines into a BigQuery warehouse for client reporting.",
+          "Automated the weekly status reports used by 14 project managers."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "AI": "Claude API, OpenAI, Gemini, MCP, RAG, evaluation",
+      "Automation": "n8n, Zapier, webhooks",
+      "Data": "PostgreSQL, BigQuery, dbt"
+    },
+    "education": [
+      "BS Computer Science, FAST-NUCES Lahore, 2019"
+    ],
+    "facts": {
+      "totalYears": 7,
+      "currentRole": "Senior AI Engineer, Northwind Labs"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r1b0"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "met",
+        "r0b1"
+      ],
+      "ai-7": [
+        "met",
+        "r0b2"
+      ],
+      "ai-8": [
+        "met",
+        "r0b3"
+      ],
+      "ai-9": [
+        "met",
+        "r0b3"
+      ],
+      "ai-10": [
+        "met",
+        "r1b1"
+      ],
+      "ai-11": [
+        "met",
+        "r0b4"
+      ],
+      "ai-12": [
+        "met",
+        "r0b0"
+      ]
+    },
+    "why": "The clearest strong match: every must and every nice to have is shown in a role."
+  },
+  {
+    "id": "ai-w02",
+    "group": "strong",
+    "format": "pdf",
+    "layout": "sidebar",
+    "subject": "AI Engineer - Maria Santos",
+    "name": "Maria Santos",
+    "headline": "AI Automation Engineer",
+    "location": "Cebu City, Philippines",
+    "city": "Cebu City",
+    "country": "Philippines",
+    "email": "maria.santos@example.com",
+    "phone": "+63 900 000 0102",
+    "links": [
+      "linkedin.com/in/maria-santos-dev"
+    ],
+    "summary": "I build AI helpers that take boring work off support and operations teams, and I stay until people actually use them.",
+    "roles": [
+      {
+        "title": "AI Automation Engineer",
+        "company": "Brightline Outsourcing",
+        "place": "Cebu City",
+        "dates": "Mar 2022 - Present",
+        "bullets": [
+          "Built LLM agents with function calling that read incoming client emails, look up the account and draft the reply for a person to approve.",
+          "Chose Gemini Flash for sorting and GPT-4o for drafting after testing both on 500 real tickets.",
+          "Connected Google Workspace, Slack and Zoho CRM through their APIs and webhooks so status updates post themselves.",
+          "Trained 60 non-technical staff to use the tools, with short videos and a weekly open hour.",
+          "Reduced average handling time per ticket from 11 minutes to 4."
+        ]
+      },
+      {
+        "title": "Full Stack Developer",
+        "company": "Isla Digital",
+        "place": "Cebu City",
+        "dates": "Jun 2020 - Feb 2022",
+        "bullets": [
+          "Developed client portals in JavaScript and TypeScript (Next.js) with a Python (Django) back end.",
+          "Wrote SQL reports and maintained the MySQL databases behind them."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, JavaScript, SQL",
+      "AI": "OpenAI API, Gemini, Claude, LangChain",
+      "Tools": "Google Workspace, Slack, Zoho, Git"
+    },
+    "education": [
+      "BS Information Technology, University of San Carlos, 2020"
+    ],
+    "facts": {
+      "totalYears": 6,
+      "currentRole": "AI Automation Engineer, Brightline Outsourcing"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r1b0"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "mentioned_only",
+        "sk:AI"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "met",
+        "r0b2"
+      ],
+      "ai-10": [
+        "met",
+        "r1b1"
+      ],
+      "ai-11": [
+        "met",
+        "r0b3"
+      ],
+      "ai-12": [
+        "met",
+        "r0b4"
+      ]
+    },
+    "why": "Strong match from the Philippines. Claude is only in the skills list, and n8n, Make and Zapier are not mentioned."
+  },
+  {
+    "id": "ai-w03",
+    "group": "strong",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Hamza Qureshi",
+    "headline": "Lead AI Engineer",
+    "location": "Karachi, Pakistan",
+    "city": "Karachi",
+    "country": "Pakistan",
+    "email": "hamza.qureshi@example.com",
+    "phone": "+92 300 0000103",
+    "links": [
+      "github.com/hamza-q",
+      "hamzaqureshi.example.com"
+    ],
+    "summary": "Engineer with more than nine years in logistics and banking software. For the last five and a half years I have built AI and internal tools that run in production every day, and for the last three I have led the team that does it. I like systems that are measured, and I write things down so the next person can take over.",
+    "roles": [
+      {
+        "title": "Lead AI Engineer",
+        "company": "Meridian Freight Tech",
+        "place": "Karachi",
+        "dates": "Jan 2024 - Present",
+        "bullets": [
+          "Lead a team of five building AI agents that plan shipments: each agent calls pricing, customs and tracking tools and hands its result to the next step.",
+          "Introduced an evaluation suite of 1,200 cases that runs before every release; wrong-answer reports from customers fell by 60%.",
+          "Use OpenAI models for planning and a small open model for extraction, chosen by measured cost per shipment.",
+          "Built n8n flows for document intake and approval reminders.",
+          "Own the data platform: Postgres, Airflow pipelines and a Snowflake warehouse that feeds the dashboards.",
+          "Set the review rules for prompts and tools, the same way code is reviewed.",
+          "Wrote the runbooks for every agent, so the on-call engineer can switch one off or roll it back in minutes.",
+          "Hired and onboarded three of the five engineers on the team."
+        ]
+      },
+      {
+        "title": "Senior Software Engineer, ML Platform",
+        "company": "Meridian Freight Tech",
+        "place": "Karachi",
+        "dates": "Mar 2021 - Dec 2023",
+        "bullets": [
+          "Built the internal tooling used by 40 operations staff: quote calculator, exception queue and audit log, in TypeScript and Python.",
+          "Integrated Salesforce, Slack and Jira through APIs and webhooks, so that an exception opens a ticket and alerts the account owner.",
+          "Put the first document-reading model into production; it reads bills of lading and fills the booking form.",
+          "Added logging, access control and cost tracking for every model call.",
+          "Cut the time to add a new carrier from two weeks to two days.",
+          "Wrote the design documents for the tooling and kept them current, so two new engineers were productive in their first week.",
+          "Ran the weekly review of failed bookings with the operations leads and turned the findings into fixes."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Crescent Bank Digital",
+        "place": "Karachi",
+        "dates": "Aug 2018 - Feb 2021",
+        "bullets": [
+          "Developed payment and statement services in Java and Python for the mobile banking app.",
+          "Wrote the reconciliation jobs that compare card transactions with the ledger every night.",
+          "Moved report generation from manual spreadsheets to scheduled SQL jobs.",
+          "Was on the on-call rota for the payments services.",
+          "Mentored two junior engineers.",
+          "Added monitoring and alerts for the nightly jobs after two silent failures.",
+          "Took part in the yearly security audit and closed the findings for the payments services."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Tameer Apps",
+        "place": "Karachi",
+        "dates": "Jul 2017 - Jul 2018",
+        "bullets": [
+          "Built Android and web features for a property listing product.",
+          "Wrote the image upload and resizing service.",
+          "Fixed the search so that results appear in under one second."
+        ]
+      },
+      {
+        "title": "Software Engineering Intern",
+        "company": "Tameer Apps",
+        "place": "Karachi",
+        "dates": "Jun 2016 - Aug 2016",
+        "bullets": [
+          "Wrote unit tests for the listing search and fixed small bugs in the web app.",
+          "Built a script that checks uploaded photos for size and format.",
+          "Presented the internship project to the engineering team at the end of the summer."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, Java, SQL",
+      "AI": "OpenAI API, open models, agents, tool use, RAG, evaluation",
+      "Automation": "n8n, webhooks",
+      "Data": "PostgreSQL, Airflow, Snowflake, dbt",
+      "Platform": "AWS, Docker, Kubernetes, Terraform, GitHub Actions"
+    },
+    "education": [
+      "BE Computer and Information Systems, NED University of Engineering and Technology, Karachi, 2017"
+    ],
+    "extra": [
+      {
+        "title": "Selected projects",
+        "lines": [
+          "Shipment planner: agents that turn a customer request into a booked route. Handles about 3,000 requests a month.",
+          "Bill of lading reader: reads scanned and digital documents and fills the booking form, with a person checking the low-confidence fields.",
+          "Carrier onboarding kit: templates and tests that let a new carrier be connected in two days.",
+          "Cost board: a dashboard of model spend per customer and per feature, used in the monthly planning meeting.",
+          "Exception queue: one screen where the operations team sees every shipment that needs a human decision.",
+          "Reconciliation jobs at Crescent Bank Digital: nightly comparison of card transactions and ledger entries."
+        ]
+      },
+      {
+        "title": "Certifications",
+        "lines": [
+          "AWS Certified Solutions Architect - Associate, 2022",
+          "Snowflake SnowPro Core, 2023",
+          "Certified Kubernetes Application Developer, 2021",
+          "Machine Learning Specialization (online), 2020",
+          "Deep Learning Specialization (online), 2021",
+          "Scrum Master course, 2019"
+        ]
+      },
+      {
+        "title": "Talks and writing",
+        "lines": [
+          "Testing AI agents before release - talk at a Karachi developer meetup, 2025",
+          "What a logistics company learned from its first year with LLMs - company engineering blog, 2024",
+          "Keeping model costs visible - talk at an internal engineering day, 2024"
+        ]
+      },
+      {
+        "title": "Awards",
+        "lines": [
+          "Engineer of the Year, Meridian Freight Tech, 2023",
+          "Best final-year project, Department of Computer and Information Systems, NED University, 2017",
+          "Second place, national university programming contest, 2016"
+        ]
+      },
+      {
+        "title": "Community",
+        "lines": [
+          "Organiser of a monthly Karachi meetup on applied AI, since 2024",
+          "Mentor in a free weekend coding programme for school leavers, since 2022",
+          "Reviewer for the student project showcase at NED University, 2023 and 2024"
+        ]
+      },
+      {
+        "title": "Languages",
+        "lines": [
+          "English (fluent), Urdu (native), Sindhi (conversational)"
+        ]
+      },
+      {
+        "title": "References",
+        "lines": [
+          "Available on request."
+        ]
+      }
+    ],
+    "facts": {
+      "totalYears": 9,
+      "currentRole": "Lead AI Engineer, Meridian Freight Tech"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r2"
+      ],
+      "ai-2": [
+        "met",
+        "r1b0"
+      ],
+      "ai-3": [
+        "met",
+        "r1b0"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "met",
+        "r0b2"
+      ],
+      "ai-8": [
+        "met",
+        "r0b3"
+      ],
+      "ai-9": [
+        "met",
+        "r1b1"
+      ],
+      "ai-10": [
+        "met",
+        "r0b4"
+      ],
+      "ai-11": [
+        "met",
+        "r1b6",
+        [
+          "unclear"
+        ]
+      ],
+      "ai-12": [
+        "met",
+        "r0b1"
+      ]
+    },
+    "why": "Strong and senior, with a long CV of four pages. The important lines are spread over several pages, between projects, certificates, awards and talks.",
+    "roomy": true
+  },
+  {
+    "id": "ai-w04",
+    "group": "borderline",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Ayesha Siddiqui",
+    "headline": "Software Engineer",
+    "location": "Islamabad, Pakistan",
+    "city": "Islamabad",
+    "country": "Pakistan",
+    "email": "ayesha.siddiqui@example.com",
+    "phone": "+92 300 0000104",
+    "links": [],
+    "summary": "Software engineer with five years of experience. Currently working on an AI document assistant.",
+    "roles": [
+      {
+        "title": "Software Engineer (AI)",
+        "company": "Margalla Systems",
+        "place": "Islamabad",
+        "dates": "Apr 2024 - Present",
+        "bullets": [
+          "Develop a document assistant: a multi-step workflow that retrieves policy text, calls a calculation tool and writes the answer with its sources.",
+          "Maintain the Python services and the TypeScript front end for it.",
+          "Tune Postgres queries and the nightly load into the reporting database."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Margalla Systems",
+        "place": "Islamabad",
+        "dates": "Sep 2021 - Mar 2024",
+        "bullets": [
+          "Built REST APIs in Python for the insurance claims product.",
+          "Wrote unit and integration tests; raised coverage of the claims service to 85%."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "Other": "FastAPI, React, PostgreSQL, Docker, Git"
+    },
+    "education": [
+      "BS Software Engineering, COMSATS University Islamabad, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "Software Engineer (AI), Margalla Systems"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b1"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "unclear"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r0b2"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "Every must is met, with little to spare: about two and a half years of AI work, and only one nice to have."
+  },
+  {
+    "id": "ai-w05",
+    "group": "borderline",
+    "format": "pdf",
+    "layout": "compact",
+    "subject": "Resume - Sana Malik",
+    "name": "Sana Malik",
+    "headline": "AI Engineer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "sana.malik@example.com",
+    "phone": "+92 300 0000105",
+    "links": [
+      "github.com/sana-malik-ai"
+    ],
+    "summary": "",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Kite Analytics",
+        "place": "Lahore",
+        "dates": "June 2024 - Present",
+        "bullets": [
+          "Built a customer-support agent with function calling on the OpenAI API; it checks order status and opens refunds through internal tools.",
+          "Moved low-risk intents from GPT-4o to GPT-4o mini after measuring accuracy, which cut the cost per chat by half.",
+          "Front end in TypeScript (React), services in Python."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Kite Analytics",
+        "place": "Lahore",
+        "dates": "April 2022 - May 2024",
+        "bullets": [
+          "Built ETL jobs in Python and SQL from the app database into Redshift.",
+          "Maintained the admin panel."
+        ]
+      }
+    ],
+    "skills": {
+      "Skills": "Python, TypeScript, SQL, OpenAI API, React, Redshift, Git"
+    },
+    "education": [
+      "BS Computer Science, University of the Punjab, 2022"
+    ],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "AI Engineer, Kite Analytics"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1",
+        null,
+        "April 2022 to November 2026 is four years and seven months, just over the line."
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b2"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r1b0"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "Every must is met, the years only just. The email subject does not name the job, so this one belongs on the did-not-match list until HR pulls it in."
+  },
+  {
+    "id": "ai-w06",
+    "group": "borderline",
+    "format": "pdf",
+    "layout": "compact",
+    "subject": "Application for AI Engineer",
+    "name": "Usman Tariq",
+    "headline": "",
+    "location": "Faisalabad, Pakistan",
+    "city": "Faisalabad",
+    "country": "Pakistan",
+    "email": "usman.tariq@example.com",
+    "phone": "+92 300 0000106",
+    "links": [],
+    "summary": "Software engineer, 6 years. Last 2.5 years on LLM products.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Chenab Soft",
+        "place": "Faisalabad",
+        "dates": "May 2024 - Present",
+        "bullets": [
+          "LLM agents with tool calling for a logistics client. Python + TypeScript."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Chenab Soft",
+        "place": "Faisalabad",
+        "dates": "Oct 2020 - Apr 2024",
+        "bullets": [
+          "Web apps. Node.js, React."
+        ]
+      }
+    ],
+    "skills": {},
+    "education": [
+      "BS Software Engineering, GC University Faisalabad, 2020"
+    ],
+    "facts": {
+      "totalYears": 6,
+      "currentRole": "AI Engineer, Chenab Soft"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b0"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "unclear"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "unclear"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "The shortest CV of the set, half a page. Every must is met in a few words and nothing else is said."
+  },
+  {
+    "id": "ai-w07",
+    "group": "misses-one-must",
+    "format": "pdf",
+    "layout": "sidebar",
+    "subject": "Application for AI Engineer",
+    "name": "Miguel Reyes",
+    "headline": "AI Engineer",
+    "location": "Quezon City, Philippines",
+    "city": "Quezon City",
+    "country": "Philippines",
+    "email": "miguel.reyes@example.com",
+    "phone": "+63 900 000 0107",
+    "links": [
+      "github.com/miguel-reyes-ai"
+    ],
+    "summary": "AI engineer at a travel company. I learn fast and I ship.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Lakbay Tech",
+        "place": "Quezon City",
+        "dates": "Sep 2024 - Present",
+        "bullets": [
+          "Built booking agents on the Claude API with tool use; wrote MCP servers for the fare and inventory systems and use Claude Code daily for reviews.",
+          "Benchmarked Claude against GPT-4o and Gemini for itinerary summaries and documented when to use which.",
+          "Zapier and Make automations for refunds and supplier follow-ups.",
+          "Python services, TypeScript widgets.",
+          "Presented results to the non-technical operations heads every sprint."
+        ]
+      },
+      {
+        "title": "Junior Software Developer",
+        "company": "Lakbay Tech",
+        "place": "Quezon City",
+        "dates": "Aug 2023 - Aug 2024",
+        "bullets": [
+          "Internal admin tools in TypeScript; SQL reports for finance."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "AI": "Claude API, Claude Code, MCP, OpenAI, Gemini",
+      "Automation": "Zapier, Make"
+    },
+    "education": [
+      "BS Computer Science, University of the Philippines Diliman, 2023"
+    ],
+    "facts": {
+      "totalYears": 3,
+      "currentRole": "AI Engineer, Lakbay Tech"
+    },
+    "ticks": {
+      "ai-1": [
+        "not_met",
+        "r1",
+        null,
+        "The first job starts in Aug 2023, so there are a little over three years of work, not four."
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b3"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "met",
+        "r0b0"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "met",
+        "r0b2"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r1b0"
+      ],
+      "ai-11": [
+        "met",
+        "r0b4"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "Misses exactly one must, the four years of software work. Everything else is strong, with five nice to haves. Out in strict mode, in the list in lenient mode."
+  },
+  {
+    "id": "ai-w08",
+    "group": "misses-one-must",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for AI Engineer - Farhan Sheikh",
+    "name": "Farhan Sheikh",
+    "headline": "Senior AI Engineer",
+    "location": "Dubai, United Arab Emirates",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "email": "farhan.sheikh@example.com",
+    "phone": "+971 50 000 0108",
+    "links": [
+      "linkedin.com/in/farhan-sheikh-ai"
+    ],
+    "summary": "Eight years in retail technology, the last four on AI assistants and automation for stores and head office.",
+    "roles": [
+      {
+        "title": "Senior AI Engineer",
+        "company": "Gulf Retail Group",
+        "place": "Dubai",
+        "dates": "Jan 2023 - Present",
+        "bullets": [
+          "Built store-support agents with function calling that check stock, raise transfer requests and answer policy questions.",
+          "Tested OpenAI and Gemini models on our own questions and picked a cheaper model for the simple ones.",
+          "Integrated Google Workspace, Slack and Salesforce through APIs and webhooks for approvals and alerts.",
+          "Explained every release to store managers in a short video and a one-page guide.",
+          "Cut the average time to answer a store query from 2 hours to 6 minutes."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Gulf Retail Group",
+        "place": "Dubai",
+        "dates": "Sep 2018 - Dec 2022",
+        "bullets": [
+          "Built pricing and promotion services in Python, with a TypeScript admin console.",
+          "Wrote the SQL models and pipelines for the sales warehouse."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "AI": "OpenAI, Gemini, agents, RAG",
+      "Data": "PostgreSQL, BigQuery"
+    },
+    "education": [
+      "BS Computer Science, Lahore University of Management Sciences, 2018"
+    ],
+    "extra": [
+      {
+        "title": "Personal",
+        "lines": [
+          "Nationality: Pakistani"
+        ]
+      }
+    ],
+    "facts": {
+      "totalYears": 8,
+      "currentRole": "Senior AI Engineer, Gulf Retail Group"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r1b0"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "not_met",
+        "loc",
+        null,
+        "A trap. The CV says Pakistani nationality, but he lives and works in Dubai. The requirement is about where the person is now."
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "met",
+        "r0b2"
+      ],
+      "ai-10": [
+        "met",
+        "r1b1"
+      ],
+      "ai-11": [
+        "met",
+        "r0b3"
+      ],
+      "ai-12": [
+        "met",
+        "r0b4"
+      ]
+    },
+    "why": "Misses exactly one must, the location. Strong everywhere else. The nationality line must not be read as the location."
+  },
+  {
+    "id": "ai-w09",
+    "group": "listed-only",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Zainab Hussain",
+    "headline": "Machine Learning Engineer",
+    "location": "Rawalpindi, Pakistan",
+    "city": "Rawalpindi",
+    "country": "Pakistan",
+    "email": "zainab.hussain@example.com",
+    "phone": "+92 300 0000109",
+    "links": [
+      "github.com/zainab-h-ml"
+    ],
+    "summary": "Machine learning engineer with six years of experience in forecasting and churn models. Keen to move into generative AI.",
+    "roles": [
+      {
+        "title": "Machine Learning Engineer",
+        "company": "Potohar Data",
+        "place": "Rawalpindi",
+        "dates": "Feb 2022 - Present",
+        "bullets": [
+          "Train and serve demand-forecast and churn models in production (Python, FastAPI); retrained weekly.",
+          "Built the labelling tool and the model dashboard in TypeScript (React).",
+          "Maintain the feature pipelines in SQL and Airflow."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Potohar Data",
+        "place": "Rawalpindi",
+        "dates": "Aug 2020 - Jan 2022",
+        "bullets": [
+          "Built back-end APIs in Python for the reporting product."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "ML": "scikit-learn, XGBoost, PyTorch, MLflow",
+      "GenAI": "LLMs, AI agents, function calling, RAG, prompt engineering, OpenAI API",
+      "Data": "PostgreSQL, Airflow"
+    },
+    "education": [
+      "BS Computer Science, National University of Sciences and Technology, 2020"
+    ],
+    "facts": {
+      "totalYears": 6,
+      "currentRole": "Machine Learning Engineer, Potohar Data"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0b0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b1"
+      ],
+      "ai-4": [
+        "mentioned_only",
+        "sk:GenAI",
+        null,
+        "Agents and function calling appear only in the skills list. No role or project uses them."
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "mentioned_only",
+        "sk:GenAI"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r0b2"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "A real ML engineer whose generative AI skills are only a list. The agents must is mentioned only; it must not be ticked as met."
+  },
+  {
+    "id": "ai-w10",
+    "group": "listed-only",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Daniyal Raza",
+    "headline": "AI Engineer",
+    "location": "Multan, Pakistan",
+    "city": "Multan",
+    "country": "Pakistan",
+    "email": "daniyal.raza@example.com",
+    "phone": "+92 300 0000110",
+    "links": [],
+    "summary": "Python developer turned AI engineer. Five years of experience.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Sutlej Labs",
+        "place": "Multan",
+        "dates": "Jan 2024 - Present",
+        "bullets": [
+          "Built a multi-agent workflow in Python (LangGraph) for invoice checking: one agent extracts, one validates against the ERP through function calls, one writes the summary.",
+          "Deployed on AWS; it handles about 9,000 invoices a month."
+        ]
+      },
+      {
+        "title": "Python Developer",
+        "company": "Sutlej Labs",
+        "place": "Multan",
+        "dates": "Jul 2021 - Dec 2023",
+        "bullets": [
+          "Python back ends (Django) and data scripts.",
+          "PostgreSQL reporting queries."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "AI": "Claude API, MCP, OpenAI, LangGraph",
+      "Cloud": "AWS, Docker"
+    },
+    "education": [
+      "BS Computer Science, Bahauddin Zakariya University, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "AI Engineer, Sutlej Labs"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "mentioned_only",
+        "sk:Languages",
+        [
+          "unclear"
+        ],
+        "Python is used in every role. TypeScript appears only in the skills list."
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "mentioned_only",
+        "sk:AI"
+      ],
+      "ai-7": [
+        "mentioned_only",
+        "sk:AI"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r1b1"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "Good agent work in Python, but TypeScript is only listed. The Python and TypeScript must is mentioned only."
+  },
+  {
+    "id": "ai-w11",
+    "group": "silent-on-a-must",
+    "format": "pdf",
+    "layout": "compact",
+    "subject": "Application for AI Engineer",
+    "name": "Carlo Mendoza",
+    "headline": "AI Engineer",
+    "location": "",
+    "city": null,
+    "country": null,
+    "email": "carlo.mendoza@example.com",
+    "phone": "0900 000 0111",
+    "links": [
+      "github.com/carlo-mendoza-dev"
+    ],
+    "summary": "Seven years of software work for a remote-first company, three of them on AI agents.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Tala Systems",
+        "place": "Remote",
+        "dates": "Aug 2023 - Present",
+        "bullets": [
+          "Built sales-assistant agents with function calling; Gemini handles the lookups and an OpenAI model writes the proposal, picked after a side-by-side test.",
+          "Make scenarios for lead routing and follow-up reminders.",
+          "Services in Python, front end in TypeScript."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Tala Systems",
+        "place": "Remote",
+        "dates": "Jun 2019 - Jul 2023",
+        "bullets": [
+          "Built the billing and subscription features of the product.",
+          "Maintained the CI pipeline."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript",
+      "AI": "OpenAI, Gemini, agents",
+      "Automation": "Make"
+    },
+    "education": [
+      "BS Computer Science, Mapua University, 2019"
+    ],
+    "facts": {
+      "totalYears": 7,
+      "currentRole": "AI Engineer, Tala Systems"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b2"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "unclear",
+        null,
+        null,
+        "No location anywhere: both jobs say Remote and the phone number has no country code. The university is in Manila, but where someone studied is not where they are now."
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "met",
+        "r0b0"
+      ],
+      "ai-8": [
+        "met",
+        "r0b1"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "unclear"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "Silent on one must, the location. It must come out as unclear, not as not met, and the candidate stays in the list."
+  },
+  {
+    "id": "ai-w12",
+    "group": "silent-on-a-must",
+    "format": "pdf",
+    "layout": "sidebar",
+    "subject": "Applying for the open position",
+    "name": "Hira Baig",
+    "headline": "AI Engineer",
+    "location": "Peshawar, Pakistan",
+    "city": "Peshawar",
+    "country": "Pakistan",
+    "email": "hira.baig@example.com",
+    "phone": "+92 300 0000112",
+    "links": [
+      "linkedin.com/in/hira-baig-ai"
+    ],
+    "summary": "Six years in data and AI engineering.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Khyber Analytics",
+        "place": "Peshawar",
+        "dates": "Mar 2023 - Present",
+        "bullets": [
+          "Built report-writing agents in Python with tool use: they query the warehouse, run the checks and write the weekly summary.",
+          "Tried three OpenAI models and kept the smallest one that passed our checks."
+        ]
+      },
+      {
+        "title": "Software Engineer (Data)",
+        "company": "Khyber Analytics",
+        "place": "Peshawar",
+        "dates": "Sep 2020 - Feb 2023",
+        "bullets": [
+          "Built data pipelines in Python and SQL into a Redshift warehouse.",
+          "Wrote the data quality checks that run after every load."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, SQL",
+      "AI": "OpenAI API, agents, RAG",
+      "Data": "Redshift, Airflow, dbt"
+    },
+    "education": [
+      "BS Computer Science, University of Peshawar, 2020"
+    ],
+    "facts": {
+      "totalYears": 6,
+      "currentRole": "AI Engineer, Khyber Analytics"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "unclear",
+        null,
+        null,
+        "Python is used in every role. TypeScript and JavaScript are not mentioned anywhere, the same gap three of the real CVs have."
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r1b0"
+      ],
+      "ai-11": [
+        "unclear"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "Silent on one must: no TypeScript or JavaScript anywhere. The email subject does not name the job, so it also belongs on the did-not-match list."
+  },
+  {
+    "id": "ai-w13",
+    "group": "tie",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Omar Farooq",
+    "headline": "AI Engineer",
+    "location": "Sialkot, Pakistan",
+    "city": "Sialkot",
+    "country": "Pakistan",
+    "email": "omar.farooq@example.com",
+    "phone": "+92 300 0000113",
+    "links": [],
+    "summary": "AI engineer with five years of software experience.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Chenab Exports IT",
+        "place": "Sialkot",
+        "dates": "Feb 2024 - Present",
+        "bullets": [
+          "Built order-desk agents with function calling that read buyer emails and prepare the quotation.",
+          "Use GPT-4o for the quotation and a smaller OpenAI model for sorting, after comparing both.",
+          "Python back end and TypeScript dashboard.",
+          "Show each new feature to the export managers in a monthly session."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Chenab Exports IT",
+        "place": "Sialkot",
+        "dates": "Aug 2021 - Jan 2024",
+        "bullets": [
+          "Built the order and shipment database and its SQL reports."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "Python, TypeScript, SQL",
+      "AI": "OpenAI API, Claude"
+    },
+    "education": [
+      "BS Computer Science, University of Sialkot, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "AI Engineer, Chenab Exports IT"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b2"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "mentioned_only",
+        "sk:AI"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r1b0"
+      ],
+      "ai-11": [
+        "met",
+        "r0b3"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "One of two CVs with exactly the same ticks (the other is ai-w14). This email is sent first, so on a tie this candidate must rank above the other."
+  },
+  {
+    "id": "ai-w14",
+    "group": "tie",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Jasmine Cruz",
+    "headline": "AI Engineer",
+    "location": "Davao City, Philippines",
+    "city": "Davao City",
+    "country": "Philippines",
+    "email": "jasmine.cruz@example.com",
+    "phone": "+63 900 000 0114",
+    "links": [],
+    "summary": "Software engineer for six years, working on AI assistants since 2024.",
+    "roles": [
+      {
+        "title": "AI Engineer",
+        "company": "Mindanao Health Apps",
+        "place": "Davao City",
+        "dates": "Mar 2024 - Present",
+        "bullets": [
+          "Built appointment agents with tool use that check doctor schedules and book, move or cancel a visit.",
+          "Tested Gemini and OpenAI models on real requests and chose one for each step.",
+          "TypeScript for the patient app, Python for the services.",
+          "Train clinic reception staff on each release and collect their feedback."
+        ]
+      },
+      {
+        "title": "Software Engineer",
+        "company": "Mindanao Health Apps",
+        "place": "Davao City",
+        "dates": "Jul 2020 - Feb 2024",
+        "bullets": [
+          "Built the patient records module and its PostgreSQL database."
+        ]
+      }
+    ],
+    "skills": {
+      "Languages": "TypeScript, Python, SQL",
+      "AI": "Gemini, OpenAI, Claude"
+    },
+    "education": [
+      "BS Computer Science, Ateneo de Davao University, 2020"
+    ],
+    "facts": {
+      "totalYears": 6,
+      "currentRole": "AI Engineer, Mindanao Health Apps"
+    },
+    "ticks": {
+      "ai-1": [
+        "met",
+        "r1"
+      ],
+      "ai-2": [
+        "met",
+        "r0"
+      ],
+      "ai-3": [
+        "met",
+        "r0b2"
+      ],
+      "ai-4": [
+        "met",
+        "r0b0"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "mentioned_only",
+        "sk:AI"
+      ],
+      "ai-7": [
+        "met",
+        "r0b1"
+      ],
+      "ai-8": [
+        "unclear"
+      ],
+      "ai-9": [
+        "unclear"
+      ],
+      "ai-10": [
+        "met",
+        "r1b0"
+      ],
+      "ai-11": [
+        "met",
+        "r0b3"
+      ],
+      "ai-12": [
+        "unclear"
+      ]
+    },
+    "why": "One of two CVs with exactly the same ticks (the other is ai-w13). This email is sent second, so on a tie this candidate must rank below the other."
+  },
+  {
+    "id": "ai-w15",
+    "group": "other-field",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for AI Engineer",
+    "name": "Nadia Karim",
+    "headline": "Digital Marketing Manager",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "nadia.karim@example.com",
+    "phone": "+92 300 0000115",
+    "links": [
+      "linkedin.com/in/nadia-karim-marketing"
+    ],
+    "summary": "Marketing manager with eight years in food retail. I use AI tools every day and want to move into an AI role.",
+    "roles": [
+      {
+        "title": "Digital Marketing Manager",
+        "company": "Ravi Foods",
+        "place": "Lahore",
+        "dates": "Feb 2021 - Present",
+        "bullets": [
+          "Automated lead follow-up with Zapier: a form entry creates a HubSpot contact, posts to Slack and adds a row in Google Sheets.",
+          "Use ChatGPT to draft ad copy and product descriptions, and wrote a prompt guide for the team.",
+          "Present monthly campaign results to the directors.",
+          "Grew online orders by 45% in one year."
+        ]
+      },
+      {
+        "title": "Marketing Executive",
+        "company": "Ravi Foods",
+        "place": "Lahore",
+        "dates": "Aug 2018 - Jan 2021",
+        "bullets": [
+          "Ran the social media pages and the email newsletter."
+        ]
+      }
+    ],
+    "skills": {
+      "Tools": "Zapier, HubSpot, Google Analytics, Meta Ads, Canva, ChatGPT"
+    },
+    "education": [
+      "BBA Marketing, University of Central Punjab, 2018"
+    ],
+    "facts": {
+      "totalYears": 8,
+      "currentRole": "Digital Marketing Manager, Ravi Foods"
+    },
+    "ticks": {
+      "ai-1": [
+        "not_met",
+        "r0",
+        null,
+        "Eight years of work, none of it as a software engineer."
+      ],
+      "ai-2": [
+        "unclear",
+        null,
+        [
+          "not_met",
+          "met"
+        ],
+        "She did build automations with Zapier since 2021, which the wording of the requirement could cover. It is not engineering work."
+      ],
+      "ai-3": [
+        "unclear"
+      ],
+      "ai-4": [
+        "unclear"
+      ],
+      "ai-5": [
+        "met",
+        "loc"
+      ],
+      "ai-6": [
+        "unclear"
+      ],
+      "ai-7": [
+        "mentioned_only",
+        "r0b1",
+        [
+          "unclear",
+          "met"
+        ],
+        "ChatGPT is used as a tool. Nothing about the API or choosing a model."
+      ],
+      "ai-8": [
+        "met",
+        "r0b0"
+      ],
+      "ai-9": [
+        "met",
+        "r0b0",
+        [
+          "mentioned_only"
+        ],
+        "Done through Zapier, not through APIs and webhooks."
+      ],
+      "ai-10": [
+        "unclear"
+      ],
+      "ai-11": [
+        "met",
+        "r0b2"
+      ],
+      "ai-12": [
+        "met",
+        "r0b3"
+      ]
+    },
+    "why": "Clearly another field. She scores on several nice to haves, but the musts are missing. She must stay at the bottom, and it is still a CV, not junk."
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "id": "ai-w15",
+  "job": "ai-engineer",
+  "file": "ai-w15.docx",
+  "source": "written",
+  "group": "other-field",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Nadia Karim"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Nadia Karim",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 8,
+      "currentRole": "Digital Marketing Manager, Ravi Foods",
+      "education": "BBA Marketing, University of Central Punjab, 2018",
+      "links": [
+        "linkedin.com/in/nadia-karim-marketing"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "not_met",
+        "proof": "Digital Marketing Manager, Ravi Foods",
+        "note": "Eight years of work, none of it as a software engineer."
+      },
+      "ai-2": {
+        "result": "unclear",
+        "proof": null,
+        "alsoAccept": [
+          "not_met",
+          "met"
+        ],
+        "note": "She did build automations with Zapier since 2021, which the wording of the requirement could cover. It is not engineering work."
+      },
+      "ai-3": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-4": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Lahore, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "mentioned_only",
+        "proof": "Use ChatGPT to draft ad copy and product descriptions, and wrote a prompt guide for the team.",
+        "alsoAccept": [
+          "unclear",
+          "met"
+        ],
+        "note": "ChatGPT is used as a tool. Nothing about the API or choosing a model."
+      },
+      "ai-8": {
+        "result": "met",
+        "proof": "Automated lead follow-up with Zapier: a form entry creates a HubSpot contact, posts to Slack and adds a row in Google Sheets."
+      },
+      "ai-9": {
+        "result": "met",
+        "proof": "Automated lead follow-up with Zapier: a form entry creates a HubSpot contact, posts to Slack and adds a row in Google Sheets.",
+        "alsoAccept": [
+          "mentioned_only"
+        ],
+        "note": "Done through Zapier, not through APIs and webhooks."
+      },
+      "ai-10": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Present monthly campaign results to the directors."
+      },
+      "ai-12": {
+        "result": "met",
+        "proof": "Grew online orders by 45% in one year."
+      }
+    }
+  },
+  "why": "Clearly another field. She scores on several nice to haves, but the musts are missing. She must stay at the bottom, and it is still a CV, not junk."
+}

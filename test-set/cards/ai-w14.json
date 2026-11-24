@@ -1,0 +1,76 @@
+{
+  "id": "ai-w14",
+  "job": "ai-engineer",
+  "file": "ai-w14.pdf",
+  "source": "written",
+  "group": "tie",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Jasmine Cruz"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Jasmine Cruz",
+      "city": "Davao City",
+      "country": "Philippines",
+      "totalYears": 6,
+      "currentRole": "AI Engineer, Mindanao Health Apps",
+      "education": "BS Computer Science, Ateneo de Davao University, 2020",
+      "links": []
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Mindanao Health Apps"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Mindanao Health Apps"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "TypeScript for the patient app, Python for the services."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built appointment agents with tool use that check doctor schedules and book, move or cancel a visit."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Davao City, Philippines"
+      },
+      "ai-6": {
+        "result": "mentioned_only",
+        "proof": "AI: Gemini, OpenAI, Claude"
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Tested Gemini and OpenAI models on real requests and chose one for each step."
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Built the patient records module and its PostgreSQL database."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Train clinic reception staff on each release and collect their feedback."
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "One of two CVs with exactly the same ticks (the other is ai-w13). This email is sent second, so on a tie this candidate must rank below the other."
+}

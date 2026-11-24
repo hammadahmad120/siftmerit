@@ -1,0 +1,43 @@
+• Map workflows across departments and identify AI and automation opportunities
+• Build and maintain a prioritized AI opportunity roadmap
+• Redesign processes around AI with team leads
+• Recommend custom builds versus existing AI tools and platforms
+• Track and report initiative impact in time saved, cost, and quality
+• Build AI agents and multi-step workflows for research, briefing, reporting, analysis, and operations
+• Develop LLM-powered applications using Claude and other suitable providers
+• Automate data entry, status updates, client reporting, onboarding, and approvals
+• Build AI assistants for drafting, summarization, review, and company-knowledge questions
+• Design and build internal web apps, portals, sites, and real-time dashboards
+• Connect dashboards to live data sources and add AI-powered features
+• Integrate Google Workspace, Slack, project management tools, CRM, HR systems, and advertising platforms
+• Build data pipelines and RAG systems over company knowledge
+• Define data standards and maintain clean, secure data
+• Build evaluation checks, monitoring, logging, access controls, and privacy practices
+• Monitor AI tool and infrastructure costs
+• Document systems for maintenance and handover
+• Roll out tools with guides, demos, and training
+• Configure Claude Projects, Skills, and connectors for teams
+• Track adoption, collect feedback, and improve tools
+• Explain technical trade-offs and results to non-technical teammates and leadership
+
+🎯 Requirements
+• 4+ years of professional software engineering experience
+• 2+ years building AI, automation, or internal tooling in production
+• Strong proficiency in Python and TypeScript or JavaScript
+• Hands-on experience with Claude, including the Claude API and at least two of Claude Code, Projects, Skills, or MCP connections
+• Experience with OpenAI or Google Gemini and selecting the appropriate model
+• Experience building AI agents, tool use, function calling, and multi-step workflows
+• Experience with n8n, Make, or Zapier
+• Experience integrating Google Workspace, Slack, CRM, and project management tools through APIs and webhooks
+• Solid SQL skills and experience with databases, data pipelines, and data warehouses
+• Excellent communication skills with non-technical stakeholders
+• Entrepreneurial mindset with strong execution, ownership, and measurable-results orientation
+• Currently located in the Philippines or Pakistan
+
+🏖️ Benefits
+• Fully remote work
+• Performance bonus
+• Equity
+• Autonomy to choose processes, tools, and architectures
+• Direct access to leadership
+• Support to make company-wide operational changes

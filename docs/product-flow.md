@@ -77,10 +77,12 @@ Rules for ticks:
 
 ### Step 7: Code scores and sorts (no AI)
 - A fixed formula turns ticks into a score. Starting values: must met 10, nice to have met 3, unclear half.
-- **Strict:** a missed must means out. **Lenient:** one must may be missing.
+- A missed must never hides a candidate. Candidates are sorted into lists: every must met; one must missing, shown with the reason; and everyone else, further down. Inside a list they are ranked by score. HR decides whom to drop.
 - "Unclear" stays in, ranked lower.
 - Ties go to the earlier applicant.
 - Code checks that each proof line really appears in the CV text.
+
+The list rule was changed on 2026-11-24. Before that, strict mode put a candidate with a missed must out, and lenient mode allowed one. The reason is in [decisions.md](decisions.md). Whether HR still picks strict or lenient in step 2 is open.
 
 ### Step 8: The best 5 go to HR
 Each candidate has a card: fact sheet details, every tick with its proof line, and why they ranked there. The full CV is one click away. The AI only recommends. It never rejects anyone.
@@ -90,7 +92,7 @@ There is **no second "careful check" with a stronger model** in the first versio
 ## 4. Limits
 
 - **Date range:** only mail from the posting date onward.
-- **Round cap:** 200 CVs per round, oldest first, fetched in small batches. Then HR is asked: "Read 200 of 340. Here are the best 5 so far. Read the rest?"
+- **Round:** 50 CVs per round, oldest first. Then HR sees the result and is asked: "Read 50 of 340. Read the next 50?" After each further round the lists are built from everything read so far, and the candidates of the latest round are clearly marked as new. The lists change only when HR acts. Changed on 2026-11-24 from a round of 200; the reason is in [decisions.md](decisions.md).
 - **Job budget:** a hard total per job as a safety net (starting guess 1,000 CVs).
 - **List cap:** the confirmation list in step 4 has its own limit, with a "narrow your subject or date" message past it.
 - HR always sees how many are still unread.
@@ -132,7 +134,7 @@ One fact sheet belongs to one candidate, not to one job. Ticks belong to one can
 - Whether short, concise CVs should be favoured over long ones. Ideas raised: recent experience counts more, and conciseness as an optional tie-breaker.
 
 **To tune on real data**
-- The 200 round cap, the job budget, the point values, the score bar for keeping candidates, the keep-until period.
+- The round of 50, the job budget, the point values, the score bar for keeping candidates, the keep-until period.
 - AI cost. "Cents per job for 200 CVs" was a rough unmeasured estimate.
 
 **To test before deciding**

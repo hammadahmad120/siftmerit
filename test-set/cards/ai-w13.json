@@ -1,0 +1,76 @@
+{
+  "id": "ai-w13",
+  "job": "ai-engineer",
+  "file": "ai-w13.docx",
+  "source": "written",
+  "group": "tie",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Omar Farooq"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Omar Farooq",
+      "city": "Sialkot",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "AI Engineer, Chenab Exports IT",
+      "education": "BS Computer Science, University of Sialkot, 2021",
+      "links": []
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Chenab Exports IT"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Chenab Exports IT"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Python back end and TypeScript dashboard."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built order-desk agents with function calling that read buyer emails and prepare the quotation."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Sialkot, Pakistan"
+      },
+      "ai-6": {
+        "result": "mentioned_only",
+        "proof": "AI: OpenAI API, Claude"
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Use GPT-4o for the quotation and a smaller OpenAI model for sorting, after comparing both."
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Built the order and shipment database and its SQL reports."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Show each new feature to the export managers in a monthly session."
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "One of two CVs with exactly the same ticks (the other is ai-w14). This email is sent first, so on a tie this candidate must rank above the other."
+}

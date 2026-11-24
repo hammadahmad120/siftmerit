@@ -1,0 +1,79 @@
+{
+  "id": "ai-w05",
+  "job": "ai-engineer",
+  "file": "ai-w05.pdf",
+  "source": "written",
+  "group": "borderline",
+  "email": {
+    "subject": "Resume - Sana Malik",
+    "senderName": "Sana Malik"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Sana Malik",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "AI Engineer, Kite Analytics",
+      "education": "BS Computer Science, University of the Punjab, 2022",
+      "links": [
+        "github.com/sana-malik-ai"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Kite Analytics",
+        "note": "April 2022 to November 2026 is four years and seven months, just over the line."
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Kite Analytics"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Front end in TypeScript (React), services in Python."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built a customer-support agent with function calling on the OpenAI API; it checks order status and opens refunds through internal tools."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Lahore, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Moved low-risk intents from GPT-4o to GPT-4o mini after measuring accuracy, which cut the cost per chat by half."
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Built ETL jobs in Python and SQL from the app database into Redshift."
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Every must is met, the years only just. The email subject does not name the job, so this one belongs on the did-not-match list until HR pulls it in."
+}

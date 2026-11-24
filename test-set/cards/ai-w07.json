@@ -1,0 +1,79 @@
+{
+  "id": "ai-w07",
+  "job": "ai-engineer",
+  "file": "ai-w07.pdf",
+  "source": "written",
+  "group": "misses-one-must",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Miguel Reyes"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Miguel Reyes",
+      "city": "Quezon City",
+      "country": "Philippines",
+      "totalYears": 3,
+      "currentRole": "AI Engineer, Lakbay Tech",
+      "education": "BS Computer Science, University of the Philippines Diliman, 2023",
+      "links": [
+        "github.com/miguel-reyes-ai"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "not_met",
+        "proof": "Junior Software Developer, Lakbay Tech",
+        "note": "The first job starts in Aug 2023, so there are a little over three years of work, not four."
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Lakbay Tech"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Python services, TypeScript widgets."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built booking agents on the Claude API with tool use; wrote MCP servers for the fare and inventory systems and use Claude Code daily for reviews."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Quezon City, Philippines"
+      },
+      "ai-6": {
+        "result": "met",
+        "proof": "Built booking agents on the Claude API with tool use; wrote MCP servers for the fare and inventory systems and use Claude Code daily for reviews."
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Benchmarked Claude against GPT-4o and Gemini for itinerary summaries and documented when to use which."
+      },
+      "ai-8": {
+        "result": "met",
+        "proof": "Zapier and Make automations for refunds and supplier follow-ups."
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Internal admin tools in TypeScript; SQL reports for finance."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Presented results to the non-technical operations heads every sprint."
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Misses exactly one must, the four years of software work. Everything else is strong, with five nice to haves. Out in strict mode, in the list in lenient mode."
+}

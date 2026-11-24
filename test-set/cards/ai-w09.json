@@ -1,0 +1,79 @@
+{
+  "id": "ai-w09",
+  "job": "ai-engineer",
+  "file": "ai-w09.pdf",
+  "source": "written",
+  "group": "listed-only",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Zainab Hussain"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Zainab Hussain",
+      "city": "Rawalpindi",
+      "country": "Pakistan",
+      "totalYears": 6,
+      "currentRole": "Machine Learning Engineer, Potohar Data",
+      "education": "BS Computer Science, National University of Sciences and Technology, 2020",
+      "links": [
+        "github.com/zainab-h-ml"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Potohar Data"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "Train and serve demand-forecast and churn models in production (Python, FastAPI); retrained weekly."
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Built the labelling tool and the model dashboard in TypeScript (React)."
+      },
+      "ai-4": {
+        "result": "mentioned_only",
+        "proof": "GenAI: LLMs, AI agents, function calling, RAG, prompt engineering, OpenAI API",
+        "note": "Agents and function calling appear only in the skills list. No role or project uses them."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Rawalpindi, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "mentioned_only",
+        "proof": "GenAI: LLMs, AI agents, function calling, RAG, prompt engineering, OpenAI API"
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Maintain the feature pipelines in SQL and Airflow."
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "A real ML engineer whose generative AI skills are only a list. The agents must is mentioned only; it must not be ticked as met."
+}

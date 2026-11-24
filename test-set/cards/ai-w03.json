@@ -1,0 +1,82 @@
+{
+  "id": "ai-w03",
+  "job": "ai-engineer",
+  "file": "ai-w03.pdf",
+  "source": "written",
+  "group": "strong",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Hamza Qureshi"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Hamza Qureshi",
+      "city": "Karachi",
+      "country": "Pakistan",
+      "totalYears": 9,
+      "currentRole": "Lead AI Engineer, Meridian Freight Tech",
+      "education": "BE Computer and Information Systems, NED University of Engineering and Technology, Karachi, 2017",
+      "links": [
+        "github.com/hamza-q",
+        "hamzaqureshi.example.com"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Crescent Bank Digital"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "Built the internal tooling used by 40 operations staff: quote calculator, exception queue and audit log, in TypeScript and Python."
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Built the internal tooling used by 40 operations staff: quote calculator, exception queue and audit log, in TypeScript and Python."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Lead a team of five building AI agents that plan shipments: each agent calls pricing, customs and tracking tools and hands its result to the next step."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Karachi, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Use OpenAI models for planning and a small open model for extraction, chosen by measured cost per shipment."
+      },
+      "ai-8": {
+        "result": "met",
+        "proof": "Built n8n flows for document intake and approval reminders."
+      },
+      "ai-9": {
+        "result": "met",
+        "proof": "Integrated Salesforce, Slack and Jira through APIs and webhooks, so that an exception opens a ticket and alerts the account owner."
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Own the data platform: Postgres, Airflow pipelines and a Snowflake warehouse that feeds the dashboards."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Ran the weekly review of failed bookings with the operations leads and turned the findings into fixes.",
+        "alsoAccept": [
+          "unclear"
+        ]
+      },
+      "ai-12": {
+        "result": "met",
+        "proof": "Introduced an evaluation suite of 1,200 cases that runs before every release; wrong-answer reports from customers fell by 60%."
+      }
+    }
+  },
+  "why": "Strong and senior, with a long CV of four pages. The important lines are spread over several pages, between projects, certificates, awards and talks."
+}

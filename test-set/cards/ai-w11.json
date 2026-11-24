@@ -1,0 +1,79 @@
+{
+  "id": "ai-w11",
+  "job": "ai-engineer",
+  "file": "ai-w11.pdf",
+  "source": "written",
+  "group": "silent-on-a-must",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Carlo Mendoza"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Carlo Mendoza",
+      "city": null,
+      "country": null,
+      "totalYears": 7,
+      "currentRole": "AI Engineer, Tala Systems",
+      "education": "BS Computer Science, Mapua University, 2019",
+      "links": [
+        "github.com/carlo-mendoza-dev"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Tala Systems"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "AI Engineer, Tala Systems"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Services in Python, front end in TypeScript."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built sales-assistant agents with function calling; Gemini handles the lookups and an OpenAI model writes the proposal, picked after a side-by-side test."
+      },
+      "ai-5": {
+        "result": "unclear",
+        "proof": null,
+        "note": "No location anywhere: both jobs say Remote and the phone number has no country code. The university is in Manila, but where someone studied is not where they are now."
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Built sales-assistant agents with function calling; Gemini handles the lookups and an OpenAI model writes the proposal, picked after a side-by-side test."
+      },
+      "ai-8": {
+        "result": "met",
+        "proof": "Make scenarios for lead routing and follow-up reminders."
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Silent on one must, the location. It must come out as unclear, not as not met, and the candidate stays in the list."
+}

@@ -229,7 +229,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 | 36 | Shortlist (steps 7 and 8): best five cards, full CV one click away, HR's notes | Build | 33, 35 | The best five show with ticks, proof lines and the reason for each rank | Card layout, where HR's notes are saved |
 | 37 | Agent tool: explain a ranking | Build | 18, 36 | The agent explains why a candidate is third | None so far |
 | 38 | Eval: top five against a person's pick | Build | 15, 36 | The command prints the overlap | Who makes the person's pick |
-| 39 | Rounds and limits (section 4) | Build | 36 | A round stops at 200 CVs and asks "Read 200 of 340. Read the rest?". The job budget is enforced, and HR sees how many are unread | How screens show progress, cap values |
+| 39 | Rounds and limits (section 4) | Build | 36 | A round stops at 50 CVs and asks "Read 50 of 340. Read the next 50?". The next round's lists are built from everything read so far, with the new candidates marked. The job budget is enforced, and HR sees how many are unread | How screens show progress, cap values |
 
 ### While the job is open
 
@@ -257,6 +257,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 ### Notes on the list
 
+- **A decision task was added on 2026-11-24, to be done right after task 12 and before task 13: how the lists are decided after each round.** It is task 54, so no other number changes. Kind: decision. Needs: 12. "Kept out" means not shown to HR in the relevant list. How to check: the rule is written in `decisions.md`, and applied by hand to the answer cards of the test set it puts the right people in the relevant list and leaves the right people out of it. Decide then: whether an unclear must counts as missing; where a must that is only mentioned puts a candidate; the point values; how many candidates each list shows first; what HR can keep or drop by hand; whether HR still picks strict or lenient. It takes these choices out of task 35, which then only builds the scorer.
 - **The company separation test has no task.** It was planned for task 6, moved to task 11 on 2026-11-18 and taken out of task 11 on 2026-11-24. When it is built, and how it stays safe beside real data, are open points in `decisions.md`. Recommended: its own small task before task 26, the first task that stores CV text.
 - **Near the size ceiling:** tasks 2, 6, 26, 29 and 32. Any that prove too big are split in their plan step.
 - **Near the floor:** tasks 25 and 42. They can be merged into 24 and 40 when reached.

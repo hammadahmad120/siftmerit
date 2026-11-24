@@ -1,0 +1,76 @@
+{
+  "id": "ai-w04",
+  "job": "ai-engineer",
+  "file": "ai-w04.docx",
+  "source": "written",
+  "group": "borderline",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Ayesha Siddiqui"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Ayesha Siddiqui",
+      "city": "Islamabad",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "Software Engineer (AI), Margalla Systems",
+      "education": "BS Software Engineering, COMSATS University Islamabad, 2021",
+      "links": []
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Margalla Systems"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "Software Engineer (AI), Margalla Systems"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Maintain the Python services and the TypeScript front end for it."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Develop a document assistant: a multi-step workflow that retrieves policy text, calls a calculation tool and writes the answer with its sources."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Islamabad, Pakistan"
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Tune Postgres queries and the nightly load into the reporting database."
+      },
+      "ai-11": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-12": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Every must is met, with little to spare: about two and a half years of AI work, and only one nice to have."
+}

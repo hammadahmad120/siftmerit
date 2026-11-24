@@ -1,0 +1,78 @@
+{
+  "id": "ai-w01",
+  "job": "ai-engineer",
+  "file": "ai-w01.pdf",
+  "source": "written",
+  "group": "strong",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Bilal Ahmed"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Bilal Ahmed",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 7,
+      "currentRole": "Senior AI Engineer, Northwind Labs",
+      "education": "BS Computer Science, FAST-NUCES Lahore, 2019",
+      "links": [
+        "github.com/bilal-ahmed-dev"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Indus Softworks"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "Senior AI Engineer, Northwind Labs"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Built internal web apps and dashboards in TypeScript (React, Node.js) and Python (FastAPI) for the delivery teams."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built a multi-step research agent on the Claude API with tool use and function calling; it drafts client briefings and cut analyst prep time from 3 hours to 25 minutes."
+      },
+      "ai-5": {
+        "result": "met",
+        "proof": "Lahore, Pakistan"
+      },
+      "ai-6": {
+        "result": "met",
+        "proof": "Set up Claude Projects and Skills for the sales and support teams, and wrote MCP connectors to the CRM and the ticket system."
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Compared Claude, GPT-4o and Gemini on our own test set and routed each task to the cheapest model that passed, lowering monthly model spend by 38%."
+      },
+      "ai-8": {
+        "result": "met",
+        "proof": "Automated client onboarding and approval steps in n8n, with webhooks into HubSpot, Slack and Google Sheets."
+      },
+      "ai-9": {
+        "result": "met",
+        "proof": "Automated client onboarding and approval steps in n8n, with webhooks into HubSpot, Slack and Google Sheets."
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Designed PostgreSQL schemas and nightly pipelines into a BigQuery warehouse for client reporting."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Ran monthly demos for the operations and finance teams and wrote plain-language guides for each tool."
+      },
+      "ai-12": {
+        "result": "met",
+        "proof": "Built a multi-step research agent on the Claude API with tool use and function calling; it drafts client briefings and cut analyst prep time from 3 hours to 25 minutes."
+      }
+    }
+  },
+  "why": "The clearest strong match: every must and every nice to have is shown in a role."
+}

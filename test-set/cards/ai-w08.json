@@ -1,0 +1,79 @@
+{
+  "id": "ai-w08",
+  "job": "ai-engineer",
+  "file": "ai-w08.docx",
+  "source": "written",
+  "group": "misses-one-must",
+  "email": {
+    "subject": "Application for AI Engineer - Farhan Sheikh",
+    "senderName": "Farhan Sheikh"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Farhan Sheikh",
+      "city": "Dubai",
+      "country": "United Arab Emirates",
+      "totalYears": 8,
+      "currentRole": "Senior AI Engineer, Gulf Retail Group",
+      "education": "BS Computer Science, Lahore University of Management Sciences, 2018",
+      "links": [
+        "linkedin.com/in/farhan-sheikh-ai"
+      ]
+    },
+    "ticks": {
+      "ai-1": {
+        "result": "met",
+        "proof": "Software Engineer, Gulf Retail Group"
+      },
+      "ai-2": {
+        "result": "met",
+        "proof": "Senior AI Engineer, Gulf Retail Group"
+      },
+      "ai-3": {
+        "result": "met",
+        "proof": "Built pricing and promotion services in Python, with a TypeScript admin console."
+      },
+      "ai-4": {
+        "result": "met",
+        "proof": "Built store-support agents with function calling that check stock, raise transfer requests and answer policy questions."
+      },
+      "ai-5": {
+        "result": "not_met",
+        "proof": "Dubai, United Arab Emirates",
+        "note": "A trap. The CV says Pakistani nationality, but he lives and works in Dubai. The requirement is about where the person is now."
+      },
+      "ai-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-7": {
+        "result": "met",
+        "proof": "Tested OpenAI and Gemini models on our own questions and picked a cheaper model for the simple ones."
+      },
+      "ai-8": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-9": {
+        "result": "met",
+        "proof": "Integrated Google Workspace, Slack and Salesforce through APIs and webhooks for approvals and alerts."
+      },
+      "ai-10": {
+        "result": "met",
+        "proof": "Wrote the SQL models and pipelines for the sales warehouse."
+      },
+      "ai-11": {
+        "result": "met",
+        "proof": "Explained every release to store managers in a short video and a one-page guide."
+      },
+      "ai-12": {
+        "result": "met",
+        "proof": "Cut the average time to answer a store query from 2 hours to 6 minutes."
+      }
+    }
+  },
+  "why": "Misses exactly one must, the location. Strong everywhere else. The nationality line must not be read as the location."
+}

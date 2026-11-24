@@ -72,6 +72,10 @@ packages/core/         Shared logic for the API and the worker: AI wrapper, prom
                        masking, proof check, scorer, work queue, mailsift client,
                        secret encryption
 supabase/migrations/   SQL files
+test-set/              The test set, in git: made-up CVs, junk files, their answer
+                       cards, the two job adverts, and the script that makes them
+test-cvs/              Ignored by git: the real CVs of the test set and their
+                       answer cards. Never commit anything from it
 docs/                  See "Docs" below
 ```
 
@@ -91,6 +95,8 @@ Run from the repo root.
 - `npm run mailbox:connect`: development only. Gets the test mailbox's secret with one Allow click and prints the line to paste into `.env`. Needed again when the secret ends (after 7 days while the Google project is in "Testing").
 - `npm run mailbox:check`: development only. Lists five emails from the test mailbox through mailsift. mailsift must be running first, in its own terminal, from its own folder: `npm run dev:env -- --http` (port 3000).
 
+- `node test-set/build.mjs`: development only. Makes the written CVs of the test set (`test-set/files/`) and their answer cards (`test-set/cards/`) from the fact cards in `test-set/source/`. It needs Google Chrome and pandoc. Files in `files/` and `cards/` are never edited by hand.
+
 Settings are listed in `.env.example`. A setting is added by the task that first uses it.
 
 ## Docs
@@ -98,6 +104,7 @@ Settings are listed in `.env.example`. A setting is added by the task that first
 - docs/tech-plan.md: tools, structure, what is copied from InstantBot, the task list (section 8), mailsift facts (section 9).
 - docs/table-map.md: the database tables, what each keeps and how they link. Read it before any task that adds or changes a table.
 - docs/decisions.md: decisions made while working, and open points for later tasks.
+- docs/test-set.md: the test set: the two jobs and their requirements, what is in the set, the answer card, how a tick is decided, and how the files are made.
 - docs/developer-guide.md: how the built product works, for a new developer: the parts, how to run them, the flow, the reasons and the traps.
 
 If docs/tech-plan.md sections 2 or 7 differ from this file, this file wins.
