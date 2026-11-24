@@ -3,6 +3,23 @@ import type { NextFunction, Request, Response } from "express";
 import { ZodError, z } from "zod";
 import { AppError, NotFoundError } from "../lib/errors.js";
 
+/**
+ * Tells the two ways Express's JSON body reader refuses a body: it is not
+ * valid JSON, or it is larger than the limit set in `app.ts`.
+ */
+function bodyReadProblem(
+  error: unknown,
+): { status: number; code: string; message: string } | null {
+  const type = (error as { type?: unknown } | null)?.type;
+  if (type === "entity.parse.failed") {
+    return { status: 400, code: "invalid_json", message: "The request body is not valid JSON" };
+  }
+  if (type === "entity.too.large") {
+    return { status: 413, code: "body_too_large", message: "The request body is too large" };
+  }
+  return null;
+}
+
 /** Runs when no route matched. Turns it into a normal "not found" error. */
 export function notFoundMiddleware(req: Request, _res: Response, next: NextFunction) {
   next(new NotFoundError(`No route for ${req.method} ${req.path}`, "route_not_found"));
@@ -52,6 +69,22 @@ function handleError(error: unknown, req: Request, res: Response, showDatabaseMe
     });
     res.status(error.statusCode).json({
       error: { code, message: error.message, requestId },
+    });
+    return;
+  }
+
+  // The request's body could not be read. Express's body reader reports this
+  // with a `type` on the error. Its message can repeat part of the body, so
+  // it is neither logged nor sent back.
+  const bodyProblem = bodyReadProblem(error);
+  if (bodyProblem) {
+    req.log.warn("request refused", {
+      errorName: "BodyReadError",
+      code: bodyProblem.code,
+      status: bodyProblem.status,
+    });
+    res.status(bodyProblem.status).json({
+      error: { code: bodyProblem.code, message: bodyProblem.message, requestId },
     });
     return;
   }

@@ -141,12 +141,25 @@ export type WorkRun = {
 };
 
 /**
+ * How a demo run should behave. Test only: each word shows one case.
+ * `delayed` waits 20 seconds before it runs, `fail_once` fails on its first
+ * try, `fail_always` on every try, and `slow` takes 20 seconds.
+ */
+export type DemoMode = "ok" | "delayed" | "fail_once" | "fail_always" | "slow";
+
+/**
  * Asks the API to start one demo run. The answer comes back at once, with the
- * run still `waiting`: the worker does the work a moment later.
+ * run still `waiting`: the worker does the work a moment later. When the
+ * company already has an unfinished demo run, the API answers 409 with the
+ * code `already_queued`.
  * Temporary, like the panel that calls it.
  */
-export function startDemoRun(): Promise<{ run: WorkRun }> {
-  return apiFetch<{ run: WorkRun }>("/v1/demo-work", { method: "POST" });
+export function startDemoRun(mode: DemoMode): Promise<{ run: WorkRun }> {
+  return apiFetch<{ run: WorkRun }>("/v1/demo-work", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode }),
+  });
 }
 
 /** The company's newest demo runs, newest first. Temporary. */

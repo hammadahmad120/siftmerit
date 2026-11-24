@@ -1,13 +1,36 @@
 import {
   QueueUnavailableError,
+  WorkRunAlreadyActiveError,
+  type DemoMode,
   type DemoQueue,
   type WorkRunRepository,
   type WorkRunRow,
 } from "@siftmerit/core";
-import { ServiceUnavailableError } from "../lib/errors.js";
+import { z } from "zod";
+import { ConflictError, ServiceUnavailableError } from "../lib/errors.js";
 
 /** How many runs the page lists. */
 const RECENT_RUNS = 10;
+
+/** How long the "Run in 20 seconds" item is kept aside before a worker may take it. */
+const DELAY_MS = 20_000;
+
+/**
+ * An unfinished run that has not changed for this long is taken to be stuck
+ * and is closed before a new one starts. Far longer than any demo run takes.
+ * Real work picks its own limit.
+ */
+const STALE_AFTER_MS = 10 * 60 * 1000;
+
+/**
+ * What the page may ask for. Test only, like the whole demo.
+ * `delayed` is an ordinary item that is kept aside for 20 seconds first.
+ */
+export const demoRunRequestSchema = z.object({
+  mode: z.enum(["ok", "delayed", "fail_once", "fail_always", "slow"]).default("ok"),
+});
+
+export type DemoRunRequest = z.infer<typeof demoRunRequestSchema>;
 
 /** What the web app may know about a run. The company ID is left out. */
 export type WorkRunView = {
@@ -51,17 +74,40 @@ export class DemoWorkService {
   /**
    * Starts one demo run. The order matters:
    *
-   * 1. The row is saved first, with the status `waiting`. What HR sees lives
-   *    in Postgres, so the row must exist before any work can.
-   * 2. Then the work item is queued, carrying the row's ID.
-   * 3. If queuing fails, the row is marked failed, so it does not say
+   * 1. Runs of this company that stopped moving long ago are closed, so one
+   *    stuck run cannot block the button for ever.
+   * 2. The row is saved, with the status `waiting`. What HR sees lives in
+   *    Postgres, so the row must exist before any work can. If the company
+   *    already has an unfinished demo run, the database refuses the row and
+   *    the caller gets 409 "already queued": nothing is queued twice.
+   * 3. Then the work item is queued, carrying the row's ID.
+   * 4. If queuing fails, the row is marked failed, so it does not say
    *    "waiting" for work that will never come.
    */
-  async startRun(tenantId: string, requestId: string): Promise<WorkRunView> {
-    const run = await this.workRuns.insert(tenantId, "demo");
+  async startRun(tenantId: string, requestId: string, request: DemoRunRequest): Promise<WorkRunView> {
+    await this.workRuns.closeStale(tenantId, "demo", STALE_AFTER_MS);
+
+    let run: WorkRunRow;
+    try {
+      run = await this.workRuns.insert(tenantId, "demo");
+    } catch (error) {
+      if (error instanceof WorkRunAlreadyActiveError) {
+        throw new ConflictError(
+          "A demo run is already waiting or running. Wait for it to finish.",
+          "already_queued",
+        );
+      }
+      throw error;
+    }
+
+    const delayed = request.mode === "delayed";
+    const mode: DemoMode = request.mode === "delayed" ? "ok" : request.mode;
 
     try {
-      await this.queue.add({ workRunId: run.id, tenantId, requestId });
+      await this.queue.add(
+        { workRunId: run.id, tenantId, requestId, mode },
+        delayed ? { delayMs: DELAY_MS } : undefined,
+      );
     } catch (error) {
       if (error instanceof QueueUnavailableError) {
         await this.workRuns.markFailed(tenantId, run.id, "queue_unavailable");

@@ -5,6 +5,8 @@ import {
   createSecretClient,
   DEMO_QUEUE_NAME,
   demoWorkItemSchema,
+  isFinalFailure,
+  isWorkerLost,
   WorkRunRepository,
 } from "@siftmerit/core";
 import { loadEnv } from "./config/env.js";
@@ -36,26 +38,51 @@ function start() {
   // Connection trouble. Without this listener an error would stop the worker.
   worker.on("error", createQueueTroubleLogger(logger));
 
-  // An item whose handler threw. `item` is missing only when the queue lost
-  // track of it, which should not happen. The line holds IDs and the error,
-  // never the item's content. The IDs inside the item are logged only
-  // when the item has the right shape: an item with the wrong shape could
-  // hold anything in those fields.
+  // A try that failed. This fires after every try, not only the last one.
+  // `item` is missing only when the queue lost track of it, which should not
+  // happen. The line holds IDs and the error, never the item's content. The
+  // IDs inside the item are logged only when the item has the right shape: an
+  // item with the wrong shape could hold anything in those fields.
   worker.on("failed", (item, error) => {
     const checked = demoWorkItemSchema.safeParse(item?.data);
-    logger.error("work item failed", {
+    const final = item ? isFinalFailure(item, error) : true;
+    const ids = checked.success
+      ? {
+          workRunId: checked.data.workRunId,
+          requestId: checked.data.requestId,
+          tenantId: checked.data.tenantId,
+        }
+      : {};
+
+    logger.error(final ? "work item failed for good" : "work item failed, it will be tried again", {
       queue: DEMO_QUEUE_NAME,
       workItemId: item?.id,
-      ...(checked.success
-        ? {
-            workRunId: checked.data.workRunId,
-            requestId: checked.data.requestId,
-            tenantId: checked.data.tenantId,
-          }
-        : {}),
+      ...ids,
+      attempt: item?.attemptsMade,
+      allowed: item?.opts.attempts,
       errorName: error.name,
       errorMessage: error.message,
     });
+
+    // Making sure the run's row says "failed" when the item is failed for
+    // good. After an ordinary last try the handler has already done this and
+    // the call below changes nothing. It matters when the queue gave up on an
+    // item whose worker died twice: then no handler ran, and this is the only
+    // place that learns of it.
+    if (final && checked.success) {
+      const reason = isWorkerLost(error) ? "worker_lost" : "work_failed";
+      workRuns
+        .markFailed(checked.data.tenantId, checked.data.workRunId, reason)
+        .catch((updateError: unknown) => {
+          logger.error("the run's row could not be marked failed", {
+            queue: DEMO_QUEUE_NAME,
+            workItemId: item?.id,
+            ...ids,
+            errorName: updateError instanceof Error ? updateError.name : "unknown",
+            errorMessage: updateError instanceof Error ? updateError.message : undefined,
+          });
+        });
+    }
   });
 
   logger.info("Worker started", { queue: DEMO_QUEUE_NAME });

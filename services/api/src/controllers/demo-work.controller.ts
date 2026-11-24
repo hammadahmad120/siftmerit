@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { UnauthorizedError } from "../lib/errors.js";
-import type { DemoWorkService } from "../services/demo-work.service.js";
+import { demoRunRequestSchema, type DemoWorkService } from "../services/demo-work.service.js";
 
 /**
  * The demo work addresses. It gives back a group of functions, one per
@@ -8,12 +8,15 @@ import type { DemoWorkService } from "../services/demo-work.service.js";
  * uses.
  *
  * Both need a signed-in user: `req.tenantId` is set by the two sign-in steps
- * that run before. Nothing is read from the request's body.
+ * that run before. The company is never read from the request.
  */
 export function createDemoWorkController(demoWorkService: DemoWorkService) {
   return {
     /**
-     * `POST /v1/demo-work`: starts one demo run for the user's company.
+     * `POST /v1/demo-work`: starts one demo run for the user's company. The
+     * body may hold `{ "mode": ... }`, one word from a fixed list that says
+     * how the run should behave; without it the run simply works. A body with
+     * anything else in `mode` is answered 400.
      *
      * The answer is 202, "accepted": the run is saved and its work item is in
      * the queue, but the work is not done yet. The API does not wait for the
@@ -25,8 +28,11 @@ export function createDemoWorkController(demoWorkService: DemoWorkService) {
           throw new UnauthorizedError();
         }
 
-        const run = await demoWorkService.startRun(req.tenantId, req.requestId);
-        req.log.info("work run queued", { workRunId: run.id });
+        // `req.body` is undefined when the request has no JSON body.
+        const request = demoRunRequestSchema.parse(req.body ?? {});
+
+        const run = await demoWorkService.startRun(req.tenantId, req.requestId, request);
+        req.log.info("work run queued", { workRunId: run.id, mode: request.mode });
         res.status(202).json({ run });
       } catch (error) {
         next(error);

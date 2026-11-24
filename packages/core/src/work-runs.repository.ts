@@ -10,7 +10,29 @@ export type WorkRunStatus = "waiting" | "running" | "done" | "failed";
  * Why a run failed, as a short fixed word. Never a raw error message, which
  * could repeat personal data. The full error goes to the logs.
  */
-export type WorkRunError = "queue_unavailable" | "work_failed";
+export type WorkRunError =
+  /** The item could not be put into the queue, because Redis was away. */
+  | "queue_unavailable"
+  /** The work threw an error on its last try. */
+  | "work_failed"
+  /** The worker running it died twice, and the queue gave up on it. */
+  | "worker_lost"
+  /** It did not move for too long and was closed when a new run was started. */
+  | "timed_out";
+
+/**
+ * The company already has an unfinished run of this kind, so the database
+ * refused a second one. See `insert`.
+ */
+export class WorkRunAlreadyActiveError extends Error {
+  constructor() {
+    super("An unfinished run of this kind already exists");
+    this.name = "WorkRunAlreadyActiveError";
+  }
+}
+
+/** The database's code for "this would break a unique rule". */
+const UNIQUE_RULE_BROKEN = "23505";
 
 export type WorkRunRow = {
   id: string;
@@ -48,7 +70,15 @@ const UNFINISHED: WorkRunStatus[] = ["waiting", "running"];
 export class WorkRunRepository {
   constructor(private readonly db: SupabaseClient) {}
 
-  /** Adds a run with the status `waiting`. The database makes its ID. */
+  /**
+   * Adds a run with the status `waiting`. The database makes its ID.
+   *
+   * A company may have only one unfinished run of a kind. That is a rule in
+   * the database (a unique index over unfinished rows), not a check made
+   * here first: two clicks at the same moment would both pass a check, but
+   * the database lets only one row in. The refused one gets a
+   * `WorkRunAlreadyActiveError`, and no row and no ID exist for it.
+   */
   async insert(tenantId: string, kind: WorkRunKind): Promise<WorkRunRow> {
     const { data, error } = await this.db
       .from("work_runs")
@@ -56,8 +86,34 @@ export class WorkRunRepository {
       .select(COLUMNS)
       .single();
 
+    if (error?.code === UNIQUE_RULE_BROKEN) throw new WorkRunAlreadyActiveError();
     if (error) throw toDatabaseError("work_runs insert", error);
     return data as WorkRunRow;
+  }
+
+  /**
+   * Closes a company's unfinished runs of one kind that have not changed for
+   * `olderThanMs`: they are marked failed with the error `timed_out`.
+   * Answers how many were closed.
+   *
+   * Without this, one run stuck on `running`, for example because a worker
+   * died and no worker ever came back, would block that company's next run
+   * for ever, since only one unfinished run is allowed. It is called just
+   * before a new run is added.
+   */
+  async closeStale(tenantId: string, kind: WorkRunKind, olderThanMs: number): Promise<number> {
+    const cutoff = new Date(Date.now() - olderThanMs).toISOString();
+    const { data, error } = await this.db
+      .from("work_runs")
+      .update({ status: "failed", error: "timed_out", finished_at: new Date().toISOString() })
+      .eq("tenant_id", tenantId)
+      .eq("kind", kind)
+      .in("status", UNFINISHED)
+      .lt("updated_at", cutoff)
+      .select("id");
+
+    if (error) throw toDatabaseError("work_runs close stale", error);
+    return (data ?? []).length;
   }
 
   /** A company's newest runs of one kind, newest first. */
@@ -74,12 +130,33 @@ export class WorkRunRepository {
     return (data ?? []) as WorkRunRow[];
   }
 
-  /** A worker has started a try. Answers false when the run is finished or gone. */
+  /**
+   * A worker has started a try. Answers false when the run is finished or
+   * gone, or when a later try has already started: an older try can never
+   * write over a newer one.
+   */
   async markRunning(tenantId: string, runId: string, attempt: number): Promise<boolean> {
-    return this.updateUnfinished("work_runs mark running", tenantId, runId, {
-      status: "running",
-      attempt,
-      started_at: new Date().toISOString(),
+    const { data, error } = await this.db
+      .from("work_runs")
+      .update({ status: "running", attempt, started_at: new Date().toISOString() })
+      .eq("tenant_id", tenantId)
+      .eq("id", runId)
+      .in("status", UNFINISHED)
+      .lte("attempt", attempt)
+      .select("id");
+
+    if (error) throw toDatabaseError("work_runs mark running", error);
+    return (data ?? []).length > 0;
+  }
+
+  /**
+   * A try failed and another one will follow after a wait. The run goes back
+   * to `waiting` and keeps its try number, so the page can say which try it
+   * was. Answers false when the run is finished or gone.
+   */
+  async markWaitingForRetry(tenantId: string, runId: string): Promise<boolean> {
+    return this.updateUnfinished("work_runs mark waiting for retry", tenantId, runId, {
+      status: "waiting",
     });
   }
 

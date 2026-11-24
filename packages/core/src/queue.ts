@@ -10,7 +10,7 @@
 // For now there is one queue, `demo`, with one kind of item that does no real
 // work. Real queues are added by the tasks that first need them.
 
-import { Queue, Worker, type Job } from "bullmq";
+import { Queue, UnrecoverableError, Worker, type Job } from "bullmq";
 import { z } from "zod";
 import type { Logger } from "./logger.js";
 
@@ -33,7 +33,28 @@ export const demoWorkItemSchema = z.object({
   workRunId: z.uuid(),
   tenantId: z.uuid(),
   requestId: z.uuid(),
+  mode: z.enum(["ok", "fail_once", "fail_always", "slow"]),
 });
+
+/**
+ * How a demo item behaves, so each failure case can be seen. Test only: it
+ * goes away with the demo, and real work items have no such field.
+ *
+ * - `ok`: works.
+ * - `fail_once`: throws on the first try and works on the second.
+ * - `fail_always`: throws on every try.
+ * - `slow`: takes 20 seconds, which leaves time to kill the worker.
+ */
+export type DemoMode = z.infer<typeof demoWorkItemSchema>["mode"];
+
+/** How many times a demo item is tried in all. Each real queue picks its own number. */
+export const DEMO_TRIES = 3;
+
+/**
+ * The wait before the second try, in milliseconds. It doubles each time
+ * (BullMQ's "exponential" wait): 2 seconds, then 4.
+ */
+const DEMO_FIRST_WAIT_MS = 2000;
 
 export type DemoWorkItem = z.infer<typeof demoWorkItemSchema>;
 
@@ -75,9 +96,10 @@ export class DemoQueue {
     this.queue = new Queue(DEMO_QUEUE_NAME, {
       connection: { url: redisUrl, enableOfflineQueue: false },
       defaultJobOptions: {
-        // One try and no retry. Every work item has a retry limit; the real
-        // numbers are chosen in task 10.
-        attempts: 1,
+        // Every work item has a retry limit. An item whose handler throws is
+        // tried again after a wait, three tries in all, then it is failed.
+        attempts: DEMO_TRIES,
+        backoff: { type: "exponential", delay: DEMO_FIRST_WAIT_MS },
         // BullMQ keeps every finished item forever unless told otherwise.
         // The last 1,000 done and 5,000 failed are kept, for looking at.
         removeOnComplete: 1000,
@@ -96,12 +118,15 @@ export class DemoQueue {
     );
   }
 
-  /** Adds one item and returns the ID the queue gave it. */
-  async add(item: DemoWorkItem): Promise<string> {
+  /**
+   * Adds one item and returns the ID the queue gave it. With `delayMs` the
+   * item is kept aside for that long before any worker may take it.
+   */
+  async add(item: DemoWorkItem, options?: { delayMs?: number }): Promise<string> {
     if (!this.ready) throw new QueueUnavailableError();
 
     try {
-      const queued = await this.queue.add(DEMO_QUEUE_NAME, item);
+      const queued = await this.queue.add(DEMO_QUEUE_NAME, item, { delay: options?.delayMs });
       if (!queued.id) throw new Error("The queue gave the item no ID");
       return queued.id;
     } catch (error) {
@@ -129,6 +154,33 @@ export function createDemoWorker(
   return new Worker<DemoWorkItem, void, typeof DEMO_QUEUE_NAME>(DEMO_QUEUE_NAME, run, {
     connection: { url: redisUrl },
   });
+}
+
+/**
+ * Whether a failed item will not be tried again. The worker's "failed" event
+ * fires after every try, so this tells the last one from the others.
+ *
+ * Two ways to be final (both tried on 2026-11-24):
+ * - the tries are used up: `attemptsMade` has reached the allowed number;
+ * - the queue gave up on the item, which it reports with an
+ *   `UnrecoverableError` whatever the number of tries. See `isWorkerLost`.
+ */
+export function isFinalFailure(item: QueuedDemoWorkItem, error: Error): boolean {
+  if (error instanceof UnrecoverableError || error.name === "UnrecoverableError") return true;
+  return item.attemptsMade >= (item.opts.attempts ?? 1);
+}
+
+/**
+ * Whether the queue gave up on an item because its worker died twice.
+ *
+ * A worker holds a 30-second lock on the item it runs and renews it while it
+ * lives. When a worker is killed, the lock runs out and the item is taken
+ * back, once. That does not count as a try. If the item's worker dies a
+ * second time, the next worker to pick the item up is told it failed with
+ * this message, and the handler is not run.
+ */
+export function isWorkerLost(error: Error): boolean {
+  return error.message.includes("stalled more than allowable limit");
 }
 
 /** How long the trouble logger stays quiet after one line. */

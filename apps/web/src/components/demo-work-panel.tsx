@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFailureMessage, listDemoRuns, startDemoRun, type WorkRun } from "@/lib/api";
+import {
+  apiFailureMessage,
+  listDemoRuns,
+  startDemoRun,
+  type DemoMode,
+  type WorkRun,
+} from "@/lib/api";
 import { BUTTON_CLASSES } from "@/lib/styles";
 
 /** How often the list is asked for again while a run is unfinished. */
@@ -9,6 +15,15 @@ const REFRESH_MS = 2000;
 
 /** How many runs the list shows. The API sends the same number. */
 const SHOWN_RUNS = 10;
+
+/** One button per case. `hint` says what to watch for in the list. */
+const BUTTONS: { mode: DemoMode; label: string; hint: string }[] = [
+  { mode: "ok", label: "Run now", hint: "waiting, running, done" },
+  { mode: "delayed", label: "Run in 20 seconds", hint: "waits 20 seconds first" },
+  { mode: "fail_once", label: "Fail once", hint: "try 1 fails, try 2 works" },
+  { mode: "fail_always", label: "Always fail", hint: "three tries, then failed" },
+  { mode: "slow", label: "Slow (20 seconds)", hint: "kill the worker while it runs" },
+];
 
 function isUnfinished(run: WorkRun): boolean {
   return run.status === "waiting" || run.status === "running";
@@ -79,15 +94,17 @@ export function DemoWorkPanel() {
     };
   }, [hasUnfinished]);
 
-  async function onStart() {
+  async function onStart(mode: DemoMode) {
     setSending(true);
     setProblem(null);
     try {
-      const { run } = await startDemoRun();
+      const { run } = await startDemoRun(mode);
       // The new run goes on top at once, still `waiting`. That also starts
       // the two-second refresh above.
       setRuns((old) => [run, ...(old ?? [])].slice(0, SHOWN_RUNS));
     } catch (error) {
+      // A second click while a run is unfinished is refused here, with the
+      // API's "already waiting or running" message.
       setProblem(apiFailureMessage(error));
       // The API may have saved a row and marked it failed, for example when
       // the queue cannot be reached. The list is asked for once more to show it.
@@ -104,14 +121,20 @@ export function DemoWorkPanel() {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={onStart}
-        disabled={sending}
-        className={`px-4 py-2 ${BUTTON_CLASSES}`}
-      >
-        {sending ? "Please wait..." : "Run demo work item"}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        {BUTTONS.map((button) => (
+          <button
+            key={button.mode}
+            type="button"
+            title={button.hint}
+            onClick={() => onStart(button.mode)}
+            disabled={sending}
+            className={`px-3 py-2 ${BUTTON_CLASSES}`}
+          >
+            {button.label}
+          </button>
+        ))}
+      </div>
 
       {problem ? <p className="mt-3 text-sm text-red-700">{problem}</p> : null}
 

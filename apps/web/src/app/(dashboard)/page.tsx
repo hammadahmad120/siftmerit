@@ -24,8 +24,9 @@ export default function HomePage() {
       <section className="mt-6 max-w-3xl rounded-xl border border-brand-navy/15 bg-white p-5">
         <h2 className="font-medium">Queue demo</h2>
         <p className="mt-1 mb-4 text-sm text-brand-light-navy">
-          Starts one pretend piece of work. The worker takes it and finishes it two seconds later.
-          The list below is read from the database.
+          Each button starts one pretend piece of work and shows one case: a normal run, a delayed
+          one, a failure that is retried, a failure for good, and a slow one for killing the
+          worker. Only one run at a time. The list below is read from the database.
         </p>
         <DemoWorkPanel />
       </section>

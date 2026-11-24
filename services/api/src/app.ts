@@ -50,6 +50,11 @@ export function createApp(env: Env, logger: Logger) {
   //    travels in a header. This protects browsers only; it is not sign-in.
   app.use(cors({ origin: env.CORS_ORIGIN }));
 
+  // 2b. Reads a JSON body into `req.body`. The limit is small on purpose: the
+  //     API takes short instructions, never files. A larger body is refused
+  //     before any of our code runs.
+  app.use(express.json({ limit: "10kb" }));
+
   // 3. Routes. Each later task adds its routes to `v1`. Health needs no
   //    sign-in. Everything else gets the two sign-in steps.
   const v1 = express.Router();
