@@ -134,6 +134,8 @@ export type JobSummary = {
   id: string;
   /** The job's short name on our screens. */
   title: string;
+  /** The phrases looked for in email subjects. */
+  subjectWords: string[];
   status: JobStatus;
   /** A plain date, `YYYY-MM-DD`. Mail from this day onward is looked at. */
   postingDate: string;
@@ -143,8 +145,6 @@ export type JobSummary = {
 /** One job in full. */
 export type Job = JobSummary & {
   description: string;
-  /** The phrases looked for in email subjects. */
-  subjectWords: string[];
 };
 
 /** What the form sends to create a job. */

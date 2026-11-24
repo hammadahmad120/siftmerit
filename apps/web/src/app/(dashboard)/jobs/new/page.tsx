@@ -1,3 +1,4 @@
+import { BackToJobs } from "@/components/back-to-jobs";
 import { JobForm } from "@/components/job-form";
 
 // The page at `/jobs/new`, opened with the "New job" button of the job list.
@@ -6,6 +7,7 @@ import { JobForm } from "@/components/job-form";
 export default function NewJobPage() {
   return (
     <>
+      <BackToJobs />
       <h1 className="text-2xl font-semibold">New job</h1>
       <p className="mt-2 text-sm text-brand-light-navy">
         Saving creates the job as a draft. No mail and no CV is read yet.

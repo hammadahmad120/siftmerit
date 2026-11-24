@@ -29,7 +29,10 @@ export type JobRow = {
 };
 
 /** The short fields of a job, for the list. The description is left out. */
-export type JobSummaryRow = Pick<JobRow, "id" | "title" | "status" | "posting_date" | "created_at">;
+export type JobSummaryRow = Pick<
+  JobRow,
+  "id" | "title" | "subject_words" | "status" | "posting_date" | "created_at"
+>;
 
 export type NewJob = {
   title: string;
@@ -57,7 +60,7 @@ const UNIQUE_RULE_BROKEN = "23505";
 const COLUMNS =
   "id, tenant_id, title, description, subject_words, posting_date, status, create_key, created_by, created_at, updated_at";
 
-const SUMMARY_COLUMNS = "id, title, status, posting_date, created_at";
+const SUMMARY_COLUMNS = "id, title, subject_words, status, posting_date, created_at";
 
 /**
  * The jobs table. It lives in core because the worker reads jobs too, from

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { BackToJobs } from "@/components/back-to-jobs";
 import { JobDetails } from "@/components/job-details";
 
 // The page of one job, at `/jobs/<id>`. The folder name in square brackets
@@ -11,12 +12,18 @@ import { JobDetails } from "@/components/job-details";
 //
 // The key makes the content start again for another job, so nothing of the
 // job shown before is seen for a moment.
+//
+// The "Back to jobs" button sits outside the `Suspense`, so it is there at
+// once and in every case: while loading, for a job, and for a wrong address.
 export default function JobPage({ params }: PageProps<"/jobs/[jobId]">) {
   return (
-    <Suspense fallback={<p className="text-sm text-brand-light-navy">Loading the job...</p>}>
-      {params.then(({ jobId }) => (
-        <JobDetails key={jobId} jobId={jobId} />
-      ))}
-    </Suspense>
+    <>
+      <BackToJobs />
+      <Suspense fallback={<p className="text-sm text-brand-light-navy">Loading the job...</p>}>
+        {params.then(({ jobId }) => (
+          <JobDetails key={jobId} jobId={jobId} />
+        ))}
+      </Suspense>
+    </>
   );
 }

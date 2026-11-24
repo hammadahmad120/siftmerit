@@ -20,3 +20,10 @@ export const FIELD_CLASSES =
  */
 export const BUTTON_CLASSES =
   "rounded-lg bg-brand-navy text-sm font-medium text-brand-cream enabled:hover:bg-brand-light-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy disabled:opacity-60";
+
+/**
+ * The same look for a link that takes the user to another page, such as "New
+ * job". The lighter navy under the mouse is written out here, because
+ * `enabled:` above only matches a real button, never a link.
+ */
+export const LINK_BUTTON_CLASSES = `inline-block hover:bg-brand-light-navy ${BUTTON_CLASSES}`;

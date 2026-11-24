@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiError, apiFailureMessage, getJob, type Job } from "@/lib/api";
-import { plainDate, STATUS_LABELS } from "@/components/job-list";
+import { plainDate, StatusLabel } from "@/components/job-list";
 import { PhraseChip } from "@/components/subject-words-field";
 
 /** The answer of `GET /v1/jobs/<id>`: still on its way, arrived, not there, or failed. */
@@ -55,11 +54,7 @@ export function JobDetails({ jobId }: { jobId: string }) {
       <>
         <h1 className="text-2xl font-semibold">This job does not exist</h1>
         <p className="mt-2 text-sm text-brand-light-navy">
-          It may have been removed, or the address is wrong.{" "}
-          <Link href="/jobs" className="text-brand-purple hover:underline">
-            Open the job list
-          </Link>
-          .
+          It may have been removed, or the address is wrong.
         </p>
       </>
     );
@@ -69,9 +64,12 @@ export function JobDetails({ jobId }: { jobId: string }) {
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">{job.title}</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="min-w-0 text-2xl font-semibold break-words">{job.title}</h1>
+        <StatusLabel status={job.status} />
+      </div>
       <p className="mt-2 text-sm text-brand-light-navy">
-        {STATUS_LABELS[job.status]} · Mail from {plainDate(job.postingDate)} onward · Created{" "}
+        Mail from {plainDate(job.postingDate)} onward · Created{" "}
         {new Date(job.createdAt).toLocaleDateString()}
       </p>
 

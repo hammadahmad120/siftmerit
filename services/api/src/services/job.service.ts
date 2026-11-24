@@ -90,8 +90,8 @@ export type JobView = {
   createdAt: string;
 };
 
-/** A job in the list: the short fields only. */
-export type JobSummaryView = Pick<JobView, "id" | "title" | "status" | "postingDate" | "createdAt">;
+/** A job in the list: the short fields only. The description is left out. */
+export type JobSummaryView = Omit<JobView, "description">;
 
 function toView(row: JobRow): JobView {
   return {
@@ -109,8 +109,9 @@ function toSummaryView(row: JobSummaryRow): JobSummaryView {
   return {
     id: row.id,
     title: row.title,
-    status: row.status,
+    subjectWords: row.subject_words,
     postingDate: row.posting_date,
+    status: row.status,
     createdAt: row.created_at,
   };
 }
