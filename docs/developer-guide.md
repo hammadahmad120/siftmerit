@@ -14,9 +14,9 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
 | Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and a placeholder page at `/jobs`. |
-| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Three addresses: `/v1/health`, `/v1/me` and `POST /v1/demo-work`, which adds a demo work item to the queue. Also holds the script that creates companies and users. |
+| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users. |
 | Worker | `services/worker` | `@siftmerit/worker` | Keeps running, takes work items from the queue and runs them (section 9). So far there is one kind, a demo item. It also holds the two mailbox scripts (section 7). |
-| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader and the work queue. |
+| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader, the database connection, the `work_runs` repository and the work queue. |
 
 How they talk today:
 
@@ -28,6 +28,7 @@ API, Worker  --->  Core                         imported as a package
 API  --->  Supabase                             the database and the sign-in check
 API  --->  Redis                                adds a work item to the queue
 Worker  --->  Redis                             takes work items out and runs them
+Worker  --->  Supabase                          saves the status of each run
 ```
 
 The API and the worker never talk to each other directly; the queue in Redis sits between them (section 9). The AI model is not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The browser never reads the database: Supabase gives it a sign-in token, and every piece of data comes from the API.
@@ -39,7 +40,7 @@ Run from the repo root, each in its own terminal.
 | Command | What it starts |
 |---|---|
 | `npm run dev:api` | The API on port 4100. Health check: `http://localhost:4100/v1/health`. |
-| `npm run dev:worker` | The worker. It listens to the queue and runs work items. Redis must be running. |
+| `npm run dev:worker` | The worker. It listens to the queue, runs work items and saves their status. Redis must be running. |
 | `npm run dev:web` | The web app on `http://localhost:3100`. |
 | `npm run typecheck` | The type check for all four parts. It must pass after every task. |
 | `npm run lint` | ESLint for the web app, with the Next.js rules. A warning fails it. It must pass after every task. |
@@ -55,7 +56,7 @@ Redis is not started by any of these. It is a program installed on the machine t
 ### Settings
 
 - There is one `.env` file, at the repo root, for every part. `.env.example` lists every setting.
-- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker still starts without a `.env` file, because `REDIS_URL` has a default.
+- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` too, because it saves the status of its work; it does not start without them.
 - A setting already present in the shell wins over the file. For example, `LOG_LEVEL=debug npm run dev:api`.
 - A setting is added by the task that first uses it.
 
@@ -67,7 +68,8 @@ Redis is not started by any of these. It is a program installed on the machine t
 | `API_PORT` | API | `4100` |
 | `CORS_ORIGIN` | API | `http://localhost:3100` |
 | `NEXT_PUBLIC_API_URL` | Web app | `http://localhost:4100` |
-| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` | API, company scripts | none |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | API, worker, company scripts | none |
+| `SUPABASE_PUBLISHABLE_KEY` | API | none |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Web app (sign-in) | none. The same values as `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Mailbox scripts | none |
 | `DEV_MAILBOX_REFRESH_TOKEN` | `mailbox:check` | none |
@@ -87,26 +89,29 @@ Core is a workspace package: a folder in the repo that the API and the worker im
 - `createLogger({ service, level, style })`: builds the winston logger. `service` is printed on every line, so the API's lines and the worker's lines can be told apart. `style` is `readable` (one short line for a person) or `json` (one structured line for a log service). Both services pick `json` when `NODE_ENV` is `production`.
 - `loadSettings(partName, schema)`: reads the root `.env` and checks the settings against a zod schema.
 - `sharedEnvSchema`: the settings both services use (`NODE_ENV`, `LOG_LEVEL`, `REDIS_URL`). A service adds its own with `sharedEnvSchema.extend({ ... })`.
-- The work queue (`src/queue.ts`): the queue's name, the shape of a work item, `DemoQueue` for the API, `createDemoWorker` for the worker, and `createQueueTroubleLogger`. See section 9.
+- The database (`src/database.ts`): `createSecretClient`, the client made with the secret key; `DatabaseError`, the error of a failed database call; and `databaseEnvShape`, the two database settings, which the API and the worker each add to their own settings.
+- `WorkRunRepository` (`src/work-runs.repository.ts`): the only code that touches the `work_runs` table. See section 9.
+- The work queue (`src/queue.ts`): the queue's name, the shape of a work item, `DemoQueue` for the API, `createDemoWorker` for the worker, `isFinalFailure` and `isWorkerLost` for telling how an item failed, and `createQueueTroubleLogger`. See section 9.
 
 **Traps**
 
 - Production needs JavaScript. A service's own `tsc` build does not write core's JavaScript, so the production build must compile core too. This is an open point for task 53.
 - The web app does not use core. Core holds server-only code.
+- **The two database settings are not in the shared settings.** The mailbox scripts use the shared settings too and need no database, so they would stop without Supabase settings they never use.
 - `bullmq` and `ioredis` are listed in core's `package.json` only. The API and the worker reach them through core, so there is one version in one place.
 - A type error inside core is reported by the type check of the API and the worker as well, because they read core's source.
 
 ## 4. API (`services/api`)
 
-The layout is routes -> controllers -> services -> repositories. A route names the address and the steps in front of it, a controller reads the request and writes the answer, a service holds the rules, and a repository is the only code that talks to a table. `src/app.ts` builds these pieces once at start and wires them together.
+The layout is routes -> controllers -> services -> repositories. A route names the address and the steps in front of it, a controller reads the request and writes the answer, a service holds the rules, and a repository is the only code that talks to a table. `src/app.ts` builds these pieces once at start and wires them together. A controller gives back a group of functions, one per address (`createDemoWorkController` gives back `startRun` and `listRuns`); `me` still gives back a single function.
 
 ### The path of a request
 
 `src/app.ts` lists the steps in order:
 
 1. **Request log.** Makes a request ID, attaches a logger that carries it (`req.log`), sends the ID back as the `x-request-id` header, and prints one "request finished" line when the answer has been sent.
-2. **CORS.** Tells browsers which web address may read the API's answers. See below.
-3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below). `POST /v1/demo-work` adds a work item to the queue and answers 202; see section 9.
+2. **CORS.** Tells browsers which web address may read the API's answers. See below. Right after it, a JSON body of at most 10 kilobytes is read into `req.body`.
+3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below). `POST /v1/demo-work` starts a demo run and answers 202, and `GET /v1/demo-work` lists the last runs; see section 9.
 4. **Not found.** An unknown address becomes a normal "not found" error.
 5. **Error step.** Turns any error into a clean JSON answer.
 
@@ -123,6 +128,7 @@ Every error answer has the same shape, so the web app handles them all the same 
 
 - **A failed database call** (`DatabaseError`): the log gets a "request failed" line with the table and action in fixed words we write, such as "tenant_members find by user", and the database's error code. The database's own wording can repeat the data that caused the error, so it is added in development only (`NODE_ENV=development`). The caller gets only "Internal server error" and the request ID.
 
+- **A body that cannot be read:** not valid JSON is answered 400 with the code `invalid_json`, and a body over the limit 413 with `body_too_large`. The reader's own message can repeat part of the body, so it is neither logged nor sent back.
 - **Something the API depends on cannot be reached** (`ServiceUnavailableError`, status 503): so far only the work queue, with the code `queue_unavailable`, when Redis is down. The request was fine, so the caller can try again.
 
 A reported error is found in the logs by its request ID.
@@ -189,7 +195,7 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 - `src/components/dashboard-shell.tsx`, `dashboard-nav.tsx`: the top bar with the page area below it, and the menu.
 - `src/components/me-context.tsx`: asks `/v1/me` once and shares the answer.
 - `src/components/sign-in-form.tsx`, `sign-out-button.tsx`: the form and the button.
-- `src/components/demo-work-button.tsx`: temporary. The button of the home page's "Queue demo" section (section 9).
+- `src/components/demo-work-panel.tsx`: temporary. The buttons and the list of runs of the home page's "Queue demo" section (section 9).
 - `src/lib/supabase.ts`: the one Supabase client for the browser.
 - `src/lib/api.ts`: the call helper.
 - `src/lib/styles.ts`: looks that more than one screen uses, such as the button.
@@ -371,7 +377,7 @@ The API makes one client with each (`src/lib/supabase.ts`): the secret one for a
 - **Our code.** The secret key can read every company's rows, and the database does not know which user a request is for. So every repository function filters by `tenant_id`, and that ID always comes from the sign-in check. One forgotten filter would show a user another company's rows.
 - **The row rules keep everyone else out.** Supabase gives the database its own web address, which our API uses too. Every table has row level security switched on, no rights and no policies for the browser-side roles, and written-out rights for the server role. Someone who asks that address directly with only the publishable key and a user's token gets nothing.
 
-A helper that always adds the company filter, and the automatic separation test, are planned for task 11, when the first table with company data arrives.
+The first table with company data is `work_runs` (section 9). Every function of its repository takes the company's ID first and filters by it. A helper that always adds the company filter, and the automatic separation test, are planned for task 11.
 
 ### SQL files
 
@@ -406,34 +412,98 @@ npm run company:add-user -- --company acme-trading --email omar@acme.com
 
 ## 9. The work queue (Redis and BullMQ)
 
-Long work never runs inside an API request. The API adds a small note, a **work item**, to a queue and answers at once. The worker takes items from the queue and does the work. The two programs never talk to each other; Redis sits between them.
+Long work never runs inside an API request. The API saves a row that says "this work is waiting", adds a small note, a **work item**, to a queue, and answers at once. The worker takes items from the queue and does the work. The two programs never talk to each other; Redis sits between them.
 
 - **Redis** is a small program that keeps data in memory. It holds the queue.
-- **BullMQ** is the library that turns Redis into a queue: it adds items, hands each one to one worker, and marks it done or failed.
+- **BullMQ** is the library that turns Redis into a queue: it adds items, hands each one to one worker, retries the failed ones and takes back the ones of a dead worker.
 - BullMQ's own word for a work item is "job". Ours is not: "job" means a hiring job.
 
-So far there is one queue, `demo`, with one kind of item that does no real work. It exists to prove the path. The button on the home page, the address `POST /v1/demo-work`, the queue and its handler are all removed when the first real work exists.
+### A run and its work items
+
+| | A run | A work item |
+|---|---|---|
+| What it is | One piece of work as HR sees it: "reading round 1: running" | One small step in the queue |
+| Where it lives | A row in `work_runs`, in Postgres | A note in Redis |
+| What it holds | Kind, status, which try, why it failed, the times | A few IDs, never text |
+
+One run can have one work item or many. Reading 200 CVs will be one run with about 200 items, so that a failure redoes one CV and not all of them. Every item carries its run's ID.
+
+**What HR sees is always read from Postgres, never from Redis.**
+
+So far there is one queue, `demo`, with one kind of item that does no real work. It exists to prove the path and the failure cases. Everything with "demo" in its name is removed when the first real work exists (task 22); the table, the repository and the failure handling stay.
 
 ### The path of one click
 
-1. The browser sends `POST /v1/demo-work` with the user's token.
-2. The API checks the token and finds the company, as for every address.
-3. The API adds an item to the queue: `{ tenantId, requestId }`. Nothing is read from the request's body.
-4. The API answers 202 ("accepted, not done yet") with the ID the queue gave the item. It does not wait for the work.
-5. The worker takes the item, checks its shape, and logs "work item started".
-6. Two seconds later it logs "work item done", and Redis marks the item completed.
+1. The browser sends `POST /v1/demo-work`.
+2. The API closes this company's demo runs that have not changed for 10 minutes (see "Stuck runs").
+3. The API adds a row to `work_runs` with the status `waiting`. The database makes the row's ID.
+4. The API queues an item: `{ workRunId, tenantId, requestId, mode }`.
+5. The API answers 202 ("accepted, not done yet") with the run. It does not wait for the work.
+6. The worker takes the item, checks its shape, and updates the row: `running`, try 1.
+7. Two seconds later it updates the row: `done`.
+8. The page asks `GET /v1/demo-work` every 2 seconds while a run is unfinished, and shows each change.
 
-The page only learns that the item was queued. That it finished is seen in the worker's terminal. Showing it on the page needs a status row in Postgres, which is task 10: what HR sees is never read from Redis.
+If step 4 fails because Redis is down, the API marks the row `failed` with the error `queue_unavailable` and answers 503. The row is saved before the item is queued so that a run can never be working without a row; this fix-up is the other half of that order.
+
+### The status of a run
+
+```
+waiting  --->  running  --->  done
+   ^              |
+   |  a try failed, another follows
+   +--------------+
+                  |
+                  +--->  failed     (the last try failed, or the queue gave up)
+```
+
+- `attempt` says which try the run is on. Between tries the row goes back to `waiting` and keeps its number, so the page reads "waiting, try 1", then "running, try 2".
+- `error` is a short fixed word, never a raw error message, which could repeat personal data. The full error goes to the worker's log, with IDs only.
+
+| Error word | Meaning |
+|---|---|
+| `queue_unavailable` | The item could not be queued, because Redis was away |
+| `work_failed` | The work threw an error on its last try |
+| `worker_lost` | The worker running it died twice and the queue gave up |
+| `timed_out` | The run did not change for too long and was closed |
+
+- **A run that is `done` or `failed` is never changed again.** Every update in `WorkRunRepository` applies only to an unfinished row, and answers whether a row was changed. A late update, for example from an item that ran twice, changes nothing.
+- **An older try cannot write over a newer one.** "Mark running" applies only when its try number is not lower than the row's.
+- **A handler asks first, then works.** If "mark running" answers that the run is finished or gone, the worker skips the item. That is what makes a handler safe to run twice.
+
+### The five cases
+
+The demo panel has one button for each.
+
+**Retry, then success ("Fail once").** An item whose handler throws is tried again after a wait: three tries in all, with waits of 2 and then 4 seconds. The handler itself moves the row back to `waiting` before it hands the error to the queue, so the row is right before the next try is planned.
+
+**The retry limit ("Always fail").** After the third failed try the handler marks the row `failed` with `work_failed`. The item goes to BullMQ's failed list and is not tried again. A new click starts a fresh run.
+
+**A delayed item ("Run in 20 seconds").** The item is kept aside for 20 seconds before any worker may take it. The row says `waiting` until then.
+
+**A killed worker ("Slow").** A worker holds a 30-second lock on the item it runs and renews it while it lives. A killed worker stops renewing. The item is taken back and run again, by any worker, about a minute later: the lock must run out, and the check for stuck items runs every 30 seconds. This does not count as a try. It is allowed once. If the item's worker dies a second time, the next worker to pick the item up is told it failed, without running the handler, and marks the row `failed` with `worker_lost`.
+
+**Duplicates (any button, clicked twice).** A rule in the database allows a company only one unfinished run of a kind. The second click's row is refused, so no second row, no second ID and no second item exist, and the API answers 409 with the code `already_queued`. It is a database rule and not a check in our code, because two clicks at the same moment would both pass a check; the database lets only one row in.
+
+### Stuck runs
+
+If a worker dies and no worker ever comes back, nothing updates the row, and it says `running` for ever. With the duplicate rule that would also block the company's next run. So before a new run is added, the API closes that company's unfinished runs of the same kind that have not changed for 10 minutes: `failed`, with the error `timed_out`.
+
+This only happens when someone starts a new run. A check that runs by itself is an open point for task 22, and real work will pick its own time limit.
+
+### Who learns that a try failed
+
+The worker's `failed` event fires after **every** failed try, not only the last. `isFinalFailure` tells the last one: either the tries are used up, or the queue gave up on the item, which it reports as an `UnrecoverableError`.
+
+- After an ordinary failed try, the handler has already updated the row.
+- When the queue gave up, no handler ran. The `failed` listener in the worker's `index.ts` is the only place that learns of it, so it marks the row `failed`.
 
 ### The rules an item follows
 
-- **IDs only.** An item holds the company ID and the API's request ID, never names or text. It is saved in Redis and its fields are written to the logs.
+- **IDs only.** An item holds its run's ID, the company ID and the API's request ID, never names or text. It is saved in Redis and its fields are written to the logs. This is a rule for all code in `CLAUDE.md`. The demo's `mode` is one fixed word from a list and goes away with the demo.
 - **The company ID comes from the signed-in user,** never from the request.
 - **The shape is defined once,** as a zod shape in core (`demoWorkItemSchema`). The API builds an item from it and the worker checks every item against it before running it, because an item comes from Redis, not from our own memory.
-- **Every log line about an item carries three IDs:** the work item ID, the request ID and the company ID. The request ID is the same one the API logged for the click, so one click can be followed from the API's terminal into the worker's.
-- **The handler is safe to run twice.** The demo handler changes nothing.
-- **One try, no retry** (`attempts: 1`), written out on purpose. The real counts are chosen in task 10.
-- **Finished items are cleaned up.** BullMQ keeps every finished item forever unless told otherwise; the last 1,000 done and 5,000 failed are kept.
+- **Every log line about an item carries four IDs:** the work item ID, the run ID, the request ID and the company ID. The request ID is the one the API logged for the click.
+- **Finished items are cleaned up in Redis.** The last 1,000 done and 5,000 failed are kept.
 
 ### The two sides
 
@@ -441,16 +511,24 @@ The page only learns that the item was queued. That it finished is seen in the w
 
 - It is created once, when the API starts, with `enableOfflineQueue: false`: when Redis goes away, adding fails at once.
 - It keeps its own "ready" mark and refuses to add until its first connection is made. Without the mark, a queue created while Redis is down keeps the add waiting until Redis comes up.
-- A refused add throws `QueueUnavailableError`, which the API's service turns into a 503 with the code `queue_unavailable`.
+- A refused add throws `QueueUnavailableError`, which the API's service turns into a 503.
 - So the API starts even when Redis is stopped, and the queue starts working by itself when Redis comes up.
 
 **The running side (`createDemoWorker`, used by the worker)** waits patiently. When Redis cannot be reached it keeps trying and carries on when Redis is back. It runs one item at a time.
 
-Both sides report connection errors through `createQueueTroubleLogger`, which logs one line and then stays quiet for 30 seconds, because the same error arrives about once a second while Redis is down.
+Both sides report connection errors through `createQueueTroubleLogger`, which logs one line and then stays quiet for 30 seconds.
 
 ### The clean stop
 
-Ctrl+C sends the worker a signal (SIGINT). A restart after a file change, or a hosting service stopping the program, sends another (SIGTERM). On either the worker takes no new item, lets the running item finish, and then ends. An item still waiting stays in Redis for the next worker. A second signal ends the worker at once, for when Redis is away and the clean stop cannot finish.
+Ctrl+C sends the worker a signal (SIGINT). A restart after a file change, or a hosting service stopping the program, sends another (SIGTERM). On either the worker takes no new item, lets the running item finish, and then ends. An item still waiting stays in Redis for the next worker. A second signal ends the worker at once.
+
+A clean stop is not a kill. To see the killed-worker case the worker must be ended hard. From the repo root, this ends every process of `npm run dev:worker`:
+
+```
+for p in $(pgrep -f "src/index.ts"); do [ "$(readlink /proc/$p/cwd)" = "$PWD/services/worker" ] && kill -9 $p; done
+```
+
+Then start `npm run dev:worker` again.
 
 ### Redis on the development machine
 
@@ -464,16 +542,21 @@ Looking inside with `redis-cli`, which comes with Redis:
 | `redis-cli zcard bull:demo:completed` | How many items are done |
 | `redis-cli zcard bull:demo:failed` | How many failed |
 | `redis-cli llen bull:demo:wait` | How many are waiting |
+| `redis-cli zcard bull:demo:delayed` | How many are kept aside: delayed, or waiting for their next try |
 | `redis-cli hgetall bull:demo:1` | Item 1: its data, its settings and its times |
 
 ### Traps
 
 - **The page says "The work queue cannot be reached":** Redis is not running. Check with `redis-cli ping`, and start it with `sudo systemctl start redis-server`.
-- **The button says "Queued" and nothing else happens:** the worker is not running. The item waits in Redis and is run as soon as `npm run dev:worker` starts. That is the queue doing its job, not a fault.
-- **Never log a field of an item before the item passed the shape check.** An item with the wrong shape can hold anything in a field named `tenantId`. The worker's "work item failed" line prints the two IDs from inside an item only when the item passes; the work item's own ID, given by the queue, is always safe.
-- **BullMQ's switch `skipWaitingForReady` is not used.** Tried in task 9: with it, a queue created while Redis was down failed at once but never worked again after Redis came up.
+- **A run stays on "waiting":** the worker is not running, or the item is delayed, or it waits for its next try. An item waits in Redis and is run as soon as a worker can take it.
+- **A run stays on "running" for about a minute after the worker was killed:** that is the lock running out. It is not stuck.
+- **The page says "A demo run is already waiting or running":** one run at a time per company. If a run really is stuck, it is closed 10 minutes after its last change, at the next click.
+- **Never log a field of an item before the item passed the shape check.** An item with the wrong shape can hold anything in a field named `tenantId`. The work item's own ID, given by the queue, is always safe.
+- **Do not update the row from the `failed` event when the handler can do it.** The event is not waited for, so its update can arrive after the next try has started.
+- **`attemptsMade` is the number of tries that already failed.** In the handler the current try is `attemptsMade + 1`; in the `failed` event it already counts the try that just failed.
+- **BullMQ's switch `skipWaitingForReady` is not used.** With it, a queue created while Redis was down failed at once but never worked again after Redis came up.
 - **Every queue and worker needs an `error` listener.** Without one, a connection error stops the whole program.
-- **`redis-cli` commands above are for the queue named `demo`.** The keys of a queue start with `bull:` and then its name.
+- **A read that only counts rows can hide a missing table.** With the Supabase library, `select(..., { head: true })` on a table that does not exist came back with no error and an empty count. Read one row to be sure.
 - **Redis saves to disk only from time to time.** A crash of the machine can lose the items added since the last snapshot. Fine for development; for production see the open points in [decisions.md](decisions.md).
-- **No retries yet.** A failed item stays failed. Retries, duplicates, delayed items and the status row are task 10.
+- **Items are handed out in the order they arrived.** One company's 200 items stand in front of another company's 5. Taking turns needs more than small items; it is an open point for task 30.
 - **This Redis is shared by everything on the machine that points at port 6379.** Another project using it with a queue also named `demo` would mix its items with ours. Nothing else uses it today.

@@ -59,7 +59,7 @@ job_requirements ─────────────────────
 | `candidates` | The fact sheet (name, contact, city, total years, education, skills, current role, short summary, links), the CV text, the keep-until date | Ali, Lahore, 4 years | 26 to 29 |
 | `applications` | Which candidate, which job, where it came from (an email or a past job), date applied, reading status, HR's notes | Ali for Accountant, 2 Nov | 26 to 29 |
 | `ticks` | Which application, which requirement, the result (met, mentioned only, not met, unclear), the proof line, whether the proof was checked | met, "Worked 4 years as accountant at XYZ" | 32 |
-| `work_runs` | Which job (can be empty), kind of work, status, error, start and end time | reading round 1, running | 9 or 10 |
+| `work_runs` | The kind of work, status (`waiting`, `running`, `done`, `failed`), which try it is on, a short fixed word for why it failed, and the created, started, finished and updated times. Which job it belongs to (can be empty) is added when `jobs` exists | reading round 1, running, try 1 | 10 (exists) |
 | `chat_messages` | Which job, who wrote it (HR or the agent), the text, the time | "Why is Ali third?" | 19 |
 | `ai_calls` | Which job (can be empty), purpose, model, tokens used, cost, time | read one CV | 13 |
 
@@ -67,6 +67,7 @@ Rules the database keeps:
 - The same email ID cannot be added twice to the same job.
 - A candidate has at most one application per job.
 - An application has at most one tick per requirement.
+- A company has at most one unfinished run (`waiting` or `running`) of a kind. This is what refuses the same work being queued twice. When `jobs` exists it becomes one per job and kind.
 
 ## 4. Why it is shaped this way
 
@@ -87,7 +88,7 @@ applications: 10 | Ali | Accountant        | 2 Nov  | from an email
 
 **Ticks are their own table.** Adding or removing one requirement changes one row per candidate and never rewrites the others.
 
-**`work_runs` holds status and errors only.** It says whether a piece of background work is waiting, running, finished or failed, and why it failed. The progress number ("120 of 200") is counted from the `job_emails` rows. It is a table and not a column on the job because one job has many pieces of work over time, and the queue tasks (9 and 10) need a status row before any job exists.
+**`work_runs` holds status and errors only.** It says whether a piece of background work is waiting, running, done or failed, which try it is on, and why it failed, as a short fixed word and never a raw error message. The progress number ("120 of 200") is counted from the `job_emails` rows. It is a table and not a column on the job because one job has many pieces of work over time, and the queue task (10) needed a status row before any job existed. One run is what HR sees; the work itself is done by one or many small work items in the queue, each carrying its run's ID. A run that is done or failed is never changed again.
 
 **The mailbox secret has its own table.** A signed-in user can read their own `tenants` row, so the secret must not sit there.
 

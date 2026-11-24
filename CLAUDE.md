@@ -82,7 +82,7 @@ Run from the repo root.
 
 - `npm install`: installs the libraries for every part.
 - `npm run dev:api`: starts the API on port 4100 and restarts it when a file changes. Health check: `http://localhost:4100/v1/health`.
-- `npm run dev:worker`: starts the worker and reruns it when a file changes. It listens to the work queue in Redis and runs each work item. Redis must be running; on the development machine it starts at boot (`redis-cli ping` answers `PONG`).
+- `npm run dev:worker`: starts the worker and reruns it when a file changes. It listens to the work queue in Redis, runs each work item and saves its status in Postgres. Redis must be running; on the development machine it starts at boot (`redis-cli ping` answers `PONG`). It needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in `.env`.
 - `npm run dev:web`: starts the web app on `http://localhost:3100` and reloads it when a file changes.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
 - `npm run lint`: checks the web app's code with ESLint and the Next.js rules. A warning fails it. When a rule flags something that is fine, the line gets a short comment saying why, or that one rule is switched off after asking the user.
