@@ -1,14 +1,14 @@
 import { Router, type RequestHandler } from "express";
 
-/** The two sign-in steps run first, then the controller. */
+/** The two sign-in steps run first, then the controller's function. */
 export function createMeRoutes(deps: {
   requireUser: RequestHandler;
   requireTenant: RequestHandler;
-  meController: RequestHandler;
+  meController: { getMe: RequestHandler };
 }) {
   const router = Router();
 
-  router.get("/me", deps.requireUser, deps.requireTenant, deps.meController);
+  router.get("/me", deps.requireUser, deps.requireTenant, deps.meController.getMe);
 
   return router;
 }

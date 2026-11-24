@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toDatabaseError } from "./database.js";
+import { forTenant } from "./tenant-db.js";
 
 /** What sort of work a run is. A new kind of work adds its name here. */
 export type WorkRunKind = "demo";
@@ -59,8 +60,9 @@ const UNFINISHED: WorkRunStatus[] = ["waiting", "running"];
  * The status table for background work: one row per piece of work, as HR sees
  * it. The API adds a row before it queues anything, and the worker updates it.
  *
- * Company separation: every function takes the company's ID first and filters
- * by it, so a run is only ever found inside its own company.
+ * Company separation: every function takes the company's ID first and reaches
+ * the table only through `forTenant`, which adds the company filter itself.
+ * So a run is only ever found inside its own company.
  *
  * The three `mark...` functions change a row only while it is unfinished, and
  * answer whether a row was changed. A run that is done or failed is never
@@ -80,9 +82,8 @@ export class WorkRunRepository {
    * `WorkRunAlreadyActiveError`, and no row and no ID exist for it.
    */
   async insert(tenantId: string, kind: WorkRunKind): Promise<WorkRunRow> {
-    const { data, error } = await this.db
-      .from("work_runs")
-      .insert({ tenant_id: tenantId, kind })
+    const { data, error } = await forTenant(this.db, tenantId)
+      .insert("work_runs", { kind })
       .select(COLUMNS)
       .single();
 
@@ -103,10 +104,12 @@ export class WorkRunRepository {
    */
   async closeStale(tenantId: string, kind: WorkRunKind, olderThanMs: number): Promise<number> {
     const cutoff = new Date(Date.now() - olderThanMs).toISOString();
-    const { data, error } = await this.db
-      .from("work_runs")
-      .update({ status: "failed", error: "timed_out", finished_at: new Date().toISOString() })
-      .eq("tenant_id", tenantId)
+    const { data, error } = await forTenant(this.db, tenantId)
+      .update("work_runs", {
+        status: "failed",
+        error: "timed_out",
+        finished_at: new Date().toISOString(),
+      })
       .eq("kind", kind)
       .in("status", UNFINISHED)
       .lt("updated_at", cutoff)
@@ -118,10 +121,8 @@ export class WorkRunRepository {
 
   /** A company's newest runs of one kind, newest first. */
   async listRecent(tenantId: string, kind: WorkRunKind, limit: number): Promise<WorkRunRow[]> {
-    const { data, error } = await this.db
-      .from("work_runs")
-      .select(COLUMNS)
-      .eq("tenant_id", tenantId)
+    const { data, error } = await forTenant(this.db, tenantId)
+      .select("work_runs", COLUMNS)
       .eq("kind", kind)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -136,10 +137,8 @@ export class WorkRunRepository {
    * write over a newer one.
    */
   async markRunning(tenantId: string, runId: string, attempt: number): Promise<boolean> {
-    const { data, error } = await this.db
-      .from("work_runs")
-      .update({ status: "running", attempt, started_at: new Date().toISOString() })
-      .eq("tenant_id", tenantId)
+    const { data, error } = await forTenant(this.db, tenantId)
+      .update("work_runs", { status: "running", attempt, started_at: new Date().toISOString() })
       .eq("id", runId)
       .in("status", UNFINISHED)
       .lte("attempt", attempt)
@@ -185,10 +184,8 @@ export class WorkRunRepository {
     runId: string,
     changes: Partial<Pick<WorkRunRow, "status" | "attempt" | "error" | "started_at" | "finished_at">>,
   ): Promise<boolean> {
-    const { data, error } = await this.db
-      .from("work_runs")
-      .update(changes)
-      .eq("tenant_id", tenantId)
+    const { data, error } = await forTenant(this.db, tenantId)
+      .update("work_runs", changes)
       .eq("id", runId)
       .in("status", UNFINISHED)
       .select("id");

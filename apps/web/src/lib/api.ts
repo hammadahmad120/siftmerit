@@ -126,6 +126,65 @@ export function getMe(): Promise<Me> {
   return apiFetch<Me>("/v1/me");
 }
 
+/** Where a job stands. A new job is a draft. */
+export type JobStatus = "draft" | "open" | "closed";
+
+/** A job in the list: the short fields only, without the description. */
+export type JobSummary = {
+  id: string;
+  /** The job's short name on our screens. */
+  title: string;
+  status: JobStatus;
+  /** A plain date, `YYYY-MM-DD`. Mail from this day onward is looked at. */
+  postingDate: string;
+  createdAt: string;
+};
+
+/** One job in full. */
+export type Job = JobSummary & {
+  description: string;
+  /** The phrases looked for in email subjects. */
+  subjectWords: string[];
+};
+
+/** What the form sends to create a job. */
+export type NewJob = {
+  title: string;
+  description: string;
+  subjectWords: string[];
+  /** Left out: the API uses 7 days back. */
+  postingDate?: string;
+  /**
+   * A random key the form makes once. The API never saves a second job under
+   * the same key: it answers with the first one. So sending the same form
+   * twice is safe.
+   */
+  createKey: string;
+};
+
+/** Saves a new job for the user's company and gives it back. */
+export function createJob(job: NewJob): Promise<{ job: Job }> {
+  return apiFetch<{ job: Job }>("/v1/jobs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(job),
+  });
+}
+
+/** The company's newest jobs, newest first. */
+export function listJobs(): Promise<{ jobs: JobSummary[] }> {
+  return apiFetch<{ jobs: JobSummary[] }>("/v1/jobs");
+}
+
+/**
+ * One job of the user's company. An ID that does not exist, or that belongs
+ * to another company, gets an `ApiError` with status 404 and the code
+ * `job_not_found`.
+ */
+export function getJob(jobId: string): Promise<{ job: Job }> {
+  return apiFetch<{ job: Job }>(`/v1/jobs/${encodeURIComponent(jobId)}`);
+}
+
 /** One piece of background work, as the API reports it from Postgres. */
 export type WorkRun = {
   id: string;

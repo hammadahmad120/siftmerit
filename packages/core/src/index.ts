@@ -10,6 +10,10 @@ export { createLogger } from "./logger.js";
 export type { Logger, LoggerOptions } from "./logger.js";
 export { createSecretClient, DatabaseError, databaseEnvShape, toDatabaseError } from "./database.js";
 export type { DatabaseEnv } from "./database.js";
+export { forTenant } from "./tenant-db.js";
+export type { TenantTable } from "./tenant-db.js";
+export { JobCreateKeyUsedError, JobRepository } from "./jobs.repository.js";
+export type { JobRow, JobStatus, JobSummaryRow, NewJob } from "./jobs.repository.js";
 export { WorkRunAlreadyActiveError, WorkRunRepository } from "./work-runs.repository.js";
 export type { WorkRunError, WorkRunKind, WorkRunRow, WorkRunStatus } from "./work-runs.repository.js";
 export {

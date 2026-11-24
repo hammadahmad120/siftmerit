@@ -4,7 +4,7 @@ import { isAuthRetryableFetchError, type AuthError } from "@supabase/supabase-js
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { ApiError, apiFailureMessage, getMeAtSignIn } from "@/lib/api";
-import { BUTTON_CLASSES } from "@/lib/styles";
+import { BUTTON_CLASSES, FIELD_CLASSES } from "@/lib/styles";
 import { getSupabase, signOutHere, supabaseSettingsProblem } from "@/lib/supabase";
 
 // Copied from InstantBot's `auth-form.tsx` and cut down to sign-in only.
@@ -13,10 +13,6 @@ import { getSupabase, signOutHere, supabaseSettingsProblem } from "@/lib/supabas
 
 /** Where a signed-in user lands: the home page. */
 const HOME = "/";
-
-/** The look of the two fields. A field in use gets a navy outline. */
-const FIELD_CLASSES =
-  "mt-1 w-full rounded-lg border border-brand-navy/30 bg-white px-3 py-2 font-normal text-brand-navy focus:outline-2 focus:outline-brand-navy";
 
 const NO_COMPANY_MESSAGE =
   "This account is not linked to a company. Contact the person who set up your account.";

@@ -2,6 +2,7 @@ import {
   createQueueTroubleLogger,
   createSecretClient,
   DemoQueue,
+  JobRepository,
   WorkRunRepository,
   type Logger,
 } from "@siftmerit/core";
@@ -9,6 +10,7 @@ import cors from "cors";
 import express from "express";
 import type { Env } from "./config/env.js";
 import { createDemoWorkController } from "./controllers/demo-work.controller.js";
+import { createJobsController } from "./controllers/jobs.controller.js";
 import { createMeController } from "./controllers/me.controller.js";
 import { createAuthMiddleware, createRequireTenantMiddleware } from "./middleware/auth.middleware.js";
 import { createErrorMiddleware, notFoundMiddleware } from "./middleware/error.middleware.js";
@@ -17,9 +19,11 @@ import { TenantMemberRepository } from "./repositories/tenant-member.repository.
 import { TenantRepository } from "./repositories/tenant.repository.js";
 import { createDemoWorkRoutes } from "./routes/v1/demo-work.routes.js";
 import { healthRoutes } from "./routes/v1/health.routes.js";
+import { createJobsRoutes } from "./routes/v1/jobs.routes.js";
 import { createMeRoutes } from "./routes/v1/me.routes.js";
 import { AuthService } from "./services/auth.service.js";
 import { DemoWorkService } from "./services/demo-work.service.js";
+import { JobService } from "./services/job.service.js";
 import { TenantService } from "./services/tenant.service.js";
 
 /** Builds the Express app. The order below is the order a request passes through. */
@@ -33,6 +37,7 @@ export function createApp(env: Env, logger: Logger) {
   const tenantRepository = new TenantRepository(db);
   const tenantMemberRepository = new TenantMemberRepository(db);
   const workRunRepository = new WorkRunRepository(db);
+  const jobRepository = new JobRepository(db);
   const requireUser = createAuthMiddleware(new AuthService(env));
   const requireTenant = createRequireTenantMiddleware(tenantMemberRepository);
 
@@ -51,9 +56,11 @@ export function createApp(env: Env, logger: Logger) {
   app.use(cors({ origin: env.CORS_ORIGIN }));
 
   // 2b. Reads a JSON body into `req.body`. The limit is small on purpose: the
-  //     API takes short instructions, never files. A larger body is refused
-  //     before any of our code runs.
-  app.use(express.json({ limit: "10kb" }));
+  //     API takes short instructions and text typed by a person, never files.
+  //     The largest thing sent is a job description, at most 20,000
+  //     characters, which can be 40 KB or more in some scripts. A larger body
+  //     is refused before any of our code runs.
+  app.use(express.json({ limit: "100kb" }));
 
   // 3. Routes. Each later task adds its routes to `v1`. Health needs no
   //    sign-in. Everything else gets the two sign-in steps.
@@ -64,6 +71,13 @@ export function createApp(env: Env, logger: Logger) {
       requireUser,
       requireTenant,
       meController: createMeController(new TenantService(tenantRepository)),
+    }),
+  );
+  v1.use(
+    createJobsRoutes({
+      requireUser,
+      requireTenant,
+      jobsController: createJobsController(new JobService(jobRepository)),
     }),
   );
   v1.use(
