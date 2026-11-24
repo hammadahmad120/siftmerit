@@ -1,6 +1,7 @@
+import { DatabaseError } from "@siftmerit/core";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError, z } from "zod";
-import { AppError, DatabaseError, NotFoundError } from "../lib/errors.js";
+import { AppError, NotFoundError } from "../lib/errors.js";
 
 /** Runs when no route matched. Turns it into a normal "not found" error. */
 export function notFoundMiddleware(req: Request, _res: Response, next: NextFunction) {

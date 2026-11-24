@@ -8,6 +8,10 @@ export { loadSettings, sharedEnvSchema } from "./env.js";
 export type { SharedEnv } from "./env.js";
 export { createLogger } from "./logger.js";
 export type { Logger, LoggerOptions } from "./logger.js";
+export { createSecretClient, DatabaseError, databaseEnvShape, toDatabaseError } from "./database.js";
+export type { DatabaseEnv } from "./database.js";
+export { WorkRunRepository } from "./work-runs.repository.js";
+export type { WorkRunError, WorkRunKind, WorkRunRow, WorkRunStatus } from "./work-runs.repository.js";
 export {
   createDemoWorker,
   createQueueTroubleLogger,

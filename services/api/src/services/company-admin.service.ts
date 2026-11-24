@@ -1,7 +1,8 @@
 import { randomBytes } from "node:crypto";
+import { toDatabaseError } from "@siftmerit/core";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { ConflictError, NotFoundError, ValidationError, toDatabaseError } from "../lib/errors.js";
+import { ConflictError, NotFoundError, ValidationError } from "../lib/errors.js";
 import { SLUG_PATTERN, slugFromName } from "../lib/slug.js";
 import type { TenantMemberRepository, TenantRole } from "../repositories/tenant-member.repository.js";
 import type { TenantRepository, TenantRow } from "../repositories/tenant.repository.js";

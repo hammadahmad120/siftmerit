@@ -11,9 +11,8 @@
 // it, and a password must never go through the logger.
 
 import { parseArgs } from "node:util";
+import { createSecretClient, DatabaseError } from "@siftmerit/core";
 import { loadEnv } from "../config/env.js";
-import { DatabaseError } from "../lib/errors.js";
-import { createSecretClient } from "../lib/supabase.js";
 import { TenantMemberRepository } from "../repositories/tenant-member.repository.js";
 import { TenantRepository } from "../repositories/tenant.repository.js";
 import { CompanyAdminService, type CreatedAccount } from "../services/company-admin.service.js";

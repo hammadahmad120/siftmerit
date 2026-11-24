@@ -1,10 +1,15 @@
-import { createQueueTroubleLogger, DemoQueue, type Logger } from "@siftmerit/core";
+import {
+  createQueueTroubleLogger,
+  createSecretClient,
+  DemoQueue,
+  WorkRunRepository,
+  type Logger,
+} from "@siftmerit/core";
 import cors from "cors";
 import express from "express";
 import type { Env } from "./config/env.js";
 import { createDemoWorkController } from "./controllers/demo-work.controller.js";
 import { createMeController } from "./controllers/me.controller.js";
-import { createSecretClient } from "./lib/supabase.js";
 import { createAuthMiddleware, createRequireTenantMiddleware } from "./middleware/auth.middleware.js";
 import { createErrorMiddleware, notFoundMiddleware } from "./middleware/error.middleware.js";
 import { createRequestLogMiddleware } from "./middleware/request-log.middleware.js";
@@ -27,6 +32,7 @@ export function createApp(env: Env, logger: Logger) {
   const db = createSecretClient(env);
   const tenantRepository = new TenantRepository(db);
   const tenantMemberRepository = new TenantMemberRepository(db);
+  const workRunRepository = new WorkRunRepository(db);
   const requireUser = createAuthMiddleware(new AuthService(env));
   const requireTenant = createRequireTenantMiddleware(tenantMemberRepository);
 
@@ -59,7 +65,9 @@ export function createApp(env: Env, logger: Logger) {
     createDemoWorkRoutes({
       requireUser,
       requireTenant,
-      demoWorkController: createDemoWorkController(new DemoWorkService(demoQueue)),
+      demoWorkController: createDemoWorkController(
+        new DemoWorkService(workRunRepository, demoQueue),
+      ),
     }),
   );
   app.use("/v1", v1);

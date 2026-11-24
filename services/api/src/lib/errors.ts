@@ -56,34 +56,5 @@ export class ServiceUnavailableError extends AppError {
   }
 }
 
-/**
- * A call to the database (or to Supabase's sign-in service) failed.
- *
- * Its own `message` holds only facts that are safe to log: the table and
- * action in fixed words we write, and the database's error code. The
- * database's own wording is kept apart in `rawMessage`, because it can repeat
- * the data that caused the error, such as an email address. It is shown in
- * development only.
- */
-export class DatabaseError extends Error {
-  constructor(
-    /** Table and action, for example "tenants insert". */
-    public readonly operation: string,
-    /** The database's error code, for example "23505". Never holds data. */
-    public readonly dbCode: string | undefined,
-    /** The database's own wording. May hold data. */
-    public readonly rawMessage: string,
-  ) {
-    super(`Database call failed: ${operation}${dbCode ? ` (code ${dbCode})` : ""}`);
-    this.name = "DatabaseError";
-  }
-}
-
-/** Wraps an error object from the Supabase library in a DatabaseError. */
-export function toDatabaseError(
-  operation: string,
-  error: { code?: string; message: string; details?: string | null },
-): DatabaseError {
-  const raw = error.details ? `${error.message} | ${error.details}` : error.message;
-  return new DatabaseError(operation, error.code, raw);
-}
+// The error for a failed database call, `DatabaseError`, lives in core, because
+// the worker uses the database too.

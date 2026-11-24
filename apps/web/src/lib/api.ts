@@ -126,16 +126,32 @@ export function getMe(): Promise<Me> {
   return apiFetch<Me>("/v1/me");
 }
 
-/** The answer of `POST /v1/demo-work`: the ID the queue gave the new work item. */
-export type QueuedWorkItem = { workItem: { id: string } };
+/** One piece of background work, as the API reports it from Postgres. */
+export type WorkRun = {
+  id: string;
+  kind: string;
+  status: "waiting" | "running" | "done" | "failed";
+  /** Which try the run is on. 0 until a worker has started it. */
+  attempt: number;
+  /** A short fixed word for why it failed, or null. */
+  error: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+};
 
 /**
- * Asks the API to queue one demo work item. The answer comes back at once,
- * before the work is done: the worker runs the item a moment later.
- * Temporary, like the button that calls it.
+ * Asks the API to start one demo run. The answer comes back at once, with the
+ * run still `waiting`: the worker does the work a moment later.
+ * Temporary, like the panel that calls it.
  */
-export function queueDemoWork(): Promise<QueuedWorkItem> {
-  return apiFetch<QueuedWorkItem>("/v1/demo-work", { method: "POST" });
+export function startDemoRun(): Promise<{ run: WorkRun }> {
+  return apiFetch<{ run: WorkRun }>("/v1/demo-work", { method: "POST" });
+}
+
+/** The company's newest demo runs, newest first. Temporary. */
+export function listDemoRuns(): Promise<{ runs: WorkRun[] }> {
+  return apiFetch<{ runs: WorkRun[] }>("/v1/demo-work");
 }
 
 /**

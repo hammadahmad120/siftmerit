@@ -1,5 +1,5 @@
+import { toDatabaseError } from "@siftmerit/core";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { toDatabaseError } from "../lib/errors.js";
 
 export type TenantRole = "owner" | "member";
 

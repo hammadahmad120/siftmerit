@@ -1,11 +1,15 @@
-import { loadSettings, sharedEnvSchema, type SharedEnv } from "@siftmerit/core";
+import { databaseEnvShape, loadSettings, sharedEnvSchema } from "@siftmerit/core";
+import { z } from "zod";
 
-// The worker has no settings of its own yet, only the shared ones, which
-// include `REDIS_URL` for the work queue.
+// The shared settings (NODE_ENV, LOG_LEVEL, REDIS_URL) come from core. The
+// worker adds the two database settings, which have no default: it updates
+// the status of every run in Postgres, so it does not start without them.
 // A setting is added here by the task that first uses it.
-const envSchema = sharedEnvSchema;
+const envSchema = sharedEnvSchema.extend({
+  ...databaseEnvShape,
+});
 
-export type Env = SharedEnv;
+export type Env = z.infer<typeof envSchema>;
 
 /** Reads and checks the settings. Throws an error that names each bad setting. */
 export function loadEnv(): Env {

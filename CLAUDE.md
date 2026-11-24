@@ -53,6 +53,7 @@ Run this at the end of a task, or whenever the user says "wrap up" (mid-task: re
 - Mail is found and picked by code, never by AI. Mail access is read-only and goes through mailsift.
 - Long work is queued, never run inside an API request or a chat reply. Every work item has a retry limit, and every handler is safe to run twice.
 - What HR sees (status, progress, skip reasons) is saved in Postgres, never read from Redis. A work item is queued after its Postgres row is saved.
+- A work item's data holds IDs only, never CV text, email content, names or contact details. The text stays in Postgres and the handler reads it by ID.
 - Agent tools are thin wrappers around workflow actions that a screen button also calls. Actions that cost AI money or delete data need HR's confirm click.
 - No LangChain or LangGraph, no component library, no embeddings or vector search.
 - Structured logs carry a request ID or a work item ID. Log lines hold IDs only, never CV text, email content, names, contact details or secret keys. The app prints its logs and never writes log files.

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DemoWorkButton } from "@/components/demo-work-button";
+import { DemoWorkPanel } from "@/components/demo-work-panel";
 
 // The home page at `/`, where a signed-in user lands. For now it holds one
 // section that opens the job list. More sections, such as numbers about the
@@ -20,14 +20,14 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* Temporary, for task 9. Removed when the first real work exists. */}
-      <section className="mt-6 max-w-xl rounded-xl border border-brand-navy/15 bg-white p-5">
+      {/* Temporary, for tasks 9 and 10. Removed when the first real work exists. */}
+      <section className="mt-6 max-w-3xl rounded-xl border border-brand-navy/15 bg-white p-5">
         <h2 className="font-medium">Queue demo</h2>
         <p className="mt-1 mb-4 text-sm text-brand-light-navy">
-          Adds one pretend work item to the queue. The worker takes it and finishes it two seconds
-          later.
+          Starts one pretend piece of work. The worker takes it and finishes it two seconds later.
+          The list below is read from the database.
         </p>
-        <DemoWorkButton />
+        <DemoWorkPanel />
       </section>
     </>
   );

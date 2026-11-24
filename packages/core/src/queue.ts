@@ -21,12 +21,16 @@ export const DEMO_QUEUE_NAME = "demo";
  * What a demo work item carries. IDs only, never names or text: an item is
  * saved in Redis and its fields are written to the logs.
  *
+ * - `workRunId`: the row in `work_runs` this item belongs to. The worker
+ *   updates that row, and the screens read it. A run can have many items;
+ *   every item carries its run's ID.
  * - `tenantId`: the company the work is for. The API takes it from the
  *   signed-in user, never from the request.
  * - `requestId`: the ID of the API request that queued the item, so one click
  *   can be followed from the API's log into the worker's.
  */
 export const demoWorkItemSchema = z.object({
+  workRunId: z.uuid(),
   tenantId: z.uuid(),
   requestId: z.uuid(),
 });

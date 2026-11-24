@@ -2,8 +2,10 @@ import {
   createDemoWorker,
   createLogger,
   createQueueTroubleLogger,
+  createSecretClient,
   DEMO_QUEUE_NAME,
   demoWorkItemSchema,
+  WorkRunRepository,
 } from "@siftmerit/core";
 import { loadEnv } from "./config/env.js";
 import { runDemoWorkItem } from "./handlers/demo.handler.js";
@@ -16,9 +18,15 @@ function start() {
     style: env.NODE_ENV === "production" ? "json" : "readable",
   });
 
+  // The worker saves the status of every run in Postgres, where the screens
+  // read it. It uses the secret key, so each update filters by the company.
+  const workRuns = new WorkRunRepository(createSecretClient(env));
+
   // The worker listens to the queue. This is what keeps the program running:
   // it waits for the next work item for as long as it lives.
-  const worker = createDemoWorker(env.REDIS_URL, (item) => runDemoWorkItem(item, logger));
+  const worker = createDemoWorker(env.REDIS_URL, (item) =>
+    runDemoWorkItem(item, { logger, workRuns }),
+  );
 
   // Connected, or connected again after Redis was away.
   worker.on("ready", () => {
@@ -30,7 +38,7 @@ function start() {
 
   // An item whose handler threw. `item` is missing only when the queue lost
   // track of it, which should not happen. The line holds IDs and the error,
-  // never the item's content. The two IDs inside the item are logged only
+  // never the item's content. The IDs inside the item are logged only
   // when the item has the right shape: an item with the wrong shape could
   // hold anything in those fields.
   worker.on("failed", (item, error) => {
@@ -39,7 +47,11 @@ function start() {
       queue: DEMO_QUEUE_NAME,
       workItemId: item?.id,
       ...(checked.success
-        ? { requestId: checked.data.requestId, tenantId: checked.data.tenantId }
+        ? {
+            workRunId: checked.data.workRunId,
+            requestId: checked.data.requestId,
+            tenantId: checked.data.tenantId,
+          }
         : {}),
       errorName: error.name,
       errorMessage: error.message,
