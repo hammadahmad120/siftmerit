@@ -1,7 +1,8 @@
-import type { Logger } from "@siftmerit/core";
+import { createQueueTroubleLogger, DemoQueue, type Logger } from "@siftmerit/core";
 import cors from "cors";
 import express from "express";
 import type { Env } from "./config/env.js";
+import { createDemoWorkController } from "./controllers/demo-work.controller.js";
 import { createMeController } from "./controllers/me.controller.js";
 import { createSecretClient } from "./lib/supabase.js";
 import { createAuthMiddleware, createRequireTenantMiddleware } from "./middleware/auth.middleware.js";
@@ -9,9 +10,11 @@ import { createErrorMiddleware, notFoundMiddleware } from "./middleware/error.mi
 import { createRequestLogMiddleware } from "./middleware/request-log.middleware.js";
 import { TenantMemberRepository } from "./repositories/tenant-member.repository.js";
 import { TenantRepository } from "./repositories/tenant.repository.js";
+import { createDemoWorkRoutes } from "./routes/v1/demo-work.routes.js";
 import { healthRoutes } from "./routes/v1/health.routes.js";
 import { createMeRoutes } from "./routes/v1/me.routes.js";
 import { AuthService } from "./services/auth.service.js";
+import { DemoWorkService } from "./services/demo-work.service.js";
 import { TenantService } from "./services/tenant.service.js";
 
 /** Builds the Express app. The order below is the order a request passes through. */
@@ -26,6 +29,11 @@ export function createApp(env: Env, logger: Logger) {
   const tenantMemberRepository = new TenantMemberRepository(db);
   const requireUser = createAuthMiddleware(new AuthService(env));
   const requireTenant = createRequireTenantMiddleware(tenantMemberRepository);
+
+  // The work queue. The API only adds work items to it; the worker runs them.
+  // The API starts even when Redis cannot be reached: the queue connects in
+  // the background, and until it has, queuing answers 503.
+  const demoQueue = new DemoQueue(env.REDIS_URL, createQueueTroubleLogger(logger));
 
   // 1. Every request gets an ID and a logger that carries it.
   app.use(createRequestLogMiddleware(logger));
@@ -45,6 +53,13 @@ export function createApp(env: Env, logger: Logger) {
       requireUser,
       requireTenant,
       meController: createMeController(new TenantService(tenantRepository)),
+    }),
+  );
+  v1.use(
+    createDemoWorkRoutes({
+      requireUser,
+      requireTenant,
+      demoWorkController: createDemoWorkController(new DemoWorkService(demoQueue)),
     }),
   );
   app.use("/v1", v1);

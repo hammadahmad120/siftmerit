@@ -14,9 +14,9 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
 | Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and a placeholder page at `/jobs`. |
-| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Two addresses: `/v1/health` and `/v1/me`. Also holds the script that creates companies and users. |
-| Worker | `services/worker` | `@siftmerit/worker` | Starts, logs one line and finishes. There is no queue yet. It also holds the two mailbox scripts (section 7). |
-| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger and the settings loader. |
+| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Three addresses: `/v1/health`, `/v1/me` and `POST /v1/demo-work`, which adds a demo work item to the queue. Also holds the script that creates companies and users. |
+| Worker | `services/worker` | `@siftmerit/worker` | Keeps running, takes work items from the queue and runs them (section 9). So far there is one kind, a demo item. It also holds the two mailbox scripts (section 7). |
+| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader and the work queue. |
 
 How they talk today:
 
@@ -26,9 +26,11 @@ Browser  --->  Supabase                         sign-in and sign-out only
 Browser  --->  API (Express, port 4100)         the page's own calls, with the token
 API, Worker  --->  Core                         imported as a package
 API  --->  Supabase                             the database and the sign-in check
+API  --->  Redis                                adds a work item to the queue
+Worker  --->  Redis                             takes work items out and runs them
 ```
 
-The queue and the AI model are not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The browser never reads the database: Supabase gives it a sign-in token, and every piece of data comes from the API.
+The API and the worker never talk to each other directly; the queue in Redis sits between them (section 9). The AI model is not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The browser never reads the database: Supabase gives it a sign-in token, and every piece of data comes from the API.
 
 ## 2. Running it
 
@@ -37,7 +39,7 @@ Run from the repo root, each in its own terminal.
 | Command | What it starts |
 |---|---|
 | `npm run dev:api` | The API on port 4100. Health check: `http://localhost:4100/v1/health`. |
-| `npm run dev:worker` | The worker. It logs one start line and then waits for file changes. |
+| `npm run dev:worker` | The worker. It listens to the queue and runs work items. Redis must be running. |
 | `npm run dev:web` | The web app on `http://localhost:3100`. |
 | `npm run typecheck` | The type check for all four parts. It must pass after every task. |
 | `npm run lint` | ESLint for the web app, with the Next.js rules. A warning fails it. It must pass after every task. |
@@ -48,10 +50,12 @@ Run from the repo root, each in its own terminal.
 
 All three `dev` commands restart their part when a file changes.
 
+Redis is not started by any of these. It is a program installed on the machine that starts at boot (section 9). `redis-cli ping` answers `PONG` when it is running.
+
 ### Settings
 
 - There is one `.env` file, at the repo root, for every part. `.env.example` lists every setting.
-- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker still starts without a `.env` file.
+- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker still starts without a `.env` file, because `REDIS_URL` has a default.
 - A setting already present in the shell wins over the file. For example, `LOG_LEVEL=debug npm run dev:api`.
 - A setting is added by the task that first uses it.
 
@@ -59,6 +63,7 @@ All three `dev` commands restart their part when a file changes.
 |---|---|---|
 | `NODE_ENV` | API, worker | `development` |
 | `LOG_LEVEL` | API, worker | `info` |
+| `REDIS_URL` | API, worker | `redis://127.0.0.1:6379` |
 | `API_PORT` | API | `4100` |
 | `CORS_ORIGIN` | API | `http://localhost:3100` |
 | `NEXT_PUBLIC_API_URL` | Web app | `http://localhost:4100` |
@@ -81,12 +86,14 @@ Core is a workspace package: a folder in the repo that the API and the worker im
 
 - `createLogger({ service, level, style })`: builds the winston logger. `service` is printed on every line, so the API's lines and the worker's lines can be told apart. `style` is `readable` (one short line for a person) or `json` (one structured line for a log service). Both services pick `json` when `NODE_ENV` is `production`.
 - `loadSettings(partName, schema)`: reads the root `.env` and checks the settings against a zod schema.
-- `sharedEnvSchema`: the settings both services use (`NODE_ENV`, `LOG_LEVEL`). A service adds its own with `sharedEnvSchema.extend({ ... })`.
+- `sharedEnvSchema`: the settings both services use (`NODE_ENV`, `LOG_LEVEL`, `REDIS_URL`). A service adds its own with `sharedEnvSchema.extend({ ... })`.
+- The work queue (`src/queue.ts`): the queue's name, the shape of a work item, `DemoQueue` for the API, `createDemoWorker` for the worker, and `createQueueTroubleLogger`. See section 9.
 
 **Traps**
 
 - Production needs JavaScript. A service's own `tsc` build does not write core's JavaScript, so the production build must compile core too. This is an open point for task 53.
 - The web app does not use core. Core holds server-only code.
+- `bullmq` and `ioredis` are listed in core's `package.json` only. The API and the worker reach them through core, so there is one version in one place.
 - A type error inside core is reported by the type check of the API and the worker as well, because they read core's source.
 
 ## 4. API (`services/api`)
@@ -99,7 +106,7 @@ The layout is routes -> controllers -> services -> repositories. A route names t
 
 1. **Request log.** Makes a request ID, attaches a logger that carries it (`req.log`), sends the ID back as the `x-request-id` header, and prints one "request finished" line when the answer has been sent.
 2. **CORS.** Tells browsers which web address may read the API's answers. See below.
-3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below).
+3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below). `POST /v1/demo-work` adds a work item to the queue and answers 202; see section 9.
 4. **Not found.** An unknown address becomes a normal "not found" error.
 5. **Error step.** Turns any error into a clean JSON answer.
 
@@ -115,6 +122,8 @@ Every error answer has the same shape, so the web app handles them all the same 
 - **An unexpected error:** the log gets a "request failed" line with the name, message and trace. The caller gets only "Internal server error" and the request ID.
 
 - **A failed database call** (`DatabaseError`): the log gets a "request failed" line with the table and action in fixed words we write, such as "tenant_members find by user", and the database's error code. The database's own wording can repeat the data that caused the error, so it is added in development only (`NODE_ENV=development`). The caller gets only "Internal server error" and the request ID.
+
+- **Something the API depends on cannot be reached** (`ServiceUnavailableError`, status 503): so far only the work queue, with the code `queue_unavailable`, when Redis is down. The request was fine, so the caller can try again.
 
 A reported error is found in the logs by its request ID.
 
@@ -155,9 +164,12 @@ A browser hides an answer from a page on another address unless the answering si
 
 ## 5. Worker (`services/worker`)
 
-Today the worker loads its settings, builds the logger with `service: "worker"`, logs one start line and finishes. Under `npm run dev:worker` it then waits for file changes, which is normal.
+The worker loads its settings, builds the logger with `service: "worker"` and starts listening to the queue. That listening is what keeps the program running. It has no web address; nothing calls it. It only takes work items out of Redis.
 
-Task 9 adds the BullMQ queue listener. That keeps the process running and brings the logger that carries a work item ID.
+- `src/index.ts` starts the listener, logs when it connects, logs every failed item, and handles the stop signals.
+- `src/handlers/` holds one file per kind of work. A handler is the work itself. So far there is `demo.handler.ts`.
+
+How an item is run, the clean stop and the traps are in section 9.
 
 The folder `src/scripts/` holds the two mailbox scripts. They are tools a developer runs by hand, not part of the running worker, and they have their own settings file so the worker starts without any mailbox setting. See section 7.
 
@@ -177,6 +189,7 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 - `src/components/dashboard-shell.tsx`, `dashboard-nav.tsx`: the top bar with the page area below it, and the menu.
 - `src/components/me-context.tsx`: asks `/v1/me` once and shares the answer.
 - `src/components/sign-in-form.tsx`, `sign-out-button.tsx`: the form and the button.
+- `src/components/demo-work-button.tsx`: temporary. The button of the home page's "Queue demo" section (section 9).
 - `src/lib/supabase.ts`: the one Supabase client for the browser.
 - `src/lib/api.ts`: the call helper.
 - `src/lib/styles.ts`: looks that more than one screen uses, such as the button.
@@ -390,3 +403,77 @@ npm run company:add-user -- --company acme-trading --email omar@acme.com
 - **A password typed on the command line stays in the terminal's history.** Leave `--password` out for a real user.
 - **A free Supabase project is paused when it sits idle.** It is switched back on from Supabase's website.
 - **The region cannot be changed in place.** It means a new project. Pick from the "specific regions" list; a "general region" lets Supabase choose the data centre.
+
+## 9. The work queue (Redis and BullMQ)
+
+Long work never runs inside an API request. The API adds a small note, a **work item**, to a queue and answers at once. The worker takes items from the queue and does the work. The two programs never talk to each other; Redis sits between them.
+
+- **Redis** is a small program that keeps data in memory. It holds the queue.
+- **BullMQ** is the library that turns Redis into a queue: it adds items, hands each one to one worker, and marks it done or failed.
+- BullMQ's own word for a work item is "job". Ours is not: "job" means a hiring job.
+
+So far there is one queue, `demo`, with one kind of item that does no real work. It exists to prove the path. The button on the home page, the address `POST /v1/demo-work`, the queue and its handler are all removed when the first real work exists.
+
+### The path of one click
+
+1. The browser sends `POST /v1/demo-work` with the user's token.
+2. The API checks the token and finds the company, as for every address.
+3. The API adds an item to the queue: `{ tenantId, requestId }`. Nothing is read from the request's body.
+4. The API answers 202 ("accepted, not done yet") with the ID the queue gave the item. It does not wait for the work.
+5. The worker takes the item, checks its shape, and logs "work item started".
+6. Two seconds later it logs "work item done", and Redis marks the item completed.
+
+The page only learns that the item was queued. That it finished is seen in the worker's terminal. Showing it on the page needs a status row in Postgres, which is task 10: what HR sees is never read from Redis.
+
+### The rules an item follows
+
+- **IDs only.** An item holds the company ID and the API's request ID, never names or text. It is saved in Redis and its fields are written to the logs.
+- **The company ID comes from the signed-in user,** never from the request.
+- **The shape is defined once,** as a zod shape in core (`demoWorkItemSchema`). The API builds an item from it and the worker checks every item against it before running it, because an item comes from Redis, not from our own memory.
+- **Every log line about an item carries three IDs:** the work item ID, the request ID and the company ID. The request ID is the same one the API logged for the click, so one click can be followed from the API's terminal into the worker's.
+- **The handler is safe to run twice.** The demo handler changes nothing.
+- **One try, no retry** (`attempts: 1`), written out on purpose. The real counts are chosen in task 10.
+- **Finished items are cleaned up.** BullMQ keeps every finished item forever unless told otherwise; the last 1,000 done and 5,000 failed are kept.
+
+### The two sides
+
+**The adding side (`DemoQueue`, used by the API)** must never make a web request wait.
+
+- It is created once, when the API starts, with `enableOfflineQueue: false`: when Redis goes away, adding fails at once.
+- It keeps its own "ready" mark and refuses to add until its first connection is made. Without the mark, a queue created while Redis is down keeps the add waiting until Redis comes up.
+- A refused add throws `QueueUnavailableError`, which the API's service turns into a 503 with the code `queue_unavailable`.
+- So the API starts even when Redis is stopped, and the queue starts working by itself when Redis comes up.
+
+**The running side (`createDemoWorker`, used by the worker)** waits patiently. When Redis cannot be reached it keeps trying and carries on when Redis is back. It runs one item at a time.
+
+Both sides report connection errors through `createQueueTroubleLogger`, which logs one line and then stays quiet for 30 seconds, because the same error arrives about once a second while Redis is down.
+
+### The clean stop
+
+Ctrl+C sends the worker a signal (SIGINT). A restart after a file change, or a hosting service stopping the program, sends another (SIGTERM). On either the worker takes no new item, lets the running item finish, and then ends. An item still waiting stays in Redis for the next worker. A second signal ends the worker at once, for when Redis is away and the clean stop cannot finish.
+
+### Redis on the development machine
+
+Installed from Redis's official package source, not Ubuntu's own, which is too old (6.0.16; BullMQ needs 6.2 or newer). It starts at boot as the service `redis-server`, listens on this machine only (port 6379), and has no password.
+
+Looking inside with `redis-cli`, which comes with Redis:
+
+| Command | Shows |
+|---|---|
+| `redis-cli ping` | `PONG` when Redis is running |
+| `redis-cli zcard bull:demo:completed` | How many items are done |
+| `redis-cli zcard bull:demo:failed` | How many failed |
+| `redis-cli llen bull:demo:wait` | How many are waiting |
+| `redis-cli hgetall bull:demo:1` | Item 1: its data, its settings and its times |
+
+### Traps
+
+- **The page says "The work queue cannot be reached":** Redis is not running. Check with `redis-cli ping`, and start it with `sudo systemctl start redis-server`.
+- **The button says "Queued" and nothing else happens:** the worker is not running. The item waits in Redis and is run as soon as `npm run dev:worker` starts. That is the queue doing its job, not a fault.
+- **Never log a field of an item before the item passed the shape check.** An item with the wrong shape can hold anything in a field named `tenantId`. The worker's "work item failed" line prints the two IDs from inside an item only when the item passes; the work item's own ID, given by the queue, is always safe.
+- **BullMQ's switch `skipWaitingForReady` is not used.** Tried in task 9: with it, a queue created while Redis was down failed at once but never worked again after Redis came up.
+- **Every queue and worker needs an `error` listener.** Without one, a connection error stops the whole program.
+- **`redis-cli` commands above are for the queue named `demo`.** The keys of a queue start with `bull:` and then its name.
+- **Redis saves to disk only from time to time.** A crash of the machine can lose the items added since the last snapshot. Fine for development; for production see the open points in [decisions.md](decisions.md).
+- **No retries yet.** A failed item stays failed. Retries, duplicates, delayed items and the status row are task 10.
+- **This Redis is shared by everything on the machine that points at port 6379.** Another project using it with a queue also named `demo` would mix its items with ours. Nothing else uses it today.

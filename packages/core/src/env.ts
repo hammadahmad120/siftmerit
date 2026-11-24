@@ -16,6 +16,9 @@ export const sharedEnvSchema = z.object({
   // development prints easy-to-read log lines, production prints JSON lines.
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   LOG_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
+  // Where Redis listens. Redis holds the work queue: the API adds work items
+  // to it and the worker takes them out. `127.0.0.1` is this machine.
+  REDIS_URL: z.url().default("redis://127.0.0.1:6379"),
 });
 
 export type SharedEnv = z.infer<typeof sharedEnvSchema>;

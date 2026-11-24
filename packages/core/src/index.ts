@@ -8,3 +8,12 @@ export { loadSettings, sharedEnvSchema } from "./env.js";
 export type { SharedEnv } from "./env.js";
 export { createLogger } from "./logger.js";
 export type { Logger, LoggerOptions } from "./logger.js";
+export {
+  createDemoWorker,
+  createQueueTroubleLogger,
+  DEMO_QUEUE_NAME,
+  DemoQueue,
+  demoWorkItemSchema,
+  QueueUnavailableError,
+} from "./queue.js";
+export type { DemoWorkItem, QueuedDemoWorkItem } from "./queue.js";

@@ -46,6 +46,17 @@ export class ConflictError extends AppError {
 }
 
 /**
+ * Something the API depends on cannot be reached right now, such as the work
+ * queue. The request itself was fine, so the caller can try again later.
+ */
+export class ServiceUnavailableError extends AppError {
+  constructor(message: string, code?: string) {
+    super(503, message, code ?? "service_unavailable");
+    this.name = "ServiceUnavailableError";
+  }
+}
+
+/**
  * A call to the database (or to Supabase's sign-in service) failed.
  *
  * Its own `message` holds only facts that are safe to log: the table and

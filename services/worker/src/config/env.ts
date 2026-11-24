@@ -1,6 +1,7 @@
 import { loadSettings, sharedEnvSchema, type SharedEnv } from "@siftmerit/core";
 
-// The worker has no settings of its own yet, only the shared ones.
+// The worker has no settings of its own yet, only the shared ones, which
+// include `REDIS_URL` for the work queue.
 // A setting is added here by the task that first uses it.
 const envSchema = sharedEnvSchema;
 

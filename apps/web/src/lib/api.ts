@@ -126,6 +126,18 @@ export function getMe(): Promise<Me> {
   return apiFetch<Me>("/v1/me");
 }
 
+/** The answer of `POST /v1/demo-work`: the ID the queue gave the new work item. */
+export type QueuedWorkItem = { workItem: { id: string } };
+
+/**
+ * Asks the API to queue one demo work item. The answer comes back at once,
+ * before the work is done: the worker runs the item a moment later.
+ * Temporary, like the button that calls it.
+ */
+export function queueDemoWork(): Promise<QueuedWorkItem> {
+  return apiFetch<QueuedWorkItem>("/v1/demo-work", { method: "POST" });
+}
+
 /**
  * The same question, asked by the sign-in form straight after Supabase
  * accepted the password, with the token from that answer. Nothing is signed
