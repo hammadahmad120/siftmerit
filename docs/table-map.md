@@ -1,6 +1,6 @@
 # Table map
 
-The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist.
+The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist. Updated on 2026-11-24 (tasks 10 and 11): `work_runs` and `jobs` exist.
 
 This is a map, not the SQL. Each table's SQL is written in the task that first needs it. The columns below are a first sketch; the exact columns are settled in that task. This doc is updated whenever a table is added or its links change.
 
@@ -53,7 +53,7 @@ job_requirements ─────────────────────
 | `tenants` | Company name and short name (`slug`: lower case with dashes, allowed only once). A `settings` column is added when something first uses it, probably the limits in task 39 | Acme Trading, `acme-trading` | 6 (exists) |
 | `tenant_members` | Which sign-in account is in which company, and its role: `owner` or `member`. One user belongs to one company. Nothing is restricted by the role yet | Sara is in Acme, owner | 6 (exists) |
 | `mailbox_connections` | Mailbox address, the secret (encrypted), status, last error | hr@acme.com, connected | 21 |
-| `jobs` | Job description, subject words, posting date, strict or lenient, status, when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, strict, open | 11 |
+| `jobs` | Title (the job's short name on our screens, typed by HR), job description, subject words (a list of 1 to 10 phrases), posting date, status (`draft`, `open`, `closed`), the form's one-time key, and who created it. Added by later tasks when first used: strict or lenient, when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, draft | 11 (exists) |
 | `job_requirements` | Which job, the requirement text, must or nice to have, its place in the list | "3 years experience", must | 14 |
 | `job_emails` | Which job, Gmail's email ID, subject, sender, date, picked by HR or not, status, skip reason. No email body and no attachment | "Application for Accountant", 2 Nov, read | 22 |
 | `candidates` | The fact sheet (name, contact, city, total years, education, skills, current role, short summary, links), the CV text, the keep-until date | Ali, Lahore, 4 years | 26 to 29 |
@@ -67,6 +67,8 @@ Rules the database keeps:
 - The same email ID cannot be added twice to the same job.
 - A candidate has at most one application per job.
 - An application has at most one tick per requirement.
+- A company has at most one job per one-time key. The form makes the key once, so a double click or a repeated request cannot save the same job twice.
+- A job's ID together with its company is allowed once. This lets a later table point at "company and job" together, so the database refuses a row that names one company and another company's job.
 - A company has at most one unfinished run (`waiting` or `running`) of a kind. This is what refuses the same work being queued twice. When `jobs` exists it becomes one per job and kind.
 
 ## 4. Why it is shaped this way
@@ -108,7 +110,6 @@ The email list is kept per job. An email that matches two open jobs is read once
 
 | Task | Point |
 |---|---|
-| 11 | Whether a job has a title |
 | 24 | Where HR's remembered subject picks are kept |
 | 26, 29 | Where the CV text sits before the AI has said "this is a CV", and when the candidate row is made |
 | 29 | The exact fact sheet boxes |
@@ -134,4 +135,4 @@ The same three lines go into the SQL file of every table:
 2. The browser-side roles (`anon` and `authenticated`) get no rights and no policies.
 3. The server role (`service_role`, used by the secret key) gets its rights written out.
 
-So only our API and worker reach the data. They hold the secret key, which goes past the row rules, and that is why every repository function filters by `tenant_id` itself. Deleting a company row removes everything the company owns; deleting a sign-in account removes its member row, never the company.
+So only our API and worker reach the data. They hold the secret key, which goes past the row rules, and that is why every repository reaches a company table only through the helper `forTenant`, which adds the `tenant_id` filter itself. Deleting a company row removes everything the company owns; deleting a sign-in account removes its member row, never the company.

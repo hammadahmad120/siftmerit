@@ -33,9 +33,12 @@ How this was discussed, and how to continue: plain simple words, honest neutral 
 
 ### Step 1: HR starts a job
 HR enters:
+- a title, the job's short name in the job list (required)
 - the job description, as free text (required)
-- subject words (required)
+- subject words, as one or more phrases (required)
 - the posting date (optional, defaults to one week back)
+
+The title was added on 2026-11-24. The reason is in [decisions.md](decisions.md).
 
 ### Step 2: Requirements are agreed
 The AI pulls the requirements out of the job description and marks each as **must** or **nice to have**. HR edits and confirms the list, and picks **strict** or **lenient**. No CV is read before HR confirms.

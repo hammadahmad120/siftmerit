@@ -13,10 +13,10 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
-| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and a placeholder page at `/jobs`. |
-| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users. |
+| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and the job screens: the list at `/jobs`, the form at `/jobs/new` and a job's page at `/jobs/<id>` (section 10). |
+| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, `/v1/jobs` (create, list, get one; section 10) and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users. |
 | Worker | `services/worker` | `@siftmerit/worker` | Keeps running, takes work items from the queue and runs them (section 9). So far there is one kind, a demo item. It also holds the two mailbox scripts (section 7). |
-| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader, the database connection, the `work_runs` repository and the work queue. |
+| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader, the database connection, the helper that keeps companies apart, the `jobs` and `work_runs` repositories and the work queue. |
 
 How they talk today:
 
@@ -90,6 +90,8 @@ Core is a workspace package: a folder in the repo that the API and the worker im
 - `loadSettings(partName, schema)`: reads the root `.env` and checks the settings against a zod schema.
 - `sharedEnvSchema`: the settings both services use (`NODE_ENV`, `LOG_LEVEL`, `REDIS_URL`). A service adds its own with `sharedEnvSchema.extend({ ... })`.
 - The database (`src/database.ts`): `createSecretClient`, the client made with the secret key; `DatabaseError`, the error of a failed database call; and `databaseEnvShape`, the two database settings, which the API and the worker each add to their own settings.
+- `forTenant(db, tenantId)` (`src/tenant-db.ts`): the one door to a company's rows. It adds the company filter by itself. See section 8.
+- `JobRepository` (`src/jobs.repository.ts`): the only code that touches the `jobs` table. See section 10.
 - `WorkRunRepository` (`src/work-runs.repository.ts`): the only code that touches the `work_runs` table. See section 9.
 - The work queue (`src/queue.ts`): the queue's name, the shape of a work item, `DemoQueue` for the API, `createDemoWorker` for the worker, `isFinalFailure` and `isWorkerLost` for telling how an item failed, and `createQueueTroubleLogger`. See section 9.
 
@@ -103,15 +105,15 @@ Core is a workspace package: a folder in the repo that the API and the worker im
 
 ## 4. API (`services/api`)
 
-The layout is routes -> controllers -> services -> repositories. A route names the address and the steps in front of it, a controller reads the request and writes the answer, a service holds the rules, and a repository is the only code that talks to a table. `src/app.ts` builds these pieces once at start and wires them together. A controller gives back a group of functions, one per address (`createDemoWorkController` gives back `startRun` and `listRuns`); `me` still gives back a single function.
+The layout is routes -> controllers -> services -> repositories. A route names the address and the steps in front of it, a controller reads the request and writes the answer, a service holds the rules, and a repository is the only code that talks to a table. `src/app.ts` builds these pieces once at start and wires them together. A controller gives back a group of functions, one per address: `createJobsController` gives back `create`, `list` and `get`, and `createMeController` gives back `getMe`.
 
 ### The path of a request
 
 `src/app.ts` lists the steps in order:
 
 1. **Request log.** Makes a request ID, attaches a logger that carries it (`req.log`), sends the ID back as the `x-request-id` header, and prints one "request finished" line when the answer has been sent.
-2. **CORS.** Tells browsers which web address may read the API's answers. See below. Right after it, a JSON body of at most 10 kilobytes is read into `req.body`.
-3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below). `POST /v1/demo-work` starts a demo run and answers 202, and `GET /v1/demo-work` lists the last runs; see section 9.
+2. **CORS.** Tells browsers which web address may read the API's answers. See below. Right after it, a JSON body of at most 100 kilobytes is read into `req.body`. The largest thing sent is a job description, at most 20,000 characters, which can be 40 kilobytes or more in some scripts.
+3. **Routes.** Everything is under `/v1`. `/v1/health` needs no sign-in. Every other address has the two sign-in steps in front of it (see "Sign-in check" below). The three job addresses are in section 10. `POST /v1/demo-work` starts a demo run and answers 202, and `GET /v1/demo-work` lists the last runs; see section 9.
 4. **Not found.** An unknown address becomes a normal "not found" error.
 5. **Error step.** Turns any error into a clean JSON answer.
 
@@ -190,7 +192,8 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 - `src/app/signin/page.tsx`: the sign-in page at `/signin`. It is the one page that needs no signed-in user.
 - `src/app/(dashboard)/layout.tsx`: puts the guard, and inside it the shell, around every page in the `(dashboard)` folder. A folder name in brackets is not part of the address.
 - `src/app/(dashboard)/page.tsx`: the home page at `/`, where a signed-in user lands. It holds a "Jobs" section.
-- `src/app/(dashboard)/jobs/page.tsx`: the page at `/jobs`, a placeholder until task 11.
+- `src/app/(dashboard)/jobs/page.tsx`, `jobs/new/page.tsx`, `jobs/[jobId]/page.tsx`: the job list, the "New job" form and a job's own page (section 10).
+- `src/components/job-list.tsx`, `job-form.tsx`, `subject-words-field.tsx`, `job-details.tsx`, `back-to-jobs.tsx`: the browser parts of those three pages.
 - `src/components/auth-guard.tsx`: the guard.
 - `src/components/dashboard-shell.tsx`, `dashboard-nav.tsx`: the top bar with the page area below it, and the menu.
 - `src/components/me-context.tsx`: asks `/v1/me` once and shares the answer.
@@ -198,7 +201,7 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 - `src/components/demo-work-panel.tsx`: temporary. The buttons and the list of runs of the home page's "Queue demo" section (section 9).
 - `src/lib/supabase.ts`: the one Supabase client for the browser.
 - `src/lib/api.ts`: the call helper.
-- `src/lib/styles.ts`: looks that more than one screen uses, such as the button.
+- `src/lib/styles.ts`: looks that more than one screen uses: the button, a link that looks like a button, and a form field.
 
 ### Server part and browser part
 
@@ -254,7 +257,8 @@ Light mode only. The colours come from the NexRhino colour guide and are written
 | Red (Tailwind's own) | Error messages only |
 
 - The bar and the cards are white on the cream page.
-- Every button uses `BUTTON_CLASSES` from `src/lib/styles.ts` and adds only its own size.
+- Every button uses `BUTTON_CLASSES` from `src/lib/styles.ts` and adds only its own size. A link that takes the user to another page and should look like a button ("New job", "Back to jobs") uses `LINK_BUTTON_CLASSES`: the lighter navy under the mouse is written out there, because `enabled:` in the button's look only matches a real button. Every form field uses `FIELD_CLASSES`.
+- A status is a small outlined label in light navy (`StatusLabel` in `job-list.tsx`). Green, amber and red are not used yet; they are kept for the ticks.
 - The font is Geist, loaded in `app/layout.tsx` with Next.js's font tool. It is downloaded when the app is built and served from our own site, so a user's browser never calls Google.
 - The guide and the live nexrhino.com differ in two places: the guide says purple buttons and the site has navy ones (we follow the site), and the site's navy is `#06173A` (we use the guide's).
 
@@ -279,7 +283,8 @@ Every screen calls the API through `apiFetch(path, init?)`, or a small function 
 
 - **Next.js 16 differs from older versions.** `apps/web/AGENTS.md` (written by Next.js itself, and written back by `next dev` if removed) says to read the docs shipped in `node_modules/next/dist/docs/` before writing web code. Do that instead of working from memory.
 - **`cacheComponents` and `partialPrefetching` are on** in `next.config.ts`. They change how the Next.js server prepares and caches pages. Nothing on our server reads the session, so they have little to act on, but two effects matter:
-  - **A page that was left stays alive in the background,** with what was typed into it. That is why the sign-in form empties its fields after a sign-in, and why the guard draws the page under the user's ID.
+  - **A page that was left stays alive in the background,** with what was typed into it. That is why the sign-in form empties its fields after a sign-in, why the guard draws the page under the user's ID, why the job form empties itself and drops its one-time key after a save, and why a job's page draws its content under the job's ID.
+  - **A page with an ID in its address (`jobs/[jobId]`) gets `params` as a promise, and the part that reads it must sit in a `<Suspense>`.** The ID is only known when the page is opened, not when the app is built. A production build shows such a page as "Partial Prerender".
   - **Reading the address in a browser part (`useSearchParams`) needs a `<Suspense>` around it,** or the build fails. The sign-in form does this for its notice.
 - **The automatic "instant navigation" check is switched off** (`experimental.instantInsights` in `next.config.ts`). Under `npm run dev` it draws each page on the server, and the guard draws no page there, so every page behind the guard was reported as "dropped from rendering". Writing `export const instant = false` in the `(dashboard)` layout did not remove the message; only the page file or this setting does.
 - **Signed in, then thrown straight back to the sign-in page:** the two `NEXT_PUBLIC_SUPABASE_` values probably differ from the API's pair. The API answers 401 to a token from another project, and the call helper signs out on any 401.
@@ -289,7 +294,7 @@ Every screen calls the API through `apiFetch(path, init?)`, or a small function 
 - **The web type check is `next typegen && tsc --noEmit`.** Next.js generates some types first, such as `LayoutProps`. Plain `tsc` alone fails on a fresh clone.
 - **Its TypeScript settings are Next's own.** `apps/web/tsconfig.json` does not extend the shared `tsconfig.base.json`, which is set up for Node.
 - **ESLint reports success when there are only warnings.** Several React rules, such as an effect that misses a value it uses, are warnings. The lint command therefore runs with `--max-warnings 0`. It covers the web app only.
-- **The page shows no colours, black text and a plain font:** the running web app is serving an old stylesheet. Seen once in task 8: the styles file had changed, but `npm run dev:web` kept serving styles made from the old one, while a production build of the same code was right. Stop it, delete `apps/web/.next/dev` and start it again. The cause was not proven. A production build had been run in `apps/web` in the same minute the web app started, and both write into `.next`, so do not run `next build` there while `npm run dev:web` is running.
+- **The page shows no colours, black text and a plain font:** the running web app is serving an old stylesheet. Seen once in task 8: the styles file had changed, but `npm run dev:web` kept serving styles made from the old one, while a production build of the same code was right. Stop it, delete `apps/web/.next/dev` and start it again. The cause was not proven. A production build had been run in `apps/web` in the same minute the web app started. The Next.js docs say the two do not disturb each other, because development writes into `.next/dev`; in task 11 a production build was run twice while `npm run dev:web` was running and the web app kept working. So the build is not proven to be the cause.
 - **The menu reads the current address (`usePathname`), so it sits in a `<Suspense>`.** With `cacheComponents` on, the Next.js docs say the build can fail without it once a page has a part of its address not known at build time, such as `/jobs/123`.
 - **A colour that is not in `globals.css` does nothing.** A class such as `bg-brand-blue` gives no error and no style. Add the colour there first.
 
@@ -377,7 +382,24 @@ The API makes one client with each (`src/lib/supabase.ts`): the secret one for a
 - **Our code.** The secret key can read every company's rows, and the database does not know which user a request is for. So every repository function filters by `tenant_id`, and that ID always comes from the sign-in check. One forgotten filter would show a user another company's rows.
 - **The row rules keep everyone else out.** Supabase gives the database its own web address, which our API uses too. Every table has row level security switched on, no rights and no policies for the browser-side roles, and written-out rights for the server role. Someone who asks that address directly with only the publishable key and a user's token gets nothing.
 
-The first table with company data is `work_runs` (section 9). Every function of its repository takes the company's ID first and filters by it. A helper that always adds the company filter, and the automatic separation test, are planned for task 11.
+**The helper `forTenant`** (`packages/core/src/tenant-db.ts`) is how our code does it. A repository never writes the company filter by hand, so it cannot forget it:
+
+```ts
+const company = forTenant(db, tenantId);
+
+company.select("jobs", "id, title").eq("id", jobId).maybeSingle();  // filter added inside
+company.insert("jobs", { title, description });                      // company set inside
+company.update("jobs", { status: "open" }).eq("id", jobId);          // filter added inside
+company.delete("jobs").eq("id", jobId);                              // filter added inside
+```
+
+- Each function gives back the Supabase library's own query, so the caller goes on with `.eq(...)`, `.order(...)` or `.single()` as usual. A filter added later only narrows the result; it cannot widen it past the company.
+- `insert` sets `tenant_id` itself, whatever the values say. `update` refuses a change that sets `tenant_id`, and an empty company ID is refused at once.
+- The tables it may reach are a fixed list in that file, `TenantTable`: `jobs` and `work_runs`. A new table with company data adds its name there, and its repository uses the helper for every query.
+- Every repository function takes the company's ID as its first argument. In the API that ID comes from the sign-in check; in the worker from a work item that passed its shape check.
+- `tenants` and `tenant_members` are not reached through it. They are the company itself and the lookup that finds a user's company, so there is no company filter to add.
+
+**There is no automatic separation test yet.** It was planned for task 6, then for task 11, and was taken out of task 11; it has no task now (open point in [decisions.md](decisions.md)). Until it exists, each task checks its new code by hand with a made-up company ID, which must find, change and delete nothing. That proves the filter is applied. It does not replace a test with two real companies and real sign-in tokens.
 
 ### SQL files
 
@@ -560,3 +582,76 @@ Looking inside with `redis-cli`, which comes with Redis:
 - **Redis saves to disk only from time to time.** A crash of the machine can lose the items added since the last snapshot. Fine for development; for production see the open points in [decisions.md](decisions.md).
 - **Items are handed out in the order they arrived.** One company's 200 items stand in front of another company's 5. Taking turns needs more than small items; it is an open point for task 30.
 - **This Redis is shared by everything on the machine that points at port 6379.** Another project using it with a queue also named `demo` would mix its items with ours. Nothing else uses it today.
+
+## 10. Jobs
+
+A job is one hiring job of a company: a title, the job description, the subject words and a posting date. HR creates it with a form. Creating a job only saves it, as a draft. Nothing reads mail or CVs because a job was created; the later steps each need HR's own confirm.
+
+### The table
+
+`jobs` (SQL file `20261124140000_jobs.sql`):
+
+| Column | Holds |
+|---|---|
+| `title` | The job's short name on our screens, 1 to 120 characters. Never used to search mail |
+| `description` | The job description as free text, up to 20,000 characters |
+| `subject_words` | The phrases looked for in email subjects, as a Postgres list (`text[]`), 1 to 10 phrases |
+| `posting_date` | A plain date. Mail from this day onward is looked at |
+| `status` | `draft`, `open` or `closed` |
+| `create_key` | The one-time key the form sent. Allowed once per company |
+| `created_by` | The user who created the job. Empty when that account was deleted |
+
+- **Status.** A new job is a `draft`: its requirements are not confirmed yet. `open` is set when HR confirms them (task 16) and `closed` when HR closes the job (task 48). What is running at the moment, such as "reading 120 of 200", is not a job status; that is read from `work_runs`.
+- **Subject words.** One phrase is enough. Inside a phrase all its words must be in the subject, in any order (mailsift sends Gmail `subject:(Senior Accountant)`). A second phrase is for applicants who use other words for the same job. Picking an email that matches any one phrase is built in task 22.
+- **Two "allowed once" rules.** `(tenant_id, create_key)` is the one-time key. `(tenant_id, id)` looks pointless, since an ID is unique by itself; it exists so that a later table can point at a job together with its company, and the database then refuses a row that names one company and another company's job.
+- Columns that later steps need (strict or lenient, when the requirements were confirmed, when the mailbox was last checked, when the job was closed) are added by the tasks that first use them.
+
+### The addresses
+
+| Address | What it does | Answers |
+|---|---|---|
+| `POST /v1/jobs` | Saves a new job for the user's company | 201 with the job. 200 with the saved job when the key was used before. 400 when a limit is broken |
+| `GET /v1/jobs` | The company's newest 100 jobs, newest first, without the description | 200 |
+| `GET /v1/jobs/:jobId` | One job in full | 200, or 404 `job_not_found` |
+
+Every user of the company, owner and member, may create and see jobs. The answers never hold the company ID or the one-time key.
+
+### The path of one "Create job"
+
+1. HR clicks "Create job". Text still in the subject field becomes a chip, and the form checks the fields.
+2. The form makes its one-time key, switches the button off and sends `POST /v1/jobs` with the token.
+3. The two sign-in steps find the user and the company. Neither is read from the body.
+4. `JobService` checks the body again with zod, tidies the phrases and picks the posting date.
+5. `JobRepository` inserts the row through `forTenant`, which sets the company.
+6. The API logs "job created" with the job's ID only, and answers 201.
+7. The form empties itself, drops its key and opens `/jobs/<id>`.
+
+### The one-time key
+
+A slow call can save the job and still lose its answer. HR sees an error, clicks again, and without a guard there are two jobs. A request that is safe to send twice is called idempotent, and the key is what makes this one so.
+
+- The form makes a random UUID on the first click of "Create job" and sends it again on every retry of that form.
+- The database allows a key once per company. This is a rule in the database, not a check in our code: two requests at the same moment would both pass a check, but the database lets only one row in.
+- The refused insert tells the service that the key was used. The service then reads the job saved under that key and answers with it, so every request ends on the same job. The content of the second request is ignored.
+- After a save the form drops the key, so opening "New job" again starts a new job.
+
+### The screens
+
+- **The list** (`job-list.tsx`) shows each job as a card: the title, the status label, up to three subject phrases and then "+2 more", and the two dates. The whole card is one link. It asks the API each time the page appears.
+- **The form** (`job-form.tsx`) fills the posting date with "7 days ago" by the user's own computer. An emptied date field is not sent, and the API then uses 7 days back by its own clock.
+- **The chip field** (`subject-words-field.tsx`) is written by us; there is no component library. Its whole value (the chips, the text being typed, and the small line that says why a phrase was not added) is kept by the form, so the form can turn leftover text into a chip when the button is clicked. Enter adds a chip and does not send the form. A comma ends a phrase, typed or pasted. Backspace in the empty field removes the last chip. The cross is a real button.
+- **A job's page** (`job-details.tsx`) shows the description as plain text, never as HTML.
+- The "New job" page and a job's page have a "Back to jobs" button at the top (`back-to-jobs.tsx`).
+
+### Traps
+
+- **The limits are written twice:** in `services/api/src/services/job.service.ts` and in the web app (`job-form.tsx`, `subject-words-field.tsx`). The web app cannot import server code. Change both together; the database has its own copy of the title, description and phrase-count limits in the SQL file.
+- **The API is the judge, not the form.** The form's checks are for a quick message. A request can come from something other than the form, later the chat agent, so the API checks everything again: it drops a repeated phrase quietly and turns several spaces inside a phrase into one.
+- **A wrong ID, another company's ID and text that is no ID all answer 404.** Nobody can learn from the answer whether an ID exists. Text that is no ID is refused before the database is asked; Postgres would answer it with an error, which would become a 500.
+- **The posting date has one day of room on both sides.** It is typed in the user's own time zone, where "today" can be the server's "tomorrow". So the API accepts a date up to one day ahead of its own clock and 366 days behind it.
+- **A date written as `2026-11-17` must not be read with `new Date("2026-11-17")`.** That reads it as midnight in UTC, which is the day before in some time zones. `plainDate` in `job-list.tsx` hands the three numbers over one by one.
+- **Two such dates compare correctly as plain text,** which is how the API checks the range.
+- **A text with a NUL character is refused with 400.** Postgres cannot store that character.
+- **A job cannot be edited or deleted yet.** A typo in the title stays. Later tasks bring the edits: subject words (25), the description (44), closing (48).
+- **The list is capped at 100 and has no paging.** The page says so when the cap is reached.
+- **`crypto.randomUUID()` in the browser needs a secure page:** `https`, or `localhost` in development.

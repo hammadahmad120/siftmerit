@@ -191,7 +191,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 | # | Task | Kind | Needs | How to check | Decide then |
 |---|---|---|---|---|---|
-| 11 | Create a job (step 1): form, list, job page. Also the company separation test, moved here from task 6 | Build | 8 | A new job with a description, subject words and a posting date appears in the list and opens, and the separation test passes | Job statuses. A helper that always adds the company filter. How the separation test stays safe beside real data |
+| 11 | Create a job (step 1): form, list, job page, and the helper that always adds the company filter | Build | 8 | A new job with a title, a description, subject words and a posting date appears in the list and opens | Job statuses. A helper that always adds the company filter |
 | 12 | Test set: job descriptions, fact cards, CVs, junk files | Design | none | A folder of files with an answer sheet, and the emails sent to the test mailbox | Which jobs, where the files live (real CVs stay out of git), the form of the answer sheet |
 | 13 | AI wrapper: forced form, code check, cost log | Build | 3, 6 | A test call shows in the cost log | Starting model, the "no training on our data" provider rule, cost log columns. Check the current AI SDK docs first |
 | 14 | AI drafts requirements (step 2, first half) | Build | 11, 13 | The job page shows requirements, each marked must or nice to have | Inline call or work item |
@@ -257,6 +257,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 ### Notes on the list
 
+- **The company separation test has no task.** It was planned for task 6, moved to task 11 on 2026-11-18 and taken out of task 11 on 2026-11-24. When it is built, and how it stays safe beside real data, are open points in `decisions.md`. Recommended: its own small task before task 26, the first task that stores CV text.
 - **Near the size ceiling:** tasks 2, 6, 26, 29 and 32. Any that prove too big are split in their plan step.
 - **Near the floor:** tasks 25 and 42. They can be merged into 24 and 40 when reached.
 - **The user's hand work:** task 5 (Google setup), task 9 (the Redis install commands) and task 12 (the real CVs). Tasks 5 and 12 need no code and can start at any time.
