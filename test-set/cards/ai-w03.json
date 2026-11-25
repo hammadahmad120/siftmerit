@@ -33,7 +33,11 @@
         "result": "met",
         "proof": "Built the internal tooling used by 40 operations staff: quote calculator, exception queue and audit log, in TypeScript and Python."
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Built the internal tooling used by 40 operations staff: quote calculator, exception queue and audit log, in TypeScript and Python."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Built the internal tooling used by 40 operations staff: quote calculator, exception queue and audit log, in TypeScript and Python."
       },

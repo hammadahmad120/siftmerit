@@ -30,7 +30,11 @@
         "result": "met",
         "proof": "AI Engineer, Chenab Soft"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "LLM agents with tool calling for a logistics client. Python + TypeScript."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "LLM agents with tool calling for a logistics client. Python + TypeScript."
       },

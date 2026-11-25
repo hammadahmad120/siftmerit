@@ -32,7 +32,11 @@
         "result": "met",
         "proof": "AI Automation Engineer, Brightline Outsourcing"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Developed client portals in JavaScript and TypeScript (Next.js) with a Python (Django) back end."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Developed client portals in JavaScript and TypeScript (Next.js) with a Python (Django) back end."
       },

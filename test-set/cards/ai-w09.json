@@ -32,7 +32,11 @@
         "result": "met",
         "proof": "Train and serve demand-forecast and churn models in production (Python, FastAPI); retrained weekly."
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Train and serve demand-forecast and churn models in production (Python, FastAPI); retrained weekly."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Built the labelling tool and the model dashboard in TypeScript (React)."
       },
@@ -75,5 +79,5 @@
       }
     }
   },
-  "why": "A real ML engineer whose generative AI skills are only a list. The agents must is mentioned only; it must not be ticked as met."
+  "why": "A real ML engineer whose generative AI skills are only a list. The agents must-have is mentioned only; it must not be ticked as met. The candidate qualifies, with half points for it and the sign \"listed only\"."
 }

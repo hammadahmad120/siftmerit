@@ -30,13 +30,14 @@
         "result": "met",
         "proof": "AI Engineer, Sutlej Labs"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Built a multi-agent workflow in Python (LangGraph) for invoice checking: one agent extracts, one validates against the ERP through function calls, one writes the summary."
+      },
+      "ai-3b": {
         "result": "mentioned_only",
         "proof": "Languages: Python, TypeScript, SQL",
-        "alsoAccept": [
-          "unclear"
-        ],
-        "note": "Python is used in every role. TypeScript appears only in the skills list."
+        "note": "TypeScript appears only in the skills list. JavaScript is not mentioned."
       },
       "ai-4": {
         "result": "met",
@@ -76,5 +77,5 @@
       }
     }
   },
-  "why": "Good agent work in Python, but TypeScript is only listed. The Python and TypeScript must is mentioned only."
+  "why": "Good agent work in Python, with every must-have shown in a role. TypeScript, Claude and OpenAI are only in the skills list: three preferred requirements that are mentioned only and earn half points."
 }

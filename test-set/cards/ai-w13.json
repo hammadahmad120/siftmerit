@@ -30,7 +30,11 @@
         "result": "met",
         "proof": "AI Engineer, Chenab Exports IT"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Python back end and TypeScript dashboard."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Python back end and TypeScript dashboard."
       },

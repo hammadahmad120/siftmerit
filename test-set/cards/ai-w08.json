@@ -32,7 +32,11 @@
         "result": "met",
         "proof": "Senior AI Engineer, Gulf Retail Group"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Built pricing and promotion services in Python, with a TypeScript admin console."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Built pricing and promotion services in Python, with a TypeScript admin console."
       },
@@ -75,5 +79,5 @@
       }
     }
   },
-  "why": "Misses exactly one must, the location. Strong everywhere else. The nationality line must not be read as the location."
+  "why": "Misses exactly one must-have, the location. Strong everywhere else. The nationality line must not be read as the location. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
 }

@@ -4,7 +4,7 @@ The CVs, junk files and answer cards that every later check uses: the mail searc
 
 **Status: approved by the user on 2026-11-24.** The set is being made in the steps of section 9.
 
-**Changed on 2026-11-25 by task 54** (how candidates are filtered and sorted): a requirement now has one of three kinds and a "silent CV" mark, and the AI engineer list in section 2 is the new one. **The files do not have the new shape yet.** `test-set/jobs/ai-engineer.json`, the fact cards in `test-set/source/` and the 20 AI engineer answer cards still hold the list of 2026-11-24, with `ai-3` as one requirement. They are changed when task 12 goes on; section 10 lists what is left.
+**Changed on 2026-11-25 by task 54** (how candidates are filtered and sorted): a requirement now has one of three kinds and a "silent CV" mark, and the AI engineer list in section 2 is the new one. **The AI engineer files have the new shape since 2026-11-25:** `test-set/jobs/ai-engineer.json`, the fact cards in `test-set/source/` and the 20 AI engineer answer cards hold the 13 requirements, with `ai-3a` and `ai-3b` in place of `ai-3`. The designer list does not have it yet; section 10 lists what is left.
 
 The core idea: **the answer is known before the product reads the CV.** For a written CV we first write a fact card ("6 years of software work, built two AI agents, lives in Lahore, never used n8n") and then write the CV from it. When the product later reads that CV, we already know every right tick.
 
@@ -135,7 +135,7 @@ Three more fields a card can have:
 1. **Met** needs a line in a role or a project that shows the thing was done.
 2. Something that appears only in a skills list, a tools list or a sentence of self-praise is **mentioned only**.
 3. When the CV says nothing, the tick is **unclear**. It is **not met** only when the CV shows the opposite, such as a location in another country.
-4. A requirement with several conditions ("Python, and TypeScript or JavaScript") is met only when each condition is shown. One shown and the other absent is unclear.
+4. A requirement with several conditions ("the Claude API and at least two of Claude Code, Projects, Skills, MCP") is met only when each condition is shown. One shown and the other absent is unclear. A requirement that holds two different skills is split into two requirements instead, as `ai-3a` and `ai-3b` were.
 5. Obvious conclusions are allowed: a senior UX designer who delivers prototypes uses a design tool.
 6. A soft skill is met only by a concrete activity, such as "presented to the executive team".
 7. Years are counted from the dated roles. A summary that claims more than the roles show does not count alone.
@@ -169,7 +169,11 @@ test-cvs/                      ignored by git: real people
 
 To change a written CV, change its entry in `source/` and run the script again. Never edit a file in `files/` or `cards/` by hand; the next run would overwrite it.
 
-The 15 written AI engineer CVs: 10 PDF and 5 Word files. `ai-w03` has four pages, `ai-w06` is a few lines. `ai-w13` and `ai-w14` have exactly the same ticks, and `ai-w13` is sent first. `ai-w05` and `ai-w12` are sent with a subject that does not name the job. `ai-w08` has a line "Nationality: Pakistani" while the person lives in Dubai. In `ai-w02`, a two-column PDF, two proof lines come out broken when the text is read back with `pdftotext`, because lines of the two columns get mixed; it is kept that way as a real case for the proof-line check.
+The script takes ID words: `node test-set/build.mjs ai-w12` remakes every answer card and only the CV files whose ID starts with `ai-w12` (`ux-` would be all the designer files). With no word it remakes every CV file. Use the words: a remade PDF or Word file holds a new date inside, so git shows it as changed even when its text is the same. The script ends with an error when a word matches no ID.
+
+Each requirement in a job file has two fields beside its text: `kind` (`must`, `preferred` or `nice`) and `ifSilent` (`ask` or `missing`), the two marks of section 2. These are names of the test set only; the database columns are named in task 14.
+
+The 15 written AI engineer CVs: 10 PDF and 5 Word files. `ai-w03` has four pages, `ai-w06` is a few lines. `ai-w13` and `ai-w14` have exactly the same ticks, and `ai-w13` is sent first. `ai-w05` and `ai-w12` are sent with a subject that does not name the job. `ai-w08` has a line "Nationality: Pakistani" while the person lives in Dubai. `ai-w11` and `ai-w12` are the two CVs that are silent on a must-have, one for each outcome: `ai-w11` gives no location, which is marked "ask the candidate", so the candidate qualifies; `ai-w12` shows LLM work and never mentions agents or tool use, which is marked "count as missing", so the candidate is dropped. `ai-w12` was changed for this on 2026-11-25: before, it was silent on TypeScript and JavaScript, which is no longer a must-have (it still is silent on them). In `ai-w02`, a two-column PDF, two proof lines come out broken when the text is read back with `pdftotext`, because lines of the two columns get mixed; it is kept that way as a real case for the proof-line check.
 
 A known weakness, said plainly: a CV written by an AI is easier for an AI to read than a real one. Scores on the written CVs will look better than real life. The 10 real CVs, and later the first pilot mailbox, are what show real quality.
 
@@ -207,17 +211,22 @@ Done so far, on 2026-11-24: step 1, the two job files in `test-set/jobs/` and th
 5. Decided on 2026-11-24: a send script with the library `nodemailer` for the first Gmail account, and a few emails by hand from the second.
 6. The order of the work, each step shown before the next: the two job files and the cards of the 10 real CVs; the written CVs of the AI engineer; the written CVs of the designer; the junk files; the sending.
 
-## 10. After task 54: the first run, and what is left
+## 10. After task 54: the run of the rule, and what is left
 
-**The first run of the whole rule**, on 2026-11-25, on the 20 AI engineer cards with the list of section 2. The `ai-3` tick was split by hand from each card's note; no file was changed.
+**The run of the whole rule** on the 20 AI engineer cards, on 2026-11-25, with the list of section 2 and the files in their new shape. It is code on the cards, with no AI call.
 
-- **14 qualify.** On top are the three strong matches (`ai-w01`, `ai-w02`, `ai-w03`), then the two equal CVs in sending order (`ai-w13`, `ai-w14`), then the borderline ones. Two real CVs qualify (`ai-r02`, `ai-r05`), both with "ask the candidate: location". The lowest qualified score is 72%.
-- **6 are dropped.** `ai-w07` (79%, under four years) and `ai-w08` (78%, lives in Dubai) are offered: both are over 60%, and the limit for 20 CVs read is two. `ai-r01` (68%) and `ai-r03` (65%) are over 60% and outside the limit. `ai-r04` (57%, two must-haves missing) and `ai-w15` (29%, another field) are under 60%.
+- **13 qualify.** On top are the three strong matches (`ai-w01`, `ai-w02`, `ai-w03`), then the two equal CVs in sending order (`ai-w13`, `ai-w14`), then the borderline ones. Two real CVs qualify (`ai-r02`, `ai-r05`), both with "ask the candidate: location". The lowest qualified score is 72%.
+- **7 are dropped.** `ai-w07` (79%, under four years) and `ai-w08` (78%, lives in Dubai) are offered: both are over 60%, and the limit for 20 CVs read is two. `ai-r01` (68%), `ai-r03` (65%) and `ai-w12` (63%, nothing about agents) are over 60% and outside the limit. `ai-r04` (57%, two must-haves missing) and `ai-w15` (29%, another field) are under 60%.
 
-**Left to do in the files, when task 12 goes on:**
+The first run, earlier the same day and before any file was changed, gave 14 and 6: `ai-w12` still qualified then, with 76%.
+
+**Done on 2026-11-25:**
 
 1. `test-set/jobs/ai-engineer.json`: the 13 requirements with kind and "silent CV" mark.
-2. `test-set/source/ai-engineer.json` and the 15 written cards made from it: one tick each for ai-3a and ai-3b in place of ai-3, and the "why" lines that still speak of strict, lenient or "the bottom".
-3. The 5 real AI engineer cards in `test-cvs/cards/`: the same split, by hand.
+2. `test-set/source/ai-engineer.json` and the 15 written cards made from it: one tick each for ai-3a and ai-3b in place of ai-3, the change to `ai-w12`, and new "why" lines where the old ones spoke of strict, lenient or "the bottom".
+3. The 5 real AI engineer cards in `test-cvs/cards/`: the same split, by hand, each new proof line checked by code to be in the CV's text.
+
+**Left to do:**
+
 4. The designer list: the three kinds and the mark, proposed by Claude and approved by the user as HR, before the 15 designer CVs are written.
 5. The rule is run again on all 40 CV cards; the 60% and the point values are starting values until then.

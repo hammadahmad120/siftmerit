@@ -32,7 +32,11 @@
         "result": "met",
         "proof": "AI Engineer, Tala Systems"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Services in Python, front end in TypeScript."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Services in Python, front end in TypeScript."
       },
@@ -75,5 +79,5 @@
       }
     }
   },
-  "why": "Silent on one must, the location. It must come out as unclear, not as not met, and the candidate stays in the list."
+  "why": "Silent on one must-have, the location. It must come out as unclear, not as not met. The location is marked \"ask the candidate\", so the candidate qualifies, with half points for it."
 }

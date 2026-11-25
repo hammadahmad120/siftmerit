@@ -95,7 +95,7 @@ Run from the repo root.
 - `npm run mailbox:connect`: development only. Gets the test mailbox's secret with one Allow click and prints the line to paste into `.env`. Needed again when the secret ends (after 7 days while the Google project is in "Testing").
 - `npm run mailbox:check`: development only. Lists five emails from the test mailbox through mailsift. mailsift must be running first, in its own terminal, from its own folder: `npm run dev:env -- --http` (port 3000).
 
-- `node test-set/build.mjs`: development only. Makes the written CVs of the test set (`test-set/files/`) and their answer cards (`test-set/cards/`) from the fact cards in `test-set/source/`. It needs Google Chrome and pandoc. Files in `files/` and `cards/` are never edited by hand.
+- `node test-set/build.mjs`: development only. Makes the written CVs of the test set (`test-set/files/`) and their answer cards (`test-set/cards/`) from the fact cards in `test-set/source/`. With ID words after it (`node test-set/build.mjs ai-w12`) it makes every answer card and only the CV files whose ID starts with one of the words; use that, because a remade CV file shows as changed in git even when its text is the same. It needs Google Chrome and pandoc. Files in `files/` and `cards/` are never edited by hand.
 
 Settings are listed in `.env.example`. A setting is added by the task that first uses it.
 

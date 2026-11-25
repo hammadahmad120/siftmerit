@@ -33,7 +33,11 @@
         "result": "met",
         "proof": "AI Engineer, Kite Analytics"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Front end in TypeScript (React), services in Python."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Front end in TypeScript (React), services in Python."
       },

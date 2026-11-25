@@ -30,7 +30,11 @@
         "result": "met",
         "proof": "Software Engineer (AI), Margalla Systems"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Maintain the Python services and the TypeScript front end for it."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Maintain the Python services and the TypeScript front end for it."
       },
@@ -72,5 +76,5 @@
       }
     }
   },
-  "why": "Every must is met, with little to spare: about two and a half years of AI work, and only one nice to have."
+  "why": "Every must-have is met, with little to spare: about two and a half years of AI work, and only two of the extras, TypeScript and SQL."
 }

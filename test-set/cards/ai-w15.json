@@ -38,7 +38,11 @@
         ],
         "note": "She did build automations with Zapier since 2021, which the wording of the requirement could cover. It is not engineering work."
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ai-3b": {
         "result": "unclear",
         "proof": null
       },
@@ -89,5 +93,5 @@
       }
     }
   },
-  "why": "Clearly another field. She scores on several nice to haves, but the musts are missing. She must stay at the bottom, and it is still a CV, not junk."
+  "why": "Clearly another field. She scores on several preferred and nice-to-have requirements, but four must-haves are missing. She is dropped and offered nowhere, and it is still a CV, not junk."
 }

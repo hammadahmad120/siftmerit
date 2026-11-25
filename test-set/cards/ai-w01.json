@@ -32,7 +32,11 @@
         "result": "met",
         "proof": "Senior AI Engineer, Northwind Labs"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Built internal web apps and dashboards in TypeScript (React, Node.js) and Python (FastAPI) for the delivery teams."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Built internal web apps and dashboards in TypeScript (React, Node.js) and Python (FastAPI) for the delivery teams."
       },
@@ -74,5 +78,5 @@
       }
     }
   },
-  "why": "The clearest strong match: every must and every nice to have is shown in a role."
+  "why": "The clearest strong match: every requirement, of all three kinds, is shown in a role."
 }

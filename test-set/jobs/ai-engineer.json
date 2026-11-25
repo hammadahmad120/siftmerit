@@ -2,67 +2,85 @@
   "id": "ai-engineer",
   "title": "AI Engineer",
   "advertFile": "ai-engineer.txt",
-  "note": "The advert marks nothing as must or nice to have. The split below was proposed by Claude and approved by the user on 2026-11-24.",
+  "note": "The advert marks nothing as must-have, preferred or nice to have. The split below was proposed by Claude and approved by the user, as HR, on 2026-11-25. `kind` is must, preferred or nice. `ifSilent` says what a CV that says nothing about the requirement means: ask (ask the candidate) or missing (count as missing). The advert's line \"Python and TypeScript or JavaScript\" is two requirements here, ai-3a and ai-3b.",
   "requirements": [
     {
       "id": "ai-1",
       "text": "4 or more years of professional software engineering experience",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-2",
       "text": "2 or more years building AI, automation or internal tooling in production",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "missing"
     },
     {
-      "id": "ai-3",
-      "text": "Strong proficiency in Python, and in TypeScript or JavaScript",
-      "kind": "must"
+      "id": "ai-3a",
+      "text": "Strong proficiency in Python",
+      "kind": "must",
+      "ifSilent": "missing"
+    },
+    {
+      "id": "ai-3b",
+      "text": "Proficiency in TypeScript or JavaScript",
+      "kind": "preferred",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-4",
       "text": "Experience building AI agents, tool use, function calling and multi-step workflows",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-5",
       "text": "Currently located in the Philippines or Pakistan",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "ask"
     },
     {
       "id": "ai-6",
       "text": "Hands-on experience with Claude: the Claude API and at least two of Claude Code, Projects, Skills or MCP connections",
-      "kind": "nice"
+      "kind": "preferred",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-7",
       "text": "Experience with OpenAI or Google Gemini, and selecting the appropriate model",
-      "kind": "nice"
+      "kind": "preferred",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-8",
       "text": "Experience with n8n, Make or Zapier",
-      "kind": "nice"
+      "kind": "nice",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-9",
       "text": "Experience integrating Google Workspace, Slack, a CRM and project management tools through APIs and webhooks",
-      "kind": "nice"
+      "kind": "preferred",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-10",
       "text": "Solid SQL skills and experience with databases, data pipelines and data warehouses",
-      "kind": "nice"
+      "kind": "nice",
+      "ifSilent": "missing"
     },
     {
       "id": "ai-11",
       "text": "Excellent communication skills with non-technical stakeholders",
-      "kind": "nice"
+      "kind": "nice",
+      "ifSilent": "ask"
     },
     {
       "id": "ai-12",
       "text": "Entrepreneurial mindset with strong execution, ownership and measurable-results orientation",
-      "kind": "nice"
+      "kind": "nice",
+      "ifSilent": "ask"
     }
   ]
 }

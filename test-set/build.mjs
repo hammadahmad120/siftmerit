@@ -1,12 +1,20 @@
 // Makes the written CVs of the test set and their answer cards.
 //
-//   node test-set/build.mjs
+//   node test-set/build.mjs            every card and every CV file
+//   node test-set/build.mjs ai-w12     every card, and only the CV files whose
+//                                      ID starts with "ai-w12" ("ux-" would be
+//                                      all the designer files)
 //
 // It reads every file in `source/` (one file per job, a list of made-up
 // people), and for each person writes:
 //
 //   files/<id>.pdf or .docx   the CV, ready to attach to an email
 //   cards/<id>.json           the answer card: the right result for that CV
+//
+// A remade PDF or Word file holds a new date inside, so git sees it as changed
+// even when its text is the same. That is what the ID words are for: remake
+// only the CV files whose fact card really changed. The cards are plain text
+// and are always remade.
 //
 // The person's entry in `source/` is the fact card. The CV and the answer
 // card are both made from it, so the card is right by design: a proof line on
@@ -233,6 +241,11 @@ function makeCard(person, job) {
   };
 }
 
+// The ID words given on the command line. With none, every CV file is remade.
+const idStarts = process.argv.slice(2);
+const fileWanted = (id) => idStarts.length === 0 || idStarts.some((start) => id.startsWith(start));
+let filesMade = 0;
+
 const workFolder = fs.mkdtempSync(path.join(os.tmpdir(), "siftmerit-test-set-"));
 fs.mkdirSync(path.join(root, "files"), { recursive: true });
 fs.mkdirSync(path.join(root, "cards"), { recursive: true });
@@ -246,9 +259,21 @@ for (const sourceFile of fs.readdirSync(path.join(root, "source")).filter((f) =>
     // The card is made first: it stops the build when a proof line is wrong.
     const card = makeCard(person, job);
     fs.writeFileSync(path.join(root, "cards", `${person.id}.json`), `${JSON.stringify(card, null, 2)}\n`);
-    makeFile(person, workFolder);
-    console.log(`${person.id}  ${person.format.padEnd(4)}  ${person.layout.padEnd(8)}  ${person.group}`);
+    const made = fileWanted(person.id);
+    if (made) {
+      makeFile(person, workFolder);
+      filesMade += 1;
+    }
+    console.log(
+      `${person.id}  ${person.format.padEnd(4)}  ${person.layout.padEnd(8)}  ${person.group.padEnd(16)}  ${made ? "card and file" : "card only"}`,
+    );
   }
 }
 
 fs.rmSync(workFolder, { recursive: true, force: true });
+
+// A mistyped ID word would otherwise look like a run that worked.
+if (idStarts.length > 0 && filesMade === 0) {
+  console.error(`No CV file was made: no ID starts with ${idStarts.map((s) => `"${s}"`).join(" or ")}.`);
+  process.exitCode = 1;
+}

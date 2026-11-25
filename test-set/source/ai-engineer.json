@@ -64,7 +64,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r1b0"
+      ],
+      "ai-3b": [
         "met",
         "r1b0"
       ],
@@ -105,7 +109,7 @@
         "r0b0"
       ]
     },
-    "why": "The clearest strong match: every must and every nice to have is shown in a role."
+    "why": "The clearest strong match: every requirement, of all three kinds, is shown in a role."
   },
   {
     "id": "ai-w02",
@@ -170,7 +174,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r1b0"
+      ],
+      "ai-3b": [
         "met",
         "r1b0"
       ],
@@ -383,7 +391,11 @@
         "met",
         "r1b0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r1b0"
+      ],
+      "ai-3b": [
         "met",
         "r1b0"
       ],
@@ -487,7 +499,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b1"
+      ],
+      "ai-3b": [
         "met",
         "r0b1"
       ],
@@ -522,7 +538,7 @@
         "unclear"
       ]
     },
-    "why": "Every must is met, with little to spare: about two and a half years of AI work, and only one nice to have."
+    "why": "Every must-have is met, with little to spare: about two and a half years of AI work, and only two of the extras, TypeScript and SQL."
   },
   {
     "id": "ai-w05",
@@ -585,7 +601,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b2"
+      ],
+      "ai-3b": [
         "met",
         "r0b2"
       ],
@@ -675,7 +695,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b0"
+      ],
+      "ai-3b": [
         "met",
         "r0b0"
       ],
@@ -775,7 +799,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b3"
+      ],
+      "ai-3b": [
         "met",
         "r0b3"
       ],
@@ -814,7 +842,7 @@
         "unclear"
       ]
     },
-    "why": "Misses exactly one must, the four years of software work. Everything else is strong, with five nice to haves. Out in strict mode, in the list in lenient mode."
+    "why": "Misses exactly one must-have, the four years of software work. Everything else is strong. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
   },
   {
     "id": "ai-w08",
@@ -887,7 +915,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r1b0"
+      ],
+      "ai-3b": [
         "met",
         "r1b0"
       ],
@@ -928,7 +960,7 @@
         "r0b4"
       ]
     },
-    "why": "Misses exactly one must, the location. Strong everywhere else. The nationality line must not be read as the location."
+    "why": "Misses exactly one must-have, the location. Strong everywhere else. The nationality line must not be read as the location. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
   },
   {
     "id": "ai-w09",
@@ -991,7 +1023,11 @@
         "met",
         "r0b0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b0"
+      ],
+      "ai-3b": [
         "met",
         "r0b1"
       ],
@@ -1029,7 +1065,7 @@
         "unclear"
       ]
     },
-    "why": "A real ML engineer whose generative AI skills are only a list. The agents must is mentioned only; it must not be ticked as met."
+    "why": "A real ML engineer whose generative AI skills are only a list. The agents must-have is mentioned only; it must not be ticked as met. The candidate qualifies, with half points for it and the sign \"listed only\"."
   },
   {
     "id": "ai-w10",
@@ -1089,13 +1125,15 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b0"
+      ],
+      "ai-3b": [
         "mentioned_only",
         "sk:Languages",
-        [
-          "unclear"
-        ],
-        "Python is used in every role. TypeScript appears only in the skills list."
+        null,
+        "TypeScript appears only in the skills list. JavaScript is not mentioned."
       ],
       "ai-4": [
         "met",
@@ -1130,7 +1168,7 @@
         "unclear"
       ]
     },
-    "why": "Good agent work in Python, but TypeScript is only listed. The Python and TypeScript must is mentioned only."
+    "why": "Good agent work in Python, with every must-have shown in a role. TypeScript, Claude and OpenAI are only in the skills list: three preferred requirements that are mentioned only and earn half points."
   },
   {
     "id": "ai-w11",
@@ -1193,7 +1231,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b2"
+      ],
+      "ai-3b": [
         "met",
         "r0b2"
       ],
@@ -1231,7 +1273,7 @@
         "unclear"
       ]
     },
-    "why": "Silent on one must, the location. It must come out as unclear, not as not met, and the candidate stays in the list."
+    "why": "Silent on one must-have, the location. It must come out as unclear, not as not met. The location is marked \"ask the candidate\", so the candidate qualifies, with half points for it."
   },
   {
     "id": "ai-w12",
@@ -1257,7 +1299,7 @@
         "place": "Peshawar",
         "dates": "Mar 2023 - Present",
         "bullets": [
-          "Built report-writing agents in Python with tool use: they query the warehouse, run the checks and write the weekly summary.",
+          "Built the LLM service in Python that writes the weekly report summary from the warehouse numbers.",
           "Tried three OpenAI models and kept the smallest one that passed our checks."
         ]
       },
@@ -1274,7 +1316,7 @@
     ],
     "skills": {
       "Languages": "Python, SQL",
-      "AI": "OpenAI API, agents, RAG",
+      "AI": "OpenAI API, RAG, prompt engineering",
       "Data": "Redshift, Airflow, dbt"
     },
     "education": [
@@ -1293,15 +1335,21 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b0"
+      ],
+      "ai-3b": [
         "unclear",
         null,
         null,
-        "Python is used in every role. TypeScript and JavaScript are not mentioned anywhere, the same gap three of the real CVs have."
+        "TypeScript and JavaScript are not mentioned anywhere, the same gap three of the real CVs have."
       ],
       "ai-4": [
-        "met",
-        "r0b0"
+        "unclear",
+        null,
+        null,
+        "Nothing about agents, tool use or function calling anywhere in the CV."
       ],
       "ai-5": [
         "met",
@@ -1331,7 +1379,7 @@
         "unclear"
       ]
     },
-    "why": "Silent on one must: no TypeScript or JavaScript anywhere. The email subject does not name the job, so it also belongs on the did-not-match list."
+    "why": "Silent on one must-have, the agent work: the CV shows LLM work in production and never mentions agents, tool use or function calling. The tick must come out as unclear, not as not met. The requirement is marked \"count as missing\", so the candidate is dropped. Also silent on TypeScript and JavaScript, a preferred requirement. The email subject does not name the job, so it also belongs on the did-not-match list."
   },
   {
     "id": "ai-w13",
@@ -1391,7 +1439,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b2"
+      ],
+      "ai-3b": [
         "met",
         "r0b2"
       ],
@@ -1489,7 +1541,11 @@
         "met",
         "r0"
       ],
-      "ai-3": [
+      "ai-3a": [
+        "met",
+        "r0b2"
+      ],
+      "ai-3b": [
         "met",
         "r0b2"
       ],
@@ -1595,7 +1651,10 @@
         ],
         "She did build automations with Zapier since 2021, which the wording of the requirement could cover. It is not engineering work."
       ],
-      "ai-3": [
+      "ai-3a": [
+        "unclear"
+      ],
+      "ai-3b": [
         "unclear"
       ],
       "ai-4": [
@@ -1641,6 +1700,6 @@
         "r0b3"
       ]
     },
-    "why": "Clearly another field. She scores on several nice to haves, but the musts are missing. She must stay at the bottom, and it is still a CV, not junk."
+    "why": "Clearly another field. She scores on several preferred and nice-to-have requirements, but four must-haves are missing. She is dropped and offered nowhere, and it is still a CV, not junk."
   }
 ]

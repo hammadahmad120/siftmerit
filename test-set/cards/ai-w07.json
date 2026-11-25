@@ -33,7 +33,11 @@
         "result": "met",
         "proof": "AI Engineer, Lakbay Tech"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "Python services, TypeScript widgets."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "Python services, TypeScript widgets."
       },
@@ -75,5 +79,5 @@
       }
     }
   },
-  "why": "Misses exactly one must, the four years of software work. Everything else is strong, with five nice to haves. Out in strict mode, in the list in lenient mode."
+  "why": "Misses exactly one must-have, the four years of software work. Everything else is strong. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
 }

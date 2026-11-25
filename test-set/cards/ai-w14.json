@@ -30,7 +30,11 @@
         "result": "met",
         "proof": "AI Engineer, Mindanao Health Apps"
       },
-      "ai-3": {
+      "ai-3a": {
+        "result": "met",
+        "proof": "TypeScript for the patient app, Python for the services."
+      },
+      "ai-3b": {
         "result": "met",
         "proof": "TypeScript for the patient app, Python for the services."
       },
