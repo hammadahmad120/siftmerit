@@ -1,0 +1,58 @@
+{
+  "id": "ux-w14",
+  "job": "ui-ux-designer",
+  "file": "ux-w14.pdf",
+  "source": "written",
+  "group": "tie",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Zara Sheikh"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Zara Sheikh",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Ravi Fintech",
+      "education": "Bachelor of Design, Punjab University College of Art and Design, 2022",
+      "links": [
+        "dribbble.com/zara-sheikh"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design, Punjab University College of Art and Design, 2022"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Gulberg Digital"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the savings app for Android and iOS in Figma and Adobe XD, with prototypes for each feature."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "dribbble.com/zara-sheikh"
+      },
+      "ux-5": {
+        "result": "mentioned_only",
+        "proof": "Design: User-centred design, responsive design, accessibility"
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with the front-end developers and the product team from the first idea to release."
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "One of two CVs with exactly the same ticks (the other is ux-w13). This email is sent second, so on a tie this candidate must rank below the other."
+}

@@ -1,0 +1,62 @@
+{
+  "id": "ux-w15",
+  "job": "ui-ux-designer",
+  "file": "ux-w15.docx",
+  "source": "written",
+  "group": "other-field",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Mariam Lodhi"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Mariam Lodhi",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 7,
+      "currentRole": "Senior Interior Designer, Gulmohar Interiors",
+      "education": "BA English Literature, Kinnaird College Lahore, 2018",
+      "links": [
+        "linkedin.com/in/mariam-lodhi-interiors"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "not_met",
+        "proof": "BA English Literature, Kinnaird College Lahore, 2018",
+        "note": "The degree is in English literature. The interior design diploma is a one-year course, not a degree."
+      },
+      "ux-2": {
+        "result": "not_met",
+        "proof": "Senior Interior Designer, Gulmohar Interiors",
+        "note": "Seven years of interior design. No UI/UX work and no software company."
+      },
+      "ux-3": {
+        "result": "unclear",
+        "proof": null,
+        "note": "None of the named tools, and no UI design or prototyping tool of that kind. SketchUp is a 3D modelling tool, not Sketch."
+      },
+      "ux-4": {
+        "result": "unclear",
+        "proof": null,
+        "note": "No portfolio is named and no link to one is given."
+      },
+      "ux-5": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "met",
+        "proof": "Present design concepts and mood boards to clients and adjust them to the budget."
+      }
+    }
+  },
+  "why": "Clearly another field: an interior designer. The word \"designer\", the tool SketchUp and a line about presenting design concepts must not fool the reader. Three must-haves are missing, so she is dropped and offered nowhere, and it is still a CV, not junk."
+}

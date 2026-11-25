@@ -2,42 +2,49 @@
   "id": "ui-ux-designer",
   "title": "UI/UX Designer",
   "advertFile": "ui-ux-designer.txt",
-  "note": "The advert lists all seven as required. The split below was proposed by Claude and approved by the user on 2026-11-24. \"3-5 years\" is read as \"at least 3\".",
+  "note": "The advert lists all seven as required. The split below was proposed by Claude and approved by the user, as HR, on 2026-11-25. `kind` is must, preferred or nice. `ifSilent` says what a CV that says nothing about the requirement means: ask (ask the candidate) or missing (count as missing). \"3-5 years\" is read as \"at least 3\".",
   "requirements": [
     {
       "id": "ux-1",
       "text": "Bachelor's or Master's degree in Design, Human-Computer Interaction, Computer Science or a related field",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "missing"
     },
     {
       "id": "ux-2",
       "text": "3 or more years of experience as a UI/UX designer in a software or tech company",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "missing"
     },
     {
       "id": "ux-3",
       "text": "Proficiency in design and prototyping tools such as Figma, Adobe XD, Sketch or InVision",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "missing"
     },
     {
       "id": "ux-4",
       "text": "A portfolio showing strong UI/UX design skills and real-world project experience",
-      "kind": "must"
+      "kind": "must",
+      "ifSilent": "ask"
     },
     {
       "id": "ux-5",
       "text": "Strong understanding of user-centred design principles, responsive design and accessibility standards",
-      "kind": "nice"
+      "kind": "preferred",
+      "ifSilent": "missing"
     },
     {
       "id": "ux-6",
       "text": "Experience collaborating with front-end developers and product teams",
-      "kind": "nice"
+      "kind": "preferred",
+      "ifSilent": "missing"
     },
     {
       "id": "ux-7",
       "text": "Ability to present and explain design concepts clearly to technical and non-technical audiences",
-      "kind": "nice"
+      "kind": "nice",
+      "ifSilent": "ask"
     }
   ]
 }

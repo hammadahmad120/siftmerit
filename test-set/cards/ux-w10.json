@@ -1,0 +1,59 @@
+{
+  "id": "ux-w10",
+  "job": "ui-ux-designer",
+  "file": "ux-w10.docx",
+  "source": "written",
+  "group": "listed-only",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Tariq Mehmood"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Tariq Mehmood",
+      "city": "Multan",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "UX Designer, Sehatmand Health Tech",
+      "education": "MS Human-Computer Interaction, COMSATS University Islamabad, 2021",
+      "links": [
+        "Portfolio: tariqmehmood.example.com"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "MS Human-Computer Interaction, COMSATS University Islamabad, 2021"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Multan Soft House"
+      },
+      "ux-3": {
+        "result": "mentioned_only",
+        "proof": "Tools: Figma, Sketch, Miro, Maze",
+        "note": "The tools are only in the skills list. No role line describes wireframes, prototypes or mockups, so there is no design output to conclude tool use from."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "Portfolio: tariqmehmood.example.com"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Ran 40 user interviews and 12 usability tests, audited the patient app against WCAG 2.1 AA, and wrote the responsive layout rules the product follows."
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with front-end developers and product managers in every sprint to turn findings into the next release."
+      },
+      "ux-7": {
+        "result": "met",
+        "proof": "Present design concepts and research findings to executives and to the engineering team each quarter."
+      }
+    }
+  },
+  "why": "A research-led UX designer. Figma and Sketch are only in the skills list, and no role line describes wireframes, prototypes or mockups, so the tools must-have is mentioned only and must not be ticked as met. The candidate qualifies, with half points for it."
+}

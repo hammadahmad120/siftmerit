@@ -1,0 +1,18 @@
+{
+  "id": "jk-01",
+  "job": "ai-engineer",
+  "file": "jk-01.pdf",
+  "source": "junk",
+  "case": "invoice",
+  "email": {
+    "subject": "Invoice 2026-1187: AI Engineer job advert",
+    "senderName": "Hireline Jobs Billing",
+    "body": "Dear customer,\n\nPlease find attached the invoice for your job advert.\n\nRegards,\nHireline Jobs Billing"
+  },
+  "expected": {
+    "isCv": false,
+    "outcome": "not_a_cv",
+    "skipReason": "not_a_cv"
+  },
+  "why": "An invoice as a PDF. The subject names the job and the file can be read, so it passes the free checks and reaches the AI, which must answer \"not a CV\"."
+}

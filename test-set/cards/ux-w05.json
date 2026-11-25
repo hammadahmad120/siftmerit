@@ -1,0 +1,58 @@
+{
+  "id": "ux-w05",
+  "job": "ui-ux-designer",
+  "file": "ux-w05.pdf",
+  "source": "written",
+  "group": "borderline",
+  "email": {
+    "subject": "My resume",
+    "senderName": "Fatima Noor"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Fatima Noor",
+      "city": "Karachi",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Bazaarly Technologies",
+      "education": "Bachelor of Design, Indus Valley School of Art and Architecture, 2022",
+      "links": [
+        "dribbble.com/fatima-noor"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design, Indus Valley School of Art and Architecture, 2022"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Quanta Systems"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design seller dashboard and storefront screens in Figma and Adobe XD."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "dribbble.com/fatima-noor"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Interviewed 20 sellers, tested prototypes with them, and rebuilt the product upload as a responsive form that passes WCAG 2.1 AA checks."
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Every must-have is met and one preferred requirement is shown. The email subject does not name the job, so this one belongs on the did-not-match list until HR pulls it in."
+}

@@ -1,0 +1,59 @@
+{
+  "id": "ux-w12",
+  "job": "ui-ux-designer",
+  "file": "ux-w12.pdf",
+  "source": "written",
+  "group": "silent-on-a-must",
+  "email": {
+    "subject": "Applying for the open position",
+    "senderName": "Saad Iqbal"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Saad Iqbal",
+      "city": "Peshawar",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Khyber Apps",
+      "education": null,
+      "links": [
+        "behance.net/saadiqbal-ux"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "unclear",
+        "proof": null,
+        "note": "The CV has no education section and names no degree anywhere."
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Bab Software"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the screens of a food delivery app in Figma and Sketch, from wireframes to interactive prototypes."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/saadiqbal-ux"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Ran user interviews and usability tests with 20 customers and rebuilt the order flow as a responsive design that meets WCAG 2.1 AA."
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Silent on one must-have, the degree: the CV has no education section. The tick must come out as unclear, not as not met. The degree is marked \"count as missing\", so the candidate is dropped. The email subject does not name the job, so it also belongs on the did-not-match list."
+}

@@ -1,0 +1,60 @@
+{
+  "id": "ux-w02",
+  "job": "ui-ux-designer",
+  "file": "ux-w02.pdf",
+  "source": "written",
+  "group": "strong",
+  "email": {
+    "subject": "UI/UX Designer - Imran Yousaf",
+    "senderName": "Imran Yousaf"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Imran Yousaf",
+      "city": "Karachi",
+      "country": "Pakistan",
+      "totalYears": 8,
+      "currentRole": "Lead Product Designer (UI/UX), Finvo Technologies",
+      "education": "BS Computer Science, NED University Karachi, 2018",
+      "links": [
+        "dribbble.com/imran-yousaf",
+        "linkedin.com/in/imran-yousaf-design"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "BS Computer Science, NED University Karachi, 2018"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Cloudnest Software",
+        "note": "Three UI/UX roles since Sep 2018, over eight years. That is more than the advert's \"3-5 years\", which is read as at least 3."
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Lead the UI/UX design of the mobile wallet: user flows, wireframes and high-fidelity screens in Figma, with prototypes tested before each release."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "dribbble.com/imran-yousaf"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Set up a routine of monthly user interviews and usability tests, and rebuilt onboarding as a responsive, WCAG 2.1 AA flow; sign-up drop-off fell from 41% to 23%."
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work daily with front-end developers and two product teams; introduced design tokens so that code and design files stay in step."
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Strong and senior, with eight years where the advert says \"3-5 years\". He must not be marked down for having more. A two-column PDF, so lines of the two columns can get mixed when the text is read."
+}

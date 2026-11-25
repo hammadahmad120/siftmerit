@@ -1,0 +1,59 @@
+{
+  "id": "ux-w09",
+  "job": "ui-ux-designer",
+  "file": "ux-w09.pdf",
+  "source": "written",
+  "group": "listed-only",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Rabia Aslam"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Rabia Aslam",
+      "city": "Rawalpindi",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Potohar Systems",
+      "education": "BS Computer Science, Fatima Jinnah Women University, 2022",
+      "links": [
+        "linkedin.com/in/rabia-aslam-design"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "BS Computer Science, Fatima Jinnah Women University, 2022"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Potohar Systems"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the screens of an accounting product for small businesses in Figma: invoices, stock and reports."
+      },
+      "ux-4": {
+        "result": "mentioned_only",
+        "proof": "Portfolio available on request.",
+        "note": "The CV names a portfolio and gives no link to it."
+      },
+      "ux-5": {
+        "result": "mentioned_only",
+        "proof": "Design: User-centred design, responsive design, accessibility standards (WCAG)"
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "A working designer whose portfolio is only mentioned (\"available on request\") and whose design principles are only a skills line. The portfolio must-have is mentioned only; it must not be ticked as met. The candidate qualifies, with half points for it and the sign \"listed only\"."
+}

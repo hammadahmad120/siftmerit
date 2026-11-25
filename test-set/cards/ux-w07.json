@@ -1,0 +1,60 @@
+{
+  "id": "ux-w07",
+  "job": "ui-ux-designer",
+  "file": "ux-w07.pdf",
+  "source": "written",
+  "group": "misses-one-must",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Laiba Shah"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Laiba Shah",
+      "city": "Islamabad",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "UI/UX Designer, Orbit Labs",
+      "education": "Bachelor of Design (Graphic Design), COMSATS University Islamabad, 2021",
+      "links": [
+        "behance.net/laibashah-design",
+        "linkedin.com/in/laiba-shah"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design (Graphic Design), COMSATS University Islamabad, 2021"
+      },
+      "ux-2": {
+        "result": "not_met",
+        "proof": "UI/UX Designer, Orbit Labs",
+        "note": "UI/UX designer since Nov 2024, two years. The three years before are print and brand design at a print house, not UI/UX work in a software company."
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the web and mobile screens of a clinic management product in Figma: wireframes, prototypes and final UI."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/laibashah-design"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Ran 15 user interviews and four usability tests, then redesigned appointment booking as a responsive flow that meets WCAG 2.1 AA."
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with three front-end developers and the product team in two-week sprints."
+      },
+      "ux-7": {
+        "result": "met",
+        "proof": "Present design concepts to clinic owners and to the engineering team before each release."
+      }
+    }
+  },
+  "why": "Misses exactly one must-have, the three years as a UI/UX designer: two years, after three in print design. Everything else is shown in a role. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
+}

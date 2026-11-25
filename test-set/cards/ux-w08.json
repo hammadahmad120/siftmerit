@@ -1,0 +1,59 @@
+{
+  "id": "ux-w08",
+  "job": "ui-ux-designer",
+  "file": "ux-w08.docx",
+  "source": "written",
+  "group": "misses-one-must",
+  "email": {
+    "subject": "Application for UI/UX Designer - Kamran Akhtar",
+    "senderName": "Kamran Akhtar"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Kamran Akhtar",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 6,
+      "currentRole": "Senior UI/UX Designer, Paywise Technologies",
+      "education": "B.Com (Accounting and Finance), University of the Punjab, 2019",
+      "links": [
+        "Portfolio: kamranakhtar.example.com"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "not_met",
+        "proof": "B.Com (Accounting and Finance), University of the Punjab, 2019",
+        "note": "The only degree is in accounting and finance. The two certificates are courses, not degrees."
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Northgate Software"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the merchant payments app in Figma, from user flows and wireframes to high-fidelity prototypes."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "Portfolio: kamranakhtar.example.com"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Interviewed 22 shop owners, ran usability tests on every major flow, and rebuilt the payment screens to be responsive and WCAG 2.1 AA compliant."
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with front-end developers and the product team every day, and sit in their sprint planning and reviews."
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Misses exactly one must-have, the degree: it is in accounting and finance. Strong everywhere else. The UX course certificates must not be read as a degree. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
+}

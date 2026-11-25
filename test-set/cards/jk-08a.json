@@ -1,0 +1,61 @@
+{
+  "id": "jk-08a",
+  "job": "ui-ux-designer",
+  "file": "jk-08a.pdf",
+  "source": "written",
+  "group": "same-person-twice",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Waleed Nasir",
+    "body": "Dear Hiring Team,\n\nPlease find my CV attached for the UI/UX Designer position.\n\nRegards,\nWaleed Nasir"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Waleed Nasir",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "UI/UX Designer, Anarkali Apps",
+      "education": "Bachelor of Design, University of the Punjab, 2021",
+      "links": [
+        "behance.net/waleednasir-ux"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design, University of the Punjab, 2021"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Shalimar Soft"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the screens of a home-services app in Figma, from wireframes to interactive prototypes."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/waleednasir-ux"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Interviewed 14 customers, ran usability tests, and rebuilt booking as a responsive flow that meets WCAG 2.1 AA."
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "The first of two applications from the same person (the other is jk-08b, sent later with a changed CV). A normal CV. What the product does with the pair is decided in task 27.",
+  "case": "same-person-twice",
+  "sameApplicantAs": "jk-08b"
+}

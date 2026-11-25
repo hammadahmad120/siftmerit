@@ -20,9 +20,15 @@
 // card are both made from it, so the card is right by design: a proof line on
 // a card is always a line that the CV really holds.
 //
+// One file in `source/` is different: `junk.json` holds the junk and hard
+// cases (an invoice, a scanned CV, a CV with a hidden instruction and so on).
+// Their files and cards are made by the second half of this script.
+//
 // This is a development tool and not part of the product. It needs Google
-// Chrome (for PDF) and pandoc (for Word) on the machine. The made files are
-// committed, so nobody needs those programs just to use the test set.
+// Chrome (for PDF) and pandoc (for Word) on the machine, and for the junk and
+// hard cases also pdftoppm (for the scanned CV) and LibreOffice (for the old
+// Word format). The made files are committed, so nobody needs those programs
+// just to use the test set.
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -52,6 +58,8 @@ const roleHeading = (role) => `${role.title}, ${role.company}`;
  *   r0      the heading of the first job        r0b2   its third bullet
  *   sum     the summary                         loc    the location
  *   sk:AI   the skills line named "AI"          edu0   the first education line
+ *   link0   the first link line                 x0l1   the second line of the first
+ *                                                      extra section
  */
 function proofText(person, pointer) {
   if (pointer === null || pointer === undefined) return null;
@@ -59,9 +67,13 @@ function proofText(person, pointer) {
   const bullet = /^r(\d+)b(\d+)$/.exec(pointer);
   const role = /^r(\d+)$/.exec(pointer);
   const education = /^edu(\d+)$/.exec(pointer);
+  const link = /^link(\d+)$/.exec(pointer);
+  const extraLine = /^x(\d+)l(\d+)$/.exec(pointer);
   if (bullet) found = person.roles[bullet[1]]?.bullets[bullet[2]];
   else if (role) found = person.roles[role[1]] && roleHeading(person.roles[role[1]]);
   else if (education) found = person.education[education[1]];
+  else if (link) found = person.links[link[1]];
+  else if (extraLine) found = person.extra?.[extraLine[1]]?.lines[extraLine[2]];
   else if (pointer === "sum") found = person.summary;
   else if (pointer === "loc") found = person.location;
   else if (pointer.startsWith("sk:")) {
@@ -78,6 +90,7 @@ function plainText(person) {
     person.name,
     person.headline,
     person.location,
+    ...person.links,
     person.summary,
     ...person.roles.flatMap((role) => [roleHeading(role), role.place, role.dates, ...role.bullets]),
     ...Object.entries(person.skills).map(([key, value]) => `${key}: ${value}`),
@@ -155,6 +168,16 @@ function partsOf(person) {
   return { contact, roles, skills, education, extra, summary };
 }
 
+/**
+ * A line a person cannot see and a program can read: white, tiny text at the
+ * end of the CV. It is how someone tries to give orders to an AI that reads
+ * the CV. Only a person marked with `"hidden"` has it.
+ */
+const hiddenLine = (person) =>
+  person.hidden
+    ? `<p style="color: #ffffff; font-size: 1pt; line-height: 1; margin: 0;">${escapeHtml(person.hidden)}</p>`
+    : "";
+
 function cvPage(person) {
   const p = partsOf(person);
   const name = `<h1>${escapeHtml(person.name)}</h1>`;
@@ -171,28 +194,155 @@ function cvPage(person) {
          ${section("Skills", p.skills)}${section("Education", p.education)}${p.extra}`;
 
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(person.name)}</title>
-    <style>@page { size: A4; margin: 18mm; } ${LOOKS[person.layout]} ${person.roomy ? ROOMY : ""}</style></head><body>${body}</body></html>`;
+    <style>@page { size: A4; margin: 18mm; } ${LOOKS[person.layout]} ${person.roomy ? ROOMY : ""}</style></head><body>${body}${hiddenLine(person)}</body></html>`;
 }
 
 // ---------------------------------------------------------------------------
 // Writing the files
 // ---------------------------------------------------------------------------
 
+/** Chrome prints a web page to a PDF file. */
+function printPdf(page, target) {
+  execFileSync(
+    "google-chrome",
+    ["--headless=new", "--disable-gpu", "--no-pdf-header-footer", `--print-to-pdf=${target}`, `file://${page}`],
+    { stdio: "ignore" },
+  );
+}
+
+/**
+ * A scanned CV: the CV is printed, every page is turned into a picture, and
+ * the pictures are printed into a new PDF. The result looks like the CV and
+ * holds no text at all, like a paper CV that went through a scanner.
+ */
+function makeScan(page, target, workFolder, id) {
+  const printed = path.join(workFolder, `${id}-printed.pdf`);
+  printPdf(page, printed);
+  execFileSync("pdftoppm", ["-r", "110", "-png", printed, path.join(workFolder, `${id}-scan`)], { stdio: "ignore" });
+  const pictures = fs
+    .readdirSync(workFolder)
+    .filter((name) => name.startsWith(`${id}-scan`) && name.endsWith(".png"))
+    .sort();
+  const scanPage = path.join(workFolder, `${id}-scan.html`);
+  fs.writeFileSync(
+    scanPage,
+    `<!doctype html><html><head><meta charset="utf-8"><style>@page { size: A4; margin: 0; } body { margin: 0; }
+      div { height: 297mm; overflow: hidden; } div:not(:last-child) { break-after: page; }
+      img { width: 100%; display: block; filter: grayscale(1) contrast(0.9); transform: rotate(0.4deg); }
+    </style></head><body>${pictures.map((name) => `<div><img src="${name}"></div>`).join("")}</body></html>`,
+  );
+  printPdf(scanPage, target);
+}
+
 function makeFile(person, workFolder) {
   const page = path.join(workFolder, `${person.id}.html`);
   const target = path.join(root, "files", `${person.id}.${person.format}`);
   fs.writeFileSync(page, cvPage(person));
 
-  if (person.format === "pdf") {
+  if (person.format === "pdf" && person.scan) {
+    makeScan(page, target, workFolder, person.id);
+  } else if (person.format === "pdf") {
+    printPdf(page, target);
+  } else if (person.format === "docx") {
+    execFileSync("pandoc", ["-f", "html", "-t", "docx", "-o", target, page], { stdio: "ignore" });
+  } else if (person.format === "doc") {
+    // The old Word format. pandoc cannot write it, so LibreOffice converts the
+    // new format into the old one. It gets its own settings folder, so it also
+    // runs while LibreOffice is open on the machine.
+    const newFormat = path.join(workFolder, `${person.id}.docx`);
+    execFileSync("pandoc", ["-f", "html", "-t", "docx", "-o", newFormat, page], { stdio: "ignore" });
     execFileSync(
-      "google-chrome",
-      ["--headless=new", "--disable-gpu", "--no-pdf-header-footer", `--print-to-pdf=${target}`, `file://${page}`],
+      "soffice",
+      [
+        `-env:UserInstallation=file://${path.join(workFolder, "libreoffice")}`,
+        "--headless",
+        "--convert-to",
+        "doc",
+        "--outdir",
+        path.dirname(target),
+        newFormat,
+      ],
       { stdio: "ignore" },
     );
   } else {
-    execFileSync("pandoc", ["-f", "html", "-t", "docx", "-o", target, page], { stdio: "ignore" });
+    throw new Error(`${person.id}: the format "${person.format}" is not known`);
   }
   return target;
+}
+
+// ---------------------------------------------------------------------------
+// The junk and hard cases (`source/junk.json`): emails that are not a normal
+// application. Some have a file that is not a CV, some a CV that cannot be
+// read, some no file at all.
+// ---------------------------------------------------------------------------
+
+/** A plain one-page document, such as an invoice. */
+function plainPage(make) {
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(make.title)}</title>
+    <style>@page { size: A4; margin: 22mm; } body { font: 11pt/1.7 Arial, sans-serif; color: #111; }
+    h1 { font-size: 20pt; margin: 0 0 14pt; } p { margin: 0 0 4pt; }</style></head>
+    <body><h1>${escapeHtml(make.title)}</h1>${make.lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}</body></html>`;
+}
+
+/**
+ * Makes the file of one junk case, when it has one of its own, and answers
+ * with the file's name (or null when the email has no file).
+ *
+ *   page   a plain one-page PDF            cv     a CV from a fact card
+ *   cut    the first bytes of another file same   another case's file again
+ */
+function junkFile(entry, workFolder, wanted) {
+  const make = entry.make;
+  if (!make) return null;
+  if (make.type === "same") return make.file;
+
+  const format = make.type === "cv" ? make.person.format : make.format;
+  const name = `${entry.id}.${format}`;
+  if (!wanted) return name;
+
+  const target = path.join(root, "files", name);
+  if (make.type === "cv") {
+    makeFile(make.person, workFolder);
+  } else if (make.type === "page") {
+    const page = path.join(workFolder, `${entry.id}.html`);
+    fs.writeFileSync(page, plainPage(make));
+    printPdf(page, target);
+  } else if (make.type === "cut") {
+    fs.writeFileSync(target, fs.readFileSync(path.join(root, "files", make.from)).subarray(0, make.bytes));
+  } else {
+    throw new Error(`${entry.id}: the kind of file "${make.type}" is not known`);
+  }
+  return name;
+}
+
+/**
+ * The answer card of one junk case. A CV that can be read (it has ticks) gets
+ * the same card as every written CV. Everything else gets a short card: where
+ * the email must end up (`outcome`) and why (`skipReason`).
+ */
+function junkCard(entry, file, jobOf) {
+  const person = entry.make?.type === "cv" ? entry.make.person : null;
+  const extras = {
+    case: entry.case,
+    ...(entry.duplicateOf ? { duplicateOf: entry.duplicateOf } : {}),
+    ...(entry.sameApplicantAs ? { sameApplicantAs: entry.sameApplicantAs } : {}),
+    ...(person?.hidden ? { hiddenText: person.hidden } : {}),
+  };
+
+  if (person?.ticks) {
+    const card = makeCard(person, jobOf(entry.job));
+    return { ...card, ...extras, email: entry.email };
+  }
+  return {
+    id: entry.id,
+    job: entry.job,
+    file,
+    source: "junk",
+    ...extras,
+    email: entry.email,
+    expected: entry.expected,
+    why: entry.why,
+  };
 }
 
 function makeCard(person, job) {
@@ -250,15 +400,38 @@ const workFolder = fs.mkdtempSync(path.join(os.tmpdir(), "siftmerit-test-set-"))
 fs.mkdirSync(path.join(root, "files"), { recursive: true });
 fs.mkdirSync(path.join(root, "cards"), { recursive: true });
 
+const readJson = (...parts) => JSON.parse(fs.readFileSync(path.join(root, ...parts), "utf8"));
+const jobOf = (jobId) => readJson("jobs", `${jobId}.json`);
+const writeCard = (card) =>
+  fs.writeFileSync(path.join(root, "cards", `${card.id}.json`), `${JSON.stringify(card, null, 2)}\n`);
+
 for (const sourceFile of fs.readdirSync(path.join(root, "source")).filter((f) => f.endsWith(".json"))) {
+  // One file holds the junk and hard cases. Every other file is one job's list of people.
+  if (sourceFile === "junk.json") {
+    for (const entry of readJson("source", sourceFile)) {
+      // As below, the card is made first.
+      const made = fileWanted(entry.id) && entry.make && entry.make.type !== "same";
+      const card = junkCard(entry, junkFile(entry, workFolder, false), jobOf);
+      writeCard(card);
+      if (made) {
+        junkFile(entry, workFolder, true);
+        filesMade += 1;
+      }
+      console.log(
+        `${entry.id.padEnd(6)}  ${(card.file ?? "no file").padEnd(12)}  ${entry.case.padEnd(18)}  ${made ? "card and file" : "card only"}`,
+      );
+    }
+    continue;
+  }
+
   const jobId = path.basename(sourceFile, ".json");
-  const job = JSON.parse(fs.readFileSync(path.join(root, "jobs", `${jobId}.json`), "utf8"));
-  const people = JSON.parse(fs.readFileSync(path.join(root, "source", sourceFile), "utf8"));
+  const job = jobOf(jobId);
+  const people = readJson("source", sourceFile);
 
   for (const person of people) {
     // The card is made first: it stops the build when a proof line is wrong.
     const card = makeCard(person, job);
-    fs.writeFileSync(path.join(root, "cards", `${person.id}.json`), `${JSON.stringify(card, null, 2)}\n`);
+    writeCard(card);
     const made = fileWanted(person.id);
     if (made) {
       makeFile(person, workFolder);

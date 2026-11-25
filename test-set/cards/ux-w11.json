@@ -1,0 +1,59 @@
+{
+  "id": "ux-w11",
+  "job": "ui-ux-designer",
+  "file": "ux-w11.pdf",
+  "source": "written",
+  "group": "silent-on-a-must",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Anum Farid"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Anum Farid",
+      "city": "Karachi",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "UI/UX Designer, Bandar Logistics Tech",
+      "education": "Bachelor of Design, Karachi School of Art, 2021",
+      "links": [
+        "linkedin.com/in/anum-farid"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design, Karachi School of Art, 2021"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Saddar Retail Systems"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the shipment tracking web app and the driver app in Figma, with prototypes for every new flow."
+      },
+      "ux-4": {
+        "result": "unclear",
+        "proof": null,
+        "note": "No portfolio is named and no link to one is given. The only link is a LinkedIn address."
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Interviewed 16 dispatchers, ran usability tests in two warehouses, and rebuilt the tracking page as a responsive, WCAG 2.1 AA screen."
+      },
+      "ux-6": {
+        "result": "mentioned_only",
+        "proof": "Teamwork: Working with front-end developers and product teams, design handoff"
+      },
+      "ux-7": {
+        "result": "met",
+        "proof": "Present design concepts to the operations heads and to client companies before each release."
+      }
+    }
+  },
+  "why": "Silent on one must-have, the portfolio. It must come out as unclear, not as not met. The portfolio is marked \"ask the candidate\", so the candidate qualifies, with half points for it."
+}

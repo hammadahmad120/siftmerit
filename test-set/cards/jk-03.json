@@ -1,0 +1,22 @@
+{
+  "id": "jk-03",
+  "job": "ai-engineer",
+  "file": null,
+  "source": "junk",
+  "case": "auto-reply",
+  "email": {
+    "subject": "Automatic reply: Application for AI Engineer",
+    "senderName": "Rashid Mahmood",
+    "body": "Thank you for your email. I am out of the office until 1 December 2026 with limited access to email. I will reply when I am back.",
+    "headers": {
+      "Auto-Submitted": "auto-replied",
+      "X-Auto-Response-Suppress": "All"
+    }
+  },
+  "expected": {
+    "isCv": false,
+    "outcome": "dropped",
+    "skipReason": "auto_reply"
+  },
+  "why": "An out-of-office reply with the job's words in its subject and no file. The free checks must drop it."
+}

@@ -1,0 +1,19 @@
+{
+  "id": "jk-07",
+  "job": "ai-engineer",
+  "file": "ai-w06.pdf",
+  "source": "junk",
+  "case": "same-file-twice",
+  "duplicateOf": "ai-w06",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Usman Tariq",
+    "body": "Dear Hiring Team,\n\nPlease find my CV attached for the AI Engineer position. I am sending it again in case the first email did not arrive.\n\nRegards,\nUsman Tariq"
+  },
+  "expected": {
+    "isCv": true,
+    "outcome": "dropped",
+    "skipReason": "duplicate_file"
+  },
+  "why": "The file of ai-w06 a second time from the same sender. It is read once: this second email is dropped as a duplicate, and the candidate appears once in the list."
+}

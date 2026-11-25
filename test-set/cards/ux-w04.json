@@ -1,0 +1,59 @@
+{
+  "id": "ux-w04",
+  "job": "ui-ux-designer",
+  "file": "ux-w04.docx",
+  "source": "written",
+  "group": "borderline",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Ali Raza"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Ali Raza",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 3,
+      "currentRole": "UI/UX Designer, Rahbar Apps",
+      "education": "BS Computer Science, University of Central Punjab, 2023",
+      "links": [
+        "behance.net/aliraza-ui"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "BS Computer Science, University of Central Punjab, 2023"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Rahbar Apps",
+        "note": "UI/UX designer since Aug 2023: three years and three months, just over the line."
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the screens of a ride-booking app for Android and iOS in Figma, from wireframes to final mockups."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/aliraza-ui"
+      },
+      "ux-5": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "Every must-have is met, with little to spare: just over three years, and nothing on the preferred or nice-to-have requirements."
+}

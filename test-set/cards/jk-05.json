@@ -1,0 +1,18 @@
+{
+  "id": "jk-05",
+  "job": "ai-engineer",
+  "file": null,
+  "source": "junk",
+  "case": "cv-as-link",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Junaid Akram",
+    "body": "Dear Hiring Team,\n\nI would like to apply for the AI Engineer position. My CV is too large to attach, so you can download it here:\nhttps://files.example.com/cv/junaid-akram-cv.pdf\n\nRegards,\nJunaid Akram"
+  },
+  "expected": {
+    "isCv": null,
+    "outcome": "could_not_read",
+    "skipReason": "cv_as_link"
+  },
+  "why": "A real applicant who sends the CV only as a link, with no file. It must go on the \"could not read\" list. Open point: as the product flow is written, the mail search lists only emails with a PDF or Word attachment and would never see this one (decisions.md, tasks 22 and 27)."
+}

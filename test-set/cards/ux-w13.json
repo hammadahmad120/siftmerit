@@ -1,0 +1,58 @@
+{
+  "id": "ux-w13",
+  "job": "ui-ux-designer",
+  "file": "ux-w13.docx",
+  "source": "written",
+  "group": "tie",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Noor Fatima"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Noor Fatima",
+      "city": "Sialkot",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Sialkot Sports Tech",
+      "education": "BS Computer Science, University of Sialkot, 2022",
+      "links": [
+        "behance.net/noorfatima-ui"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "BS Computer Science, University of Sialkot, 2022"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Iqbal Software"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the web store and the order tracking app in Figma, from wireframes to final screens."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/noorfatima-ui"
+      },
+      "ux-5": {
+        "result": "mentioned_only",
+        "proof": "Design: User-centred design, responsive design, accessibility"
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with front-end developers and the product team in weekly sprints."
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "One of two CVs with exactly the same ticks (the other is ux-w14). This email is sent first, so on a tie this candidate must rank above the other."
+}

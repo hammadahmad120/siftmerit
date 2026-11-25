@@ -1,0 +1,59 @@
+{
+  "id": "ux-w01",
+  "job": "ui-ux-designer",
+  "file": "ux-w01.pdf",
+  "source": "written",
+  "group": "strong",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Sara Khan"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Sara Khan",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "Senior UI/UX Designer, Brightcart Technologies",
+      "education": "Bachelor of Design (Communication Design), National College of Arts Lahore, 2021",
+      "links": [
+        "behance.net/sarakhan-ux",
+        "linkedin.com/in/sara-khan-ux"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design (Communication Design), National College of Arts Lahore, 2021"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Tezro Software"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Built wireframes, interactive prototypes and high-fidelity mockups in Figma for the web store and the iOS and Android apps."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/sarakhan-ux"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Redesigned the checkout after 18 user interviews and two rounds of usability testing; the new responsive flow meets WCAG 2.1 AA and raised completed orders by 14%."
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with four front-end developers and the product manager in two-week sprints, with annotated handoff files and a design review before every release."
+      },
+      "ux-7": {
+        "result": "met",
+        "proof": "Present design concepts to the leadership team each month and walk the engineering team through every new flow."
+      }
+    }
+  },
+  "why": "The clearest strong match: every requirement, of all three kinds, is shown in a role, and the portfolio link is in the contact line."
+}

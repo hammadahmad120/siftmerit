@@ -1,0 +1,1381 @@
+[
+  {
+    "id": "ux-w01",
+    "group": "strong",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Sara Khan",
+    "headline": "Senior UI/UX Designer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "sara.khan@example.com",
+    "phone": "+92 300 0000201",
+    "links": [
+      "behance.net/sarakhan-ux",
+      "linkedin.com/in/sara-khan-ux"
+    ],
+    "summary": "UI/UX designer with five years in software companies, designing web and mobile products from first research to shipped screens.",
+    "roles": [
+      {
+        "title": "Senior UI/UX Designer",
+        "company": "Brightcart Technologies",
+        "place": "Lahore",
+        "dates": "Mar 2023 - Present",
+        "bullets": [
+          "Redesigned the checkout after 18 user interviews and two rounds of usability testing; the new responsive flow meets WCAG 2.1 AA and raised completed orders by 14%.",
+          "Built wireframes, interactive prototypes and high-fidelity mockups in Figma for the web store and the iOS and Android apps.",
+          "Work with four front-end developers and the product manager in two-week sprints, with annotated handoff files and a design review before every release.",
+          "Present design concepts to the leadership team each month and walk the engineering team through every new flow.",
+          "Maintain the design system: 60 components with usage rules, used across three products."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Tezro Software",
+        "place": "Lahore",
+        "dates": "Jun 2021 - Feb 2023",
+        "bullets": [
+          "Designed the customer portal and the mobile app of a courier service, from user flows to final screens.",
+          "Ran usability tests with 25 customers and turned the findings into a simpler booking flow.",
+          "Created the icon set and illustration style for the product."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "User research, wireframing, prototyping, design systems",
+      "Tools": "Figma, Adobe XD, Sketch, Miro",
+      "Web": "HTML and CSS basics"
+    },
+    "education": [
+      "Bachelor of Design (Communication Design), National College of Arts Lahore, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "Senior UI/UX Designer, Brightcart Technologies"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b1"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b0"
+      ],
+      "ux-6": [
+        "met",
+        "r0b2"
+      ],
+      "ux-7": [
+        "met",
+        "r0b3"
+      ]
+    },
+    "why": "The clearest strong match: every requirement, of all three kinds, is shown in a role, and the portfolio link is in the contact line."
+  },
+  {
+    "id": "ux-w02",
+    "group": "strong",
+    "format": "pdf",
+    "layout": "sidebar",
+    "subject": "UI/UX Designer - Imran Yousaf",
+    "name": "Imran Yousaf",
+    "headline": "Lead Product Designer",
+    "location": "Karachi, Pakistan",
+    "city": "Karachi",
+    "country": "Pakistan",
+    "email": "imran.yousaf@example.com",
+    "phone": "+92 300 0000202",
+    "links": [
+      "dribbble.com/imran-yousaf",
+      "linkedin.com/in/imran-yousaf-design"
+    ],
+    "summary": "Product designer with eight years in fintech and health software. I lead design for a product used by two million people.",
+    "roles": [
+      {
+        "title": "Lead Product Designer (UI/UX)",
+        "company": "Finvo Technologies",
+        "place": "Karachi",
+        "dates": "Jan 2022 - Present",
+        "bullets": [
+          "Lead the UI/UX design of the mobile wallet: user flows, wireframes and high-fidelity screens in Figma, with prototypes tested before each release.",
+          "Set up a routine of monthly user interviews and usability tests, and rebuilt onboarding as a responsive, WCAG 2.1 AA flow; sign-up drop-off fell from 41% to 23%.",
+          "Work daily with front-end developers and two product teams; introduced design tokens so that code and design files stay in step.",
+          "Mentor three designers and review their work every week."
+        ]
+      },
+      {
+        "title": "Senior UI/UX Designer",
+        "company": "Sehat Digital",
+        "place": "Karachi",
+        "dates": "Aug 2020 - Dec 2021",
+        "bullets": [
+          "Designed the doctor booking app for web and mobile in Sketch and InVision.",
+          "Mapped patient journeys from 30 interviews and cut the booking steps from nine to four."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Cloudnest Software",
+        "place": "Karachi",
+        "dates": "Sep 2018 - Jul 2020",
+        "bullets": [
+          "Designed dashboards and settings screens for a cloud storage product.",
+          "Made the first component library of the company in Sketch."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "Product design, interaction design, design systems",
+      "Tools": "Figma, Sketch, InVision, Principle",
+      "Research": "Interviews, usability tests, surveys"
+    },
+    "education": [
+      "BS Computer Science, NED University Karachi, 2018"
+    ],
+    "facts": {
+      "totalYears": 8,
+      "currentRole": "Lead Product Designer (UI/UX), Finvo Technologies"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r2",
+        null,
+        "Three UI/UX roles since Sep 2018, over eight years. That is more than the advert's \"3-5 years\", which is read as at least 3."
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "met",
+        "r0b2"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "Strong and senior, with eight years where the advert says \"3-5 years\". He must not be marked down for having more. A two-column PDF, so lines of the two columns can get mixed when the text is read."
+  },
+  {
+    "id": "ux-w03",
+    "group": "strong",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Mehwish Anwar",
+    "headline": "Senior UX/UI Designer",
+    "location": "Islamabad, Pakistan",
+    "city": "Islamabad",
+    "country": "Pakistan",
+    "email": "mehwish.anwar@example.com",
+    "phone": "+92 300 0000203",
+    "links": [
+      "Portfolio: mehwishanwar.example.com",
+      "behance.net/mehwish-anwar",
+      "linkedin.com/in/mehwish-anwar-ux"
+    ],
+    "summary": "Senior UX/UI designer with nine years in software companies, across travel, banking and education products. I take a product from the first conversation with its users to tested, polished screens, and I build the design systems that keep large products consistent. Looking for a senior design role in a company that ships to many users.",
+    "roles": [
+      {
+        "title": "Senior UX/UI Designer",
+        "company": "Safarnama Travel Tech",
+        "place": "Islamabad",
+        "dates": "Apr 2022 - Present",
+        "bullets": [
+          "Own the design of the flight and hotel booking product on web, iOS and Android, used by 600,000 travellers a year.",
+          "Redesigned search and results after 24 user interviews and three rounds of usability testing; the responsive layout meets WCAG 2.1 AA and bookings per visit rose by 11%.",
+          "Produce wireframes, clickable prototypes and high-fidelity screens in Figma for every release.",
+          "Built the Safarnama design system from scratch: 85 components, colour and type scales, and written usage rules.",
+          "Present design concepts at the quarterly company review to the leadership team and to client airlines.",
+          "Introduced a monthly diary study with 15 frequent travellers to catch problems early.",
+          "Designed the loyalty programme screens, from the points wallet to the reward catalogue.",
+          "Wrote the content guidelines for error messages and empty states in English and Urdu."
+        ]
+      },
+      {
+        "title": "UX/UI Designer",
+        "company": "Meezan Soft",
+        "place": "Islamabad",
+        "dates": "Jan 2020 - Mar 2022",
+        "bullets": [
+          "Designed the retail banking app of a mid-size bank: accounts, transfers, bill payments and cards.",
+          "Ran card-sorting sessions with 40 customers to rebuild the navigation; the main tasks moved from four taps to two.",
+          "Created the prototype used in the bank's customer testing lab, built in Adobe XD.",
+          "Designed the onboarding flow with identity checks, cutting the time to open an account from 20 minutes to 7.",
+          "Made the dark theme and the large-text mode of the app.",
+          "Drew the icon family and the illustration set for the product.",
+          "Documented every flow with annotated screens for the bank's audit."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Ilmgah Learning",
+        "place": "Rawalpindi",
+        "dates": "Mar 2018 - Dec 2019",
+        "bullets": [
+          "Designed the student and teacher apps of an online learning platform for schools.",
+          "Designed the lesson player, the quiz screens and the progress reports for parents.",
+          "Tested early versions with pupils in six schools and simplified the screens for younger children.",
+          "Designed the tablet layouts used in classrooms with weak internet.",
+          "Built the first shared style guide of the company in Sketch.",
+          "Designed the marketing site and the sign-up pages.",
+          "Made the printable worksheets that go with each lesson."
+        ]
+      },
+      {
+        "title": "Junior UI Designer",
+        "company": "Pixelbagh Apps",
+        "place": "Rawalpindi",
+        "dates": "Aug 2017 - Feb 2018",
+        "bullets": [
+          "Designed screens for small-business mobile apps: restaurant menus, salon bookings and delivery tracking.",
+          "Prepared the image and icon assets for release in several screen sizes.",
+          "Redrew old app screens in the new brand style."
+        ]
+      },
+      {
+        "title": "Design Intern",
+        "company": "Kohsar Media",
+        "place": "Islamabad",
+        "dates": "Jun 2016 - Aug 2016",
+        "bullets": [
+          "Laid out social media graphics and web banners.",
+          "Helped redesign the weekly newsletter template."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "UX design, UI design, interaction design, information architecture, design systems",
+      "Research": "User interviews, usability testing, card sorting, diary studies",
+      "Tools": "Figma, Adobe XD, Sketch, InVision, Miro",
+      "Teamwork": "Design handoff, working with front-end developers and product teams"
+    },
+    "education": [
+      "Master of Design (Interaction Design), National University of Sciences and Technology, 2017",
+      "Bachelor of Design (Visual Communication), Beaconhouse National University, 2015"
+    ],
+    "extra": [
+      {
+        "title": "Selected projects",
+        "lines": [
+          "Fare calendar: a month view that shows the cheapest day to fly; now used in 38% of searches.",
+          "One-page checkout: passenger details, seats and payment on one screen, tested with 30 travellers.",
+          "Trip wallet: tickets, hotel vouchers and visa papers in one place, available offline.",
+          "Account opening at Meezan Soft: a guided flow with a camera check of the identity card.",
+          "Parent report at Ilmgah Learning: a weekly summary of a child's lessons and quiz results.",
+          "Classroom mode: a tablet layout for teachers who show a lesson to the whole class."
+        ]
+      },
+      {
+        "title": "Certifications",
+        "lines": [
+          "UX Certification with Interaction Design specialty, 2021",
+          "Google UX Design Professional Certificate, 2019",
+          "Accessibility: How to Design for All, online course, 2020",
+          "Certified Usability Analyst, 2022",
+          "Design Thinking Practitioner course, 2020"
+        ]
+      },
+      {
+        "title": "Talks and writing",
+        "lines": [
+          "Speaker at a UX meetup in Islamabad, 2024: \"Designing travel search for people in a hurry\".",
+          "Article: \"What 24 traveller interviews taught us about filters\", company blog, 2023.",
+          "Guest lecture on design systems at a design school in Islamabad, 2023."
+        ]
+      },
+      {
+        "title": "Awards",
+        "lines": [
+          "Safarnama Travel Tech: Team of the Year, 2023.",
+          "Meezan Soft: Best Launch of the Year, 2021.",
+          "Beaconhouse National University: thesis distinction, 2015."
+        ]
+      },
+      {
+        "title": "Community",
+        "lines": [
+          "Mentor at a women-in-design programme since 2022; eight mentees so far.",
+          "Organiser of a design critique evening in Islamabad, held every two months.",
+          "Volunteer designer for the website of a school charity."
+        ]
+      },
+      {
+        "title": "Languages",
+        "lines": [
+          "English (fluent), Urdu (native), Punjabi (spoken)"
+        ]
+      },
+      {
+        "title": "References",
+        "lines": [
+          "Available on request."
+        ]
+      }
+    ],
+    "facts": {
+      "totalYears": 9,
+      "currentRole": "Senior UX/UI Designer, Safarnama Travel Tech"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r2"
+      ],
+      "ux-3": [
+        "met",
+        "r0b2"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "mentioned_only",
+        "sk:Teamwork",
+        null,
+        "Working with developers and product teams is named only in the skills list. No role line describes it."
+      ],
+      "ux-7": [
+        "met",
+        "r0b4"
+      ]
+    },
+    "why": "Strong and senior, with a long CV of four pages. The important lines are spread over several pages, between projects, certificates, talks and awards. Working with developers and product teams is only a skills line, so that one preferred requirement is mentioned only.",
+    "roomy": true
+  },
+  {
+    "id": "ux-w04",
+    "group": "borderline",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Ali Raza",
+    "headline": "UI/UX Designer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "ali.raza@example.com",
+    "phone": "+92 300 0000204",
+    "links": [
+      "behance.net/aliraza-ui"
+    ],
+    "summary": "UI/UX designer with three years at a software company, designing mobile app screens.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Rahbar Apps",
+        "place": "Lahore",
+        "dates": "Aug 2023 - Present",
+        "bullets": [
+          "Design the screens of a ride-booking app for Android and iOS in Figma, from wireframes to final mockups.",
+          "Keep the component library tidy and name every style and layer the same way.",
+          "Make the app store screenshots and release graphics."
+        ]
+      },
+      {
+        "title": "Graphic Design Intern",
+        "company": "Lahore Print House",
+        "place": "Lahore",
+        "dates": "Jan 2023 - Jun 2023",
+        "bullets": [
+          "Laid out brochures and social media posts."
+        ]
+      }
+    ],
+    "skills": {
+      "Tools": "Figma, Adobe Illustrator, Photoshop"
+    },
+    "education": [
+      "BS Computer Science, University of Central Punjab, 2023"
+    ],
+    "facts": {
+      "totalYears": 3,
+      "currentRole": "UI/UX Designer, Rahbar Apps"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r0",
+        null,
+        "UI/UX designer since Aug 2023: three years and three months, just over the line."
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "unclear"
+      ],
+      "ux-6": [
+        "unclear"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "Every must-have is met, with little to spare: just over three years, and nothing on the preferred or nice-to-have requirements."
+  },
+  {
+    "id": "ux-w05",
+    "group": "borderline",
+    "format": "pdf",
+    "layout": "compact",
+    "subject": "My resume",
+    "name": "Fatima Noor",
+    "headline": "UI/UX Designer",
+    "location": "Karachi, Pakistan",
+    "city": "Karachi",
+    "country": "Pakistan",
+    "email": "fatima.noor@example.com",
+    "phone": "+92 300 0000205",
+    "links": [
+      "dribbble.com/fatima-noor"
+    ],
+    "summary": "UI/UX designer, four years in e-commerce software.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Bazaarly Technologies",
+        "place": "Karachi",
+        "dates": "Feb 2024 - Present",
+        "bullets": [
+          "Design seller dashboard and storefront screens in Figma and Adobe XD.",
+          "Interviewed 20 sellers, tested prototypes with them, and rebuilt the product upload as a responsive form that passes WCAG 2.1 AA checks."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Quanta Systems",
+        "place": "Karachi",
+        "dates": "Oct 2022 - Jan 2024",
+        "bullets": [
+          "Designed web and mobile screens for an inventory product.",
+          "Kept the style guide up to date."
+        ]
+      }
+    ],
+    "skills": {
+      "Skills": "Figma, Adobe XD, wireframing, prototyping, visual design"
+    },
+    "education": [
+      "Bachelor of Design, Indus Valley School of Art and Architecture, 2022"
+    ],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Bazaarly Technologies"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "unclear"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "Every must-have is met and one preferred requirement is shown. The email subject does not name the job, so this one belongs on the did-not-match list until HR pulls it in."
+  },
+  {
+    "id": "ux-w06",
+    "group": "borderline",
+    "format": "pdf",
+    "layout": "compact",
+    "subject": "Application for UI/UX Designer",
+    "name": "Hassan Javed",
+    "headline": "",
+    "location": "Faisalabad, Pakistan",
+    "city": "Faisalabad",
+    "country": "Pakistan",
+    "email": "hassan.javed@example.com",
+    "phone": "+92 300 0000206",
+    "links": [
+      "behance.net/hassanjaved"
+    ],
+    "summary": "UI/UX designer, 4 years, software companies.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Chenab Soft",
+        "place": "Faisalabad",
+        "dates": "Jan 2025 - Present",
+        "bullets": [
+          "Web and mobile app screens and prototypes. Figma."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Lyallpur Digital",
+        "place": "Faisalabad",
+        "dates": "Sep 2022 - Dec 2024",
+        "bullets": [
+          "Mobile app design. Adobe XD."
+        ]
+      }
+    ],
+    "skills": {
+      "Skills": "Figma, Adobe XD, user-centred design, responsive design, accessibility"
+    },
+    "education": [
+      "BS Computer Science, GC University Faisalabad, 2022"
+    ],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Chenab Soft"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "mentioned_only",
+        "sk:Skills"
+      ],
+      "ux-6": [
+        "unclear"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "The shortest CV of the set, half a page. Every must-have is met in a few words. The design principles are only named in the skills line."
+  },
+  {
+    "id": "ux-w07",
+    "group": "misses-one-must",
+    "format": "pdf",
+    "layout": "sidebar",
+    "subject": "Application for UI/UX Designer",
+    "name": "Laiba Shah",
+    "headline": "UI/UX Designer",
+    "location": "Islamabad, Pakistan",
+    "city": "Islamabad",
+    "country": "Pakistan",
+    "email": "laiba.shah@example.com",
+    "phone": "+92 300 0000207",
+    "links": [
+      "behance.net/laibashah-design",
+      "linkedin.com/in/laiba-shah"
+    ],
+    "summary": "Designer with five years of experience: three in print and brand design, and the last two as a UI/UX designer in a software company.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Orbit Labs",
+        "place": "Islamabad",
+        "dates": "Nov 2024 - Present",
+        "bullets": [
+          "Design the web and mobile screens of a clinic management product in Figma: wireframes, prototypes and final UI.",
+          "Ran 15 user interviews and four usability tests, then redesigned appointment booking as a responsive flow that meets WCAG 2.1 AA.",
+          "Work with three front-end developers and the product team in two-week sprints.",
+          "Present design concepts to clinic owners and to the engineering team before each release."
+        ]
+      },
+      {
+        "title": "Graphic Designer",
+        "company": "Margalla Print and Brand",
+        "place": "Islamabad",
+        "dates": "Sep 2021 - Oct 2024",
+        "bullets": [
+          "Designed logos, packaging and printed catalogues for retail clients.",
+          "Made the files ready for print and checked proofs at the press."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "UI design, UX design, branding",
+      "Tools": "Figma, Adobe XD, Illustrator, InDesign"
+    },
+    "education": [
+      "Bachelor of Design (Graphic Design), COMSATS University Islamabad, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "UI/UX Designer, Orbit Labs"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "not_met",
+        "r0",
+        null,
+        "UI/UX designer since Nov 2024, two years. The three years before are print and brand design at a print house, not UI/UX work in a software company."
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "met",
+        "r0b2"
+      ],
+      "ux-7": [
+        "met",
+        "r0b3"
+      ]
+    },
+    "why": "Misses exactly one must-have, the three years as a UI/UX designer: two years, after three in print design. Everything else is shown in a role. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
+  },
+  {
+    "id": "ux-w08",
+    "group": "misses-one-must",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer - Kamran Akhtar",
+    "name": "Kamran Akhtar",
+    "headline": "Senior UI/UX Designer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "kamran.akhtar@example.com",
+    "phone": "+92 300 0000208",
+    "links": [
+      "Portfolio: kamranakhtar.example.com"
+    ],
+    "summary": "Self-taught UI/UX designer with six years in software companies, after a first degree in commerce.",
+    "roles": [
+      {
+        "title": "Senior UI/UX Designer",
+        "company": "Paywise Technologies",
+        "place": "Lahore",
+        "dates": "May 2023 - Present",
+        "bullets": [
+          "Design the merchant payments app in Figma, from user flows and wireframes to high-fidelity prototypes.",
+          "Interviewed 22 shop owners, ran usability tests on every major flow, and rebuilt the payment screens to be responsive and WCAG 2.1 AA compliant.",
+          "Work with front-end developers and the product team every day, and sit in their sprint planning and reviews."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Northgate Software",
+        "place": "Lahore",
+        "dates": "Sep 2020 - Apr 2023",
+        "bullets": [
+          "Designed the admin panel and the customer app of a delivery product in Sketch.",
+          "Built the company's first design system."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "Interaction design, visual design, design systems",
+      "Tools": "Figma, Sketch, Adobe XD"
+    },
+    "education": [
+      "B.Com (Accounting and Finance), University of the Punjab, 2019"
+    ],
+    "extra": [
+      {
+        "title": "Certifications",
+        "lines": [
+          "Google UX Design Professional Certificate, Coursera, 2020",
+          "User Research Methods, online course, 2021"
+        ]
+      }
+    ],
+    "facts": {
+      "totalYears": 6,
+      "currentRole": "Senior UI/UX Designer, Paywise Technologies"
+    },
+    "ticks": {
+      "ux-1": [
+        "not_met",
+        "edu0",
+        null,
+        "The only degree is in accounting and finance. The two certificates are courses, not degrees."
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "met",
+        "r0b2"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "Misses exactly one must-have, the degree: it is in accounting and finance. Strong everywhere else. The UX course certificates must not be read as a degree. Dropped, and offered behind the \"strong candidates were dropped\" option with that reason."
+  },
+  {
+    "id": "ux-w09",
+    "group": "listed-only",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Rabia Aslam",
+    "headline": "UI/UX Designer",
+    "location": "Rawalpindi, Pakistan",
+    "city": "Rawalpindi",
+    "country": "Pakistan",
+    "email": "rabia.aslam@example.com",
+    "phone": "+92 300 0000209",
+    "links": [
+      "linkedin.com/in/rabia-aslam-design"
+    ],
+    "summary": "UI/UX designer with four years of experience designing business software.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Potohar Systems",
+        "place": "Rawalpindi",
+        "dates": "Jul 2022 - Present",
+        "bullets": [
+          "Design the screens of an accounting product for small businesses in Figma: invoices, stock and reports.",
+          "Produced wireframes and high-fidelity mockups for the mobile app released in 2024.",
+          "Redrew 120 icons and set the colour and type styles of the product."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "User-centred design, responsive design, accessibility standards (WCAG)",
+      "Tools": "Figma, Adobe XD, Zeplin"
+    },
+    "education": [
+      "BS Computer Science, Fatima Jinnah Women University, 2022"
+    ],
+    "extra": [
+      {
+        "title": "Portfolio",
+        "lines": [
+          "Portfolio available on request."
+        ]
+      }
+    ],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Potohar Systems"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r0"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "mentioned_only",
+        "x0l0",
+        null,
+        "The CV names a portfolio and gives no link to it."
+      ],
+      "ux-5": [
+        "mentioned_only",
+        "sk:Design"
+      ],
+      "ux-6": [
+        "unclear"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "A working designer whose portfolio is only mentioned (\"available on request\") and whose design principles are only a skills line. The portfolio must-have is mentioned only; it must not be ticked as met. The candidate qualifies, with half points for it and the sign \"listed only\"."
+  },
+  {
+    "id": "ux-w10",
+    "group": "listed-only",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Tariq Mehmood",
+    "headline": "UX Designer",
+    "location": "Multan, Pakistan",
+    "city": "Multan",
+    "country": "Pakistan",
+    "email": "tariq.mehmood@example.com",
+    "phone": "+92 300 0000210",
+    "links": [
+      "Portfolio: tariqmehmood.example.com"
+    ],
+    "summary": "UX designer with five years in software companies. My strength is finding out what users need before anything is built.",
+    "roles": [
+      {
+        "title": "UX Designer",
+        "company": "Sehatmand Health Tech",
+        "place": "Multan (remote)",
+        "dates": "Feb 2023 - Present",
+        "bullets": [
+          "Ran 40 user interviews and 12 usability tests, audited the patient app against WCAG 2.1 AA, and wrote the responsive layout rules the product follows.",
+          "Mapped the patient and pharmacist journeys and turned them into the flows of the refill feature.",
+          "Work with front-end developers and product managers in every sprint to turn findings into the next release.",
+          "Present design concepts and research findings to executives and to the engineering team each quarter."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Multan Soft House",
+        "place": "Multan",
+        "dates": "Oct 2021 - Jan 2023",
+        "bullets": [
+          "Planned the information architecture and the user flows of a school fee portal.",
+          "Surveyed 300 parents and rewrote the payment steps from their answers."
+        ]
+      }
+    ],
+    "skills": {
+      "Tools": "Figma, Sketch, Miro, Maze",
+      "Methods": "Interviews, usability testing, journey mapping, card sorting"
+    },
+    "education": [
+      "MS Human-Computer Interaction, COMSATS University Islamabad, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "UX Designer, Sehatmand Health Tech"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "mentioned_only",
+        "sk:Tools",
+        null,
+        "The tools are only in the skills list. No role line describes wireframes, prototypes or mockups, so there is no design output to conclude tool use from."
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b0"
+      ],
+      "ux-6": [
+        "met",
+        "r0b2"
+      ],
+      "ux-7": [
+        "met",
+        "r0b3"
+      ]
+    },
+    "why": "A research-led UX designer. Figma and Sketch are only in the skills list, and no role line describes wireframes, prototypes or mockups, so the tools must-have is mentioned only and must not be ticked as met. The candidate qualifies, with half points for it."
+  },
+  {
+    "id": "ux-w11",
+    "group": "silent-on-a-must",
+    "format": "pdf",
+    "layout": "compact",
+    "subject": "Application for UI/UX Designer",
+    "name": "Anum Farid",
+    "headline": "UI/UX Designer",
+    "location": "Karachi, Pakistan",
+    "city": "Karachi",
+    "country": "Pakistan",
+    "email": "anum.farid@example.com",
+    "phone": "+92 300 0000211",
+    "links": [
+      "linkedin.com/in/anum-farid"
+    ],
+    "summary": "UI/UX designer, five years in logistics and retail software.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Bandar Logistics Tech",
+        "place": "Karachi",
+        "dates": "Mar 2023 - Present",
+        "bullets": [
+          "Design the shipment tracking web app and the driver app in Figma, with prototypes for every new flow.",
+          "Interviewed 16 dispatchers, ran usability tests in two warehouses, and rebuilt the tracking page as a responsive, WCAG 2.1 AA screen.",
+          "Present design concepts to the operations heads and to client companies before each release."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Saddar Retail Systems",
+        "place": "Karachi",
+        "dates": "Aug 2021 - Feb 2023",
+        "bullets": [
+          "Designed point-of-sale screens for tablets in Adobe XD."
+        ]
+      }
+    ],
+    "skills": {
+      "Tools": "Figma, Adobe XD",
+      "Teamwork": "Working with front-end developers and product teams, design handoff"
+    },
+    "education": [
+      "Bachelor of Design, Karachi School of Art, 2021"
+    ],
+    "facts": {
+      "totalYears": 5,
+      "currentRole": "UI/UX Designer, Bandar Logistics Tech"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "unclear",
+        null,
+        null,
+        "No portfolio is named and no link to one is given. The only link is a LinkedIn address."
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "mentioned_only",
+        "sk:Teamwork"
+      ],
+      "ux-7": [
+        "met",
+        "r0b2"
+      ]
+    },
+    "why": "Silent on one must-have, the portfolio. It must come out as unclear, not as not met. The portfolio is marked \"ask the candidate\", so the candidate qualifies, with half points for it."
+  },
+  {
+    "id": "ux-w12",
+    "group": "silent-on-a-must",
+    "format": "pdf",
+    "layout": "sidebar",
+    "subject": "Applying for the open position",
+    "name": "Saad Iqbal",
+    "headline": "UI/UX Designer",
+    "location": "Peshawar, Pakistan",
+    "city": "Peshawar",
+    "country": "Pakistan",
+    "email": "saad.iqbal@example.com",
+    "phone": "+92 300 0000212",
+    "links": [
+      "behance.net/saadiqbal-ux"
+    ],
+    "summary": "UI/UX designer with four years in software companies.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Khyber Apps",
+        "place": "Peshawar",
+        "dates": "Apr 2024 - Present",
+        "bullets": [
+          "Design the screens of a food delivery app in Figma and Sketch, from wireframes to interactive prototypes.",
+          "Ran user interviews and usability tests with 20 customers and rebuilt the order flow as a responsive design that meets WCAG 2.1 AA."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Bab Software",
+        "place": "Peshawar",
+        "dates": "Oct 2022 - Mar 2024",
+        "bullets": [
+          "Designed the booking screens of a bus ticket app.",
+          "Made the style guide and the icon set."
+        ]
+      }
+    ],
+    "skills": {
+      "Tools": "Figma, Sketch, Adobe XD",
+      "Design": "Wireframing, prototyping, visual design"
+    },
+    "education": [],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Khyber Apps"
+    },
+    "ticks": {
+      "ux-1": [
+        "unclear",
+        null,
+        null,
+        "The CV has no education section and names no degree anywhere."
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "met",
+        "r0b1"
+      ],
+      "ux-6": [
+        "unclear"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "Silent on one must-have, the degree: the CV has no education section. The tick must come out as unclear, not as not met. The degree is marked \"count as missing\", so the candidate is dropped. The email subject does not name the job, so it also belongs on the did-not-match list."
+  },
+  {
+    "id": "ux-w13",
+    "group": "tie",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Noor Fatima",
+    "headline": "UI/UX Designer",
+    "location": "Sialkot, Pakistan",
+    "city": "Sialkot",
+    "country": "Pakistan",
+    "email": "noor.fatima@example.com",
+    "phone": "+92 300 0000213",
+    "links": [
+      "behance.net/noorfatima-ui"
+    ],
+    "summary": "UI/UX designer with four years in software companies.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Sialkot Sports Tech",
+        "place": "Sialkot",
+        "dates": "Jan 2024 - Present",
+        "bullets": [
+          "Design the web store and the order tracking app in Figma, from wireframes to final screens.",
+          "Work with front-end developers and the product team in weekly sprints."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Iqbal Software",
+        "place": "Sialkot",
+        "dates": "Sep 2022 - Dec 2023",
+        "bullets": [
+          "Designed dashboard screens for an export paperwork product."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "User-centred design, responsive design, accessibility",
+      "Tools": "Figma, Adobe XD"
+    },
+    "education": [
+      "BS Computer Science, University of Sialkot, 2022"
+    ],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Sialkot Sports Tech"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "mentioned_only",
+        "sk:Design"
+      ],
+      "ux-6": [
+        "met",
+        "r0b1"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "One of two CVs with exactly the same ticks (the other is ux-w14). This email is sent first, so on a tie this candidate must rank above the other."
+  },
+  {
+    "id": "ux-w14",
+    "group": "tie",
+    "format": "pdf",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Zara Sheikh",
+    "headline": "UI/UX Designer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "zara.sheikh@example.com",
+    "phone": "+92 300 0000214",
+    "links": [
+      "dribbble.com/zara-sheikh"
+    ],
+    "summary": "UI/UX designer, four years, mobile and web products.",
+    "roles": [
+      {
+        "title": "UI/UX Designer",
+        "company": "Ravi Fintech",
+        "place": "Lahore",
+        "dates": "Mar 2024 - Present",
+        "bullets": [
+          "Design the savings app for Android and iOS in Figma and Adobe XD, with prototypes for each feature.",
+          "Work with the front-end developers and the product team from the first idea to release."
+        ]
+      },
+      {
+        "title": "UI/UX Designer",
+        "company": "Gulberg Digital",
+        "place": "Lahore",
+        "dates": "Oct 2022 - Feb 2024",
+        "bullets": [
+          "Designed the customer portal of an insurance product."
+        ]
+      }
+    ],
+    "skills": {
+      "Design": "User-centred design, responsive design, accessibility",
+      "Tools": "Figma, Adobe XD"
+    },
+    "education": [
+      "Bachelor of Design, Punjab University College of Art and Design, 2022"
+    ],
+    "facts": {
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Ravi Fintech"
+    },
+    "ticks": {
+      "ux-1": [
+        "met",
+        "edu0"
+      ],
+      "ux-2": [
+        "met",
+        "r1"
+      ],
+      "ux-3": [
+        "met",
+        "r0b0"
+      ],
+      "ux-4": [
+        "met",
+        "link0"
+      ],
+      "ux-5": [
+        "mentioned_only",
+        "sk:Design"
+      ],
+      "ux-6": [
+        "met",
+        "r0b1"
+      ],
+      "ux-7": [
+        "unclear"
+      ]
+    },
+    "why": "One of two CVs with exactly the same ticks (the other is ux-w13). This email is sent second, so on a tie this candidate must rank below the other."
+  },
+  {
+    "id": "ux-w15",
+    "group": "other-field",
+    "format": "docx",
+    "layout": "classic",
+    "subject": "Application for UI/UX Designer",
+    "name": "Mariam Lodhi",
+    "headline": "Interior Designer",
+    "location": "Lahore, Pakistan",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "email": "mariam.lodhi@example.com",
+    "phone": "+92 300 0000215",
+    "links": [
+      "linkedin.com/in/mariam-lodhi-interiors"
+    ],
+    "summary": "Interior designer with seven years of experience in homes, cafes and retail shops. Looking to move into digital design.",
+    "roles": [
+      {
+        "title": "Senior Interior Designer",
+        "company": "Gulmohar Interiors",
+        "place": "Lahore",
+        "dates": "Feb 2022 - Present",
+        "bullets": [
+          "Design the interiors of homes, cafes and retail shops, from space planning to furniture and lighting.",
+          "Draw floor plans in AutoCAD and build 3D views in SketchUp and 3ds Max.",
+          "Present design concepts and mood boards to clients and adjust them to the budget.",
+          "Coordinate with contractors and suppliers on site until the keys are handed over."
+        ]
+      },
+      {
+        "title": "Interior Designer",
+        "company": "Canal View Design Studio",
+        "place": "Lahore",
+        "dates": "Aug 2019 - Jan 2022",
+        "bullets": [
+          "Designed kitchens, wardrobes and office fit-outs.",
+          "Made material boards and cost estimates."
+        ]
+      }
+    ],
+    "skills": {
+      "Tools": "AutoCAD, SketchUp, 3ds Max, Photoshop",
+      "Skills": "Space planning, material selection, site supervision"
+    },
+    "education": [
+      "BA English Literature, Kinnaird College Lahore, 2018",
+      "Diploma in Interior Design, Lahore School of Design, 2019"
+    ],
+    "facts": {
+      "totalYears": 7,
+      "currentRole": "Senior Interior Designer, Gulmohar Interiors"
+    },
+    "ticks": {
+      "ux-1": [
+        "not_met",
+        "edu0",
+        null,
+        "The degree is in English literature. The interior design diploma is a one-year course, not a degree."
+      ],
+      "ux-2": [
+        "not_met",
+        "r0",
+        null,
+        "Seven years of interior design. No UI/UX work and no software company."
+      ],
+      "ux-3": [
+        "unclear",
+        null,
+        null,
+        "None of the named tools, and no UI design or prototyping tool of that kind. SketchUp is a 3D modelling tool, not Sketch."
+      ],
+      "ux-4": [
+        "unclear",
+        null,
+        null,
+        "No portfolio is named and no link to one is given."
+      ],
+      "ux-5": [
+        "unclear"
+      ],
+      "ux-6": [
+        "unclear"
+      ],
+      "ux-7": [
+        "met",
+        "r0b2"
+      ]
+    },
+    "why": "Clearly another field: an interior designer. The word \"designer\", the tool SketchUp and a line about presenting design concepts must not fool the reader. Three must-haves are missing, so she is dropped and offered nowhere, and it is still a CV, not junk."
+  }
+]

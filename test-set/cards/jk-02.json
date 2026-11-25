@@ -1,0 +1,22 @@
+{
+  "id": "jk-02",
+  "job": "ui-ux-designer",
+  "file": "jk-02.pdf",
+  "source": "junk",
+  "case": "newsletter",
+  "email": {
+    "subject": "12 new UI/UX Designer jobs this week",
+    "senderName": "DesignJobs Weekly",
+    "body": "This week's openings for designers:\n\n1. UI/UX Designer, fintech, Karachi\n2. Senior UI/UX Designer, health tech, Lahore\n3. Product Designer, remote\n\nOur salary guide for 2026 is attached.\n\nYou are receiving this email because you subscribed to DesignJobs Weekly.\nUnsubscribe: https://designjobs.example.com/unsubscribe",
+    "headers": {
+      "List-Unsubscribe": "<https://designjobs.example.com/unsubscribe>",
+      "Precedence": "bulk"
+    }
+  },
+  "expected": {
+    "isCv": false,
+    "outcome": "dropped",
+    "skipReason": "newsletter"
+  },
+  "why": "A newsletter whose subject names the job and which carries a PDF, so the mail search lists it. The free checks must drop it, by its unsubscribe marks, before any AI call."
+}

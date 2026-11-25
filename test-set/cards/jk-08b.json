@@ -1,0 +1,61 @@
+{
+  "id": "jk-08b",
+  "job": "ui-ux-designer",
+  "file": "jk-08b.pdf",
+  "source": "written",
+  "group": "same-person-twice",
+  "email": {
+    "subject": "Updated CV - Application for UI/UX Designer",
+    "senderName": "Waleed Nasir",
+    "body": "Dear Hiring Team,\n\nPlease find my CV attached for the UI/UX Designer position. This is an updated version of the CV I sent earlier.\n\nRegards,\nWaleed Nasir"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Waleed Nasir",
+      "city": "Lahore",
+      "country": "Pakistan",
+      "totalYears": 5,
+      "currentRole": "Senior UI/UX Designer, Anarkali Apps",
+      "education": "Bachelor of Design, University of the Punjab, 2021",
+      "links": [
+        "behance.net/waleednasir-ux"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Bachelor of Design, University of the Punjab, 2021"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Shalimar Soft"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Design the screens of a home-services app in Figma, from wireframes to interactive prototypes."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/waleednasir-ux"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Interviewed 14 customers, ran usability tests, and rebuilt booking as a responsive flow that meets WCAG 2.1 AA."
+      },
+      "ux-6": {
+        "result": "met",
+        "proof": "Work with the front-end developers and the product team in two-week sprints."
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "The second of two applications from the same person (the first is jk-08a). The CV is changed: a new title and one more line, which earns one more tick (ux-6). The file is different, so the duplicate-file rule does not catch it. What the product does with the pair is decided in task 27.",
+  "case": "same-person-twice",
+  "sameApplicantAs": "jk-08a"
+}

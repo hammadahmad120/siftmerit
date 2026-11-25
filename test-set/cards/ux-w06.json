@@ -1,0 +1,58 @@
+{
+  "id": "ux-w06",
+  "job": "ui-ux-designer",
+  "file": "ux-w06.pdf",
+  "source": "written",
+  "group": "borderline",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Hassan Javed"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Hassan Javed",
+      "city": "Faisalabad",
+      "country": "Pakistan",
+      "totalYears": 4,
+      "currentRole": "UI/UX Designer, Chenab Soft",
+      "education": "BS Computer Science, GC University Faisalabad, 2022",
+      "links": [
+        "behance.net/hassanjaved"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "BS Computer Science, GC University Faisalabad, 2022"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Lyallpur Digital"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Web and mobile app screens and prototypes. Figma."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "behance.net/hassanjaved"
+      },
+      "ux-5": {
+        "result": "mentioned_only",
+        "proof": "Skills: Figma, Adobe XD, user-centred design, responsive design, accessibility"
+      },
+      "ux-6": {
+        "result": "unclear",
+        "proof": null
+      },
+      "ux-7": {
+        "result": "unclear",
+        "proof": null
+      }
+    }
+  },
+  "why": "The shortest CV of the set, half a page. Every must-have is met in a few words. The design principles are only named in the skills line."
+}

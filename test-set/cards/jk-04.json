@@ -1,0 +1,18 @@
+{
+  "id": "jk-04",
+  "job": "ui-ux-designer",
+  "file": "jk-04.pdf",
+  "source": "junk",
+  "case": "scanned-cv",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Hamid Rauf",
+    "body": "Dear Hiring Team,\n\nPlease find my CV attached for the UI/UX Designer position.\n\nRegards,\nHamid Rauf"
+  },
+  "expected": {
+    "isCv": true,
+    "outcome": "could_not_read",
+    "skipReason": "no_text_layer"
+  },
+  "why": "A real applicant whose CV is a scan: a picture inside a PDF, with no text to read. It must go on the \"could not read\" list and must never be dropped silently."
+}

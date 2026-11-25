@@ -1,0 +1,61 @@
+{
+  "id": "ux-w03",
+  "job": "ui-ux-designer",
+  "file": "ux-w03.pdf",
+  "source": "written",
+  "group": "strong",
+  "email": {
+    "subject": "Application for UI/UX Designer",
+    "senderName": "Mehwish Anwar"
+  },
+  "asOf": "2026-11",
+  "expected": {
+    "isCv": true,
+    "skipReason": null,
+    "facts": {
+      "name": "Mehwish Anwar",
+      "city": "Islamabad",
+      "country": "Pakistan",
+      "totalYears": 9,
+      "currentRole": "Senior UX/UI Designer, Safarnama Travel Tech",
+      "education": "Master of Design (Interaction Design), National University of Sciences and Technology, 2017",
+      "links": [
+        "Portfolio: mehwishanwar.example.com",
+        "behance.net/mehwish-anwar",
+        "linkedin.com/in/mehwish-anwar-ux"
+      ]
+    },
+    "ticks": {
+      "ux-1": {
+        "result": "met",
+        "proof": "Master of Design (Interaction Design), National University of Sciences and Technology, 2017"
+      },
+      "ux-2": {
+        "result": "met",
+        "proof": "UI/UX Designer, Ilmgah Learning"
+      },
+      "ux-3": {
+        "result": "met",
+        "proof": "Produce wireframes, clickable prototypes and high-fidelity screens in Figma for every release."
+      },
+      "ux-4": {
+        "result": "met",
+        "proof": "Portfolio: mehwishanwar.example.com"
+      },
+      "ux-5": {
+        "result": "met",
+        "proof": "Redesigned search and results after 24 user interviews and three rounds of usability testing; the responsive layout meets WCAG 2.1 AA and bookings per visit rose by 11%."
+      },
+      "ux-6": {
+        "result": "mentioned_only",
+        "proof": "Teamwork: Design handoff, working with front-end developers and product teams",
+        "note": "Working with developers and product teams is named only in the skills list. No role line describes it."
+      },
+      "ux-7": {
+        "result": "met",
+        "proof": "Present design concepts at the quarterly company review to the leadership team and to client airlines."
+      }
+    }
+  },
+  "why": "Strong and senior, with a long CV of four pages. The important lines are spread over several pages, between projects, certificates, talks and awards. Working with developers and product teams is only a skills line, so that one preferred requirement is mentioned only."
+}
