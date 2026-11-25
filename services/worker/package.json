@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "mailbox:connect": "tsx src/scripts/mailbox-connect.ts",
-    "mailbox:check": "tsx src/scripts/mailbox-check.ts"
+    "mailbox:check": "tsx src/scripts/mailbox-check.ts",
+    "test-set:send": "tsx src/scripts/test-set-send.ts"
   },
   "dependencies": {
     "@siftmerit/core": "*",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "^24",
+    "nodemailer": "^10.6.1",
     "tsx": "^4.19.3",
     "typescript": "^5"
   }

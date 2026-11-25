@@ -150,3 +150,6 @@ vite.config.ts.timestamp-*
 .turbo
 
 test-cvs/
+
+# Which test emails were already sent from this machine (npm run test-set:send)
+test-set/sent.json

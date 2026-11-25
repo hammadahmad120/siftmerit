@@ -1,0 +1,20 @@
+{
+  "id": "jk-11",
+  "job": "ai-engineer",
+  "file": "ai-w06.pdf",
+  "source": "junk",
+  "case": "same-file-other-sender",
+  "sendBy": "hand",
+  "duplicateOf": "ai-w06",
+  "email": {
+    "subject": "Application for AI Engineer",
+    "senderName": "Usman Tariq",
+    "body": "Dear Hiring Team,\n\nPlease find my CV attached for the AI Engineer position. I am sending it from my other address as well.\n\nRegards,\nUsman Tariq"
+  },
+  "expected": {
+    "isCv": true,
+    "outcome": null,
+    "skipReason": null
+  },
+  "why": "The file of ai-w06 again, but from another address. Sent by hand from the second Gmail account, never by the send script. The duplicate rule is \"the same file from the same sender\", so this email is not a duplicate by that rule and must not be dropped as one (jk-07, from the same address, is). The same person then appears twice; what the product does with that is decided in task 27."
+}

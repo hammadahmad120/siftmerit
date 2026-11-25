@@ -352,6 +352,8 @@ The script makes a pass, asks mailsift which mailbox it is, and prints the date,
 
 Both scripts use plain prints, not the logger. A secret or an email subject must never go through the logger.
 
+A third script in the same folder, `npm run test-set:send`, sends the emails of the test set. It is described in section 11.
+
 ### Traps
 
 - **The mailbox secret ends after 7 days** while the Google project is in "Testing". The check then says the secret has ended; run `npm run mailbox:connect` again and replace the line in `.env`.
@@ -655,3 +657,55 @@ A slow call can save the job and still lose its answer. HR sees an error, clicks
 - **A job cannot be edited or deleted yet.** A typo in the title stays. Later tasks bring the edits: subject words (25), the description (44), closing (48).
 - **The list is capped at 100 and has no paging.** The page says so when the cap is reached.
 - **`crypto.randomUUID()` in the browser needs a secure page:** `https`, or `localhost` in development.
+
+## 11. The test set
+
+The CVs, junk files and answer cards that every later check of the AI uses. Nothing in the product reads it yet. Its design, the requirement lists and every case are in [test-set.md](test-set.md); this section is how to work with it.
+
+### The idea
+
+The answer is known before the product reads the CV. For a written CV a **fact card** comes first ("six years of software work, built two agents, lives in Lahore, never used n8n"), and both the CV and its **answer card** are made from it by a script. The answer card holds the right fact sheet and, for every requirement of the job, the right tick with the CV line that proves it. A later check runs the product on the CV and compares.
+
+### What is where
+
+```
+test-set/            in git: made-up people only
+  jobs/              per job: the advert as pasted, and its requirement list with kind and "silent CV" mark
+  source/            the fact cards: one file per job, and junk.json with the junk and hard cases
+  files/             the made CVs and junk files, ready to attach
+  cards/             the made answer cards
+  build.mjs          makes files/ and cards/ from source/
+  sent.json          ignored by git: which emails this machine has sent
+test-cvs/            ignored by git: the 10 real CVs and their answer cards
+```
+
+Per job there are 15 written CVs and 5 real ones. The IDs say what a case is: `ai-w07` is a written AI engineer CV, `ux-r02` a real designer CV, `jk-04` a junk or hard case.
+
+### Making the files
+
+`node test-set/build.mjs` reads every file in `source/` and writes a CV and a card for each person. It stops when a proof line on a card is not a line of the CV. To change a CV, change its fact card and run the script; a file in `files/` or `cards/` is never edited by hand.
+
+Give it ID words: `node test-set/build.mjs ai-w12` remakes every card and only the CV files whose ID starts with `ai-w12`.
+
+The answer card of a real CV was written by hand after reading the CV, and each proof line was checked by code to be in the CV's text.
+
+### Sending the emails
+
+`npm run test-set:send` prints the 52 emails in the order of sending and sends nothing. With `-- --send` it sends, from a Gmail account of the user's, with one email every 4 seconds. It makes each email from an answer card and notes each sent one in `test-set/sent.json`, so a second run sends nothing twice. One email, `jk-11`, is sent by hand from a second account. The three settings it needs are in `.env.example`.
+
+The product itself can only read mail; that is why sending is a separate script with its own sign-in.
+
+### Traps
+
+- **Use the ID words when remaking files.** A remade PDF or Word file holds a new date inside, so git shows it as changed even when its text is the same.
+- **The script needs four programs:** Google Chrome and pandoc for every CV, and `pdftoppm` and LibreOffice for the scanned CV and the old Word file. Nobody needs them just to use the set, because the made files are in git.
+- **In the two-column PDFs some proof lines read back broken** (`ai-w02`, `ux-w02`, `ux-w07`), because lines of the two columns get mixed. They are kept on purpose: real CVs do this, and the proof-line check (task 33) must cope with it.
+- **A CV written by an AI is easier for an AI to read than a real one.** Scores on the written CVs will look better than real life. The 10 real CVs, and later a pilot mailbox, show real quality.
+- **Years grow with time.** A card carries `asOf` (2026-11); "four years of experience" on a card is true for that month.
+- **Nothing from `test-cvs/` goes into git,** and neither does a real CV's text into a demo or a screenshot. The cards there repeat the person's facts.
+- **The words `outcome` and `skipReason` on a junk card are names of the test set.** The product's own words for skip reasons are chosen in task 27.
+- **Deleting `test-set/sent.json` makes the send script forget.** The next `--send` would send all 51 emails again.
+- **Test emails can land in Spam,** and a normal Gmail search leaves Spam out. The test mailbox has a filter that never sends mail from the two sending addresses to Spam. A new test mailbox needs the same filter before the first run.
+- **Gmail's screen folds emails with the same subject into one row.** They are still single emails, and mailsift lists them one by one. Switch "conversation view" off to count them.
+- **All test emails come from two addresses and arrive on one day.** "Oldest first" is only the order of sending, and the duplicate rule ("same file, same sender") can be tried only with the two addresses.
+- **The app password in `.env` can read and send all mail of that Gmail account.** It is only needed while sending and can be deleted at `myaccount.google.com/apppasswords` afterwards.

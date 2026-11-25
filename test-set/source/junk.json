@@ -587,5 +587,27 @@
       "skipReason": "broken_file"
     },
     "why": "A PDF that stops after its first 2,000 bytes, as after a failed upload. It cannot be opened. The free checks must drop it with a reason and must not crash on it."
+  },
+  {
+    "id": "jk-11",
+    "case": "same-file-other-sender",
+    "job": "ai-engineer",
+    "sendBy": "hand",
+    "email": {
+      "subject": "Application for AI Engineer",
+      "senderName": "Usman Tariq",
+      "body": "Dear Hiring Team,\n\nPlease find my CV attached for the AI Engineer position. I am sending it from my other address as well.\n\nRegards,\nUsman Tariq"
+    },
+    "make": {
+      "type": "same",
+      "file": "ai-w06.pdf"
+    },
+    "duplicateOf": "ai-w06",
+    "expected": {
+      "isCv": true,
+      "outcome": null,
+      "skipReason": null
+    },
+    "why": "The file of ai-w06 again, but from another address. Sent by hand from the second Gmail account, never by the send script. The duplicate rule is \"the same file from the same sender\", so this email is not a duplicate by that rule and must not be dropped as one (jk-07, from the same address, is). The same person then appears twice; what the product does with that is decided in task 27."
   }
 ]

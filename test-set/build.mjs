@@ -324,6 +324,7 @@ function junkCard(entry, file, jobOf) {
   const person = entry.make?.type === "cv" ? entry.make.person : null;
   const extras = {
     case: entry.case,
+    ...(entry.sendBy ? { sendBy: entry.sendBy } : {}),
     ...(entry.duplicateOf ? { duplicateOf: entry.duplicateOf } : {}),
     ...(entry.sameApplicantAs ? { sameApplicantAs: entry.sameApplicantAs } : {}),
     ...(person?.hidden ? { hiddenText: person.hidden } : {}),
@@ -394,7 +395,8 @@ function makeCard(person, job) {
 // The ID words given on the command line. With none, every CV file is remade.
 const idStarts = process.argv.slice(2);
 const fileWanted = (id) => idStarts.length === 0 || idStarts.some((start) => id.startsWith(start));
-let filesMade = 0;
+// How many IDs the words matched, also counting a case that has no file of its own.
+let idsMatched = 0;
 
 const workFolder = fs.mkdtempSync(path.join(os.tmpdir(), "siftmerit-test-set-"));
 fs.mkdirSync(path.join(root, "files"), { recursive: true });
@@ -410,12 +412,12 @@ for (const sourceFile of fs.readdirSync(path.join(root, "source")).filter((f) =>
   if (sourceFile === "junk.json") {
     for (const entry of readJson("source", sourceFile)) {
       // As below, the card is made first.
+      if (fileWanted(entry.id)) idsMatched += 1;
       const made = fileWanted(entry.id) && entry.make && entry.make.type !== "same";
       const card = junkCard(entry, junkFile(entry, workFolder, false), jobOf);
       writeCard(card);
       if (made) {
         junkFile(entry, workFolder, true);
-        filesMade += 1;
       }
       console.log(
         `${entry.id.padEnd(6)}  ${(card.file ?? "no file").padEnd(12)}  ${entry.case.padEnd(18)}  ${made ? "card and file" : "card only"}`,
@@ -434,8 +436,8 @@ for (const sourceFile of fs.readdirSync(path.join(root, "source")).filter((f) =>
     writeCard(card);
     const made = fileWanted(person.id);
     if (made) {
+      idsMatched += 1;
       makeFile(person, workFolder);
-      filesMade += 1;
     }
     console.log(
       `${person.id}  ${person.format.padEnd(4)}  ${person.layout.padEnd(8)}  ${person.group.padEnd(16)}  ${made ? "card and file" : "card only"}`,
@@ -446,7 +448,7 @@ for (const sourceFile of fs.readdirSync(path.join(root, "source")).filter((f) =>
 fs.rmSync(workFolder, { recursive: true, force: true });
 
 // A mistyped ID word would otherwise look like a run that worked.
-if (idStarts.length > 0 && filesMade === 0) {
-  console.error(`No CV file was made: no ID starts with ${idStarts.map((s) => `"${s}"`).join(" or ")}.`);
+if (idStarts.length > 0 && idsMatched === 0) {
+  console.error(`Nothing matched: no ID starts with ${idStarts.map((s) => `"${s}"`).join(" or ")}.`);
   process.exitCode = 1;
 }
