@@ -4,6 +4,8 @@ The CVs, junk files and answer cards that every later check uses: the mail searc
 
 **Status: approved by the user on 2026-11-24.** The set is being made in the steps of section 9.
 
+**Changed on 2026-11-25 by task 54** (how candidates are filtered and sorted): a requirement now has one of three kinds and a "silent CV" mark, and the AI engineer list in section 2 is the new one. **The files do not have the new shape yet.** `test-set/jobs/ai-engineer.json`, the fact cards in `test-set/source/` and the 20 AI engineer answer cards still hold the list of 2026-11-24, with `ai-3` as one requirement. They are changed when task 12 goes on; section 10 lists what is left.
+
 The core idea: **the answer is known before the product reads the CV.** For a written CV we first write a fact card ("6 years of software work, built two AI agents, lives in Lahore, never used n8n") and then write the CV from it. When the product later reads that CV, we already know every right tick.
 
 ## 1. The two jobs
@@ -19,26 +21,31 @@ Both adverts are used as they are, with the boring parts left in. The AI must pu
 
 ## 2. The right requirements for each job
 
-This list is the answer for the "AI drafts requirements" check (task 15), and every tick in an answer card points at one line of it. The adverts do not say what is a must, so the split is HR's choice. Claude proposed it and the user, as HR, approved it.
+This list is the answer for the "AI drafts requirements" check (task 15), and every tick in an answer card points at one line of it. The adverts do not say what is a must-have, so the split is HR's choice. Claude proposed it and the user, as HR, approved it.
+
+Each requirement has two marks. The **kind** is must-have, preferred or nice to have. **If the CV says nothing** is "ask" (ask the candidate: the requirement is then not clear and earns half points) or "missing" (count as missing). How the two are used is in step 7 of [product-flow.md](product-flow.md).
 
 **AI engineer**
 
-| ID | Requirement | Kind |
-|---|---|---|
-| ai-1 | 4 or more years of professional software engineering | must |
-| ai-2 | 2 or more years building AI, automation or internal tools in production | must |
-| ai-3 | Strong Python, and TypeScript or JavaScript | must |
-| ai-4 | Built AI agents, tool use, function calling and multi-step workflows | must |
-| ai-5 | Located in the Philippines or Pakistan | must |
-| ai-6 | Hands-on with Claude: the Claude API and at least two of Claude Code, Projects, Skills, MCP | nice to have |
-| ai-7 | Experience with OpenAI or Google Gemini, and choosing the right model | nice to have |
-| ai-8 | Experience with n8n, Make or Zapier | nice to have |
-| ai-9 | Integrated Google Workspace, Slack, a CRM and project tools through APIs and webhooks | nice to have |
-| ai-10 | Solid SQL, databases, data pipelines and data warehouses | nice to have |
-| ai-11 | Excellent communication with non-technical people | nice to have |
-| ai-12 | Entrepreneurial mindset: execution, ownership, measurable results | nice to have |
+| ID | Requirement | Kind | If the CV says nothing |
+|---|---|---|---|
+| ai-1 | 4 or more years of professional software engineering | must-have | missing |
+| ai-2 | 2 or more years building AI, automation or internal tools in production | must-have | missing |
+| ai-3a | Strong Python | must-have | missing |
+| ai-3b | TypeScript or JavaScript | preferred | missing |
+| ai-4 | Built AI agents, tool use, function calling and multi-step workflows | must-have | missing |
+| ai-5 | Located in the Philippines or Pakistan | must-have | ask |
+| ai-6 | Hands-on with Claude: the Claude API and at least two of Claude Code, Projects, Skills, MCP | preferred | missing |
+| ai-7 | Experience with OpenAI or Google Gemini, and choosing the right model | preferred | missing |
+| ai-8 | Experience with n8n, Make or Zapier | nice to have | missing |
+| ai-9 | Integrated Google Workspace, Slack, a CRM and project tools through APIs and webhooks | preferred | missing |
+| ai-10 | Solid SQL, databases, data pipelines and data warehouses | nice to have | missing |
+| ai-11 | Excellent communication with non-technical people | nice to have | ask |
+| ai-12 | Entrepreneurial mindset: execution, ownership, measurable results | nice to have | ask |
 
-**UI/UX designer**
+Approved by the user on 2026-11-25: 5 must-haves, 4 preferred, 4 nice to have, with a highest possible score of 23 points. The advert's line "Python and TypeScript or JavaScript" is split into ai-3a and ai-3b, because it holds two skills and a person often has one without the other. The other lines with several parts are one skill with examples and stay whole.
+
+**UI/UX designer** (still in the shape of 2026-11-24: two kinds, no "silent CV" mark. The new split is HR's choice and is made with step 3 of section 9.)
 
 | ID | Requirement | Kind |
 |---|---|---|
@@ -61,13 +68,13 @@ About 50 files: 20 CVs per job and 10 junk and hard cases.
 | Group | Count | What it checks |
 |---|---|---|
 | Real CVs, from portfolio sites | 5 | Real layouts and real writing |
-| Clear strong match | 3 | These should reach the top five |
-| Borderline: every must, few extras | 3 | The order in the middle of the list |
-| Misses exactly one must | 2 | Strict (out) against lenient (stays in) |
-| Skills only listed, never used in a role | 2 | "Mentioned only" must not count as "met" |
-| Silent on one must | 2 | "Unclear", not "not met" |
+| Clear strong match | 3 | These should be at the top of the list |
+| Borderline: every must-have, few extras | 3 | The order in the middle of the list |
+| Misses exactly one must-have | 2 | Dropped, and offered behind the "strong candidates were dropped" option with the reason |
+| Skills only listed, never used in a role | 2 | "Mentioned only" must not count as "met": the candidate qualifies, with half points and the sign "listed only" |
+| Silent on one must-have | 2 | "Unclear", not "not met". Then the requirement's mark decides: not clear, or missing |
 | Two that score exactly the same | 2 | Ties go to the earlier applicant |
-| Clearly another field | 1 | Stays at the bottom, and is still a CV |
+| Clearly another field | 1 | Dropped and offered nowhere, and is still a CV |
 
 Of the 15 written CVs per job, 10 are PDF files in three different layouts and 5 are Word files. One is four pages or longer and one is half a page. Some of the special cases are made by a small edit of a real CV, which keeps them realistic: for example a real CV with its degree line removed "misses exactly one must".
 
@@ -199,3 +206,18 @@ Done so far, on 2026-11-24: step 1, the two job files in `test-set/jobs/` and th
 4. The new folder `test-set/` in git, with the real CVs and their cards staying in `test-cvs/`.
 5. Decided on 2026-11-24: a send script with the library `nodemailer` for the first Gmail account, and a few emails by hand from the second.
 6. The order of the work, each step shown before the next: the two job files and the cards of the 10 real CVs; the written CVs of the AI engineer; the written CVs of the designer; the junk files; the sending.
+
+## 10. After task 54: the first run, and what is left
+
+**The first run of the whole rule**, on 2026-11-25, on the 20 AI engineer cards with the list of section 2. The `ai-3` tick was split by hand from each card's note; no file was changed.
+
+- **14 qualify.** On top are the three strong matches (`ai-w01`, `ai-w02`, `ai-w03`), then the two equal CVs in sending order (`ai-w13`, `ai-w14`), then the borderline ones. Two real CVs qualify (`ai-r02`, `ai-r05`), both with "ask the candidate: location". The lowest qualified score is 72%.
+- **6 are dropped.** `ai-w07` (79%, under four years) and `ai-w08` (78%, lives in Dubai) are offered: both are over 60%, and the limit for 20 CVs read is two. `ai-r01` (68%) and `ai-r03` (65%) are over 60% and outside the limit. `ai-r04` (57%, two must-haves missing) and `ai-w15` (29%, another field) are under 60%.
+
+**Left to do in the files, when task 12 goes on:**
+
+1. `test-set/jobs/ai-engineer.json`: the 13 requirements with kind and "silent CV" mark.
+2. `test-set/source/ai-engineer.json` and the 15 written cards made from it: one tick each for ai-3a and ai-3b in place of ai-3, and the "why" lines that still speak of strict, lenient or "the bottom".
+3. The 5 real AI engineer cards in `test-cvs/cards/`: the same split, by hand.
+4. The designer list: the three kinds and the mark, proposed by Claude and approved by the user as HR, before the 15 designer CVs are written.
+5. The rule is run again on all 40 CV cards; the 60% and the point values are starting values until then.

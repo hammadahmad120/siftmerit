@@ -41,7 +41,16 @@ HR enters:
 The title was added on 2026-11-24. The reason is in [decisions.md](decisions.md).
 
 ### Step 2: Requirements are agreed
-The AI pulls the requirements out of the job description and marks each as **must** or **nice to have**. HR edits and confirms the list, and picks **strict** or **lenient**. No CV is read before HR confirms.
+The AI pulls the requirements out of the job description and gives each one two marks:
+
+- **Its kind:** **must-have**, **preferred** (strongly wanted) or **nice to have** (an extra). Always exactly one of the three.
+- **What a silent CV means:** "ask the candidate" (a city, a language, a soft skill: things people leave off a CV and one question settles) or "count as missing" (a skill, the years of experience, the domain: things a CV must show).
+
+A requirement that holds two different skills ("Python, and TypeScript or JavaScript") is written as two requirements.
+
+HR edits the list, changes any kind or mark, adds or removes requirements, and confirms. The list needs at least one must-have. No CV is read before HR confirms.
+
+Changed on 2026-11-25. Before that there were two kinds (must, nice to have) and HR picked strict or lenient. The reasons are in [decisions.md](decisions.md).
 
 ### Step 3: Saved candidates from past jobs (HR's choice)
 When creating a job, HR can pick past jobs to bring saved candidates from. HR confirms before any AI is used. Those candidates are then scored against the new requirements from their saved CV text, before any mail is read. Nothing is checked automatically.
@@ -70,29 +79,54 @@ One CV per call, several running side by side. Each call returns:
 The cleaned CV text is saved too. CV text is always treated as data, never as instructions.
 
 Rules for ticks:
-- "Met" needs proof the skill was used in a role or project. A skill that only appears in a list is "mentioned only" and worth fewer points.
+- "Met" needs proof the skill was used in a role or project. A skill that only appears in a list is "mentioned only" and worth half the points.
 - Obvious conclusions are allowed (a senior React developer has JavaScript).
-- If the CV is silent on something, the tick is "unclear", not "not met".
+- If the CV is silent on something, the tick is "unclear", not "not met". "Not met" means the CV shows the opposite.
 - Content outside the job's requirements earns nothing.
+- The AI does not see a requirement's kind and gives no points. It gives one of the four answers and the proof line, nothing else.
 
-### Step 7: Code scores and sorts (no AI)
-- A fixed formula turns ticks into a score. Starting values: must met 10, nice to have met 3, unclear half.
-- A missed must never hides a candidate. Candidates are sorted into lists: every must met; one must missing, shown with the reason; and everyone else, further down. Inside a list they are ranked by score. HR decides whom to drop.
-- "Unclear" stays in, ranked lower.
-- Ties go to the earlier applicant.
+### Step 7: Code filters, scores and sorts (no AI)
+**Who qualifies.** A candidate qualifies when every must-have is present. Present means one of three:
+- met: shown in a role or project;
+- mentioned only: in a skills list. The card shows a sign, "listed only, check in a call";
+- not clear: the CV is silent and the requirement is marked "ask the candidate".
+
+A must-have is missing when the CV shows the opposite, or when the CV is silent and the requirement is marked "count as missing". A candidate with a missing must-have is **dropped**.
+
+**The score.** One rule for all three kinds. Starting values: must-have 3 points, preferred 1.5, nice to have 0.5.
+
+| The tick | Points |
+|---|---|
+| Met | Full points of the kind |
+| Mentioned only, or not clear on an "ask the candidate" requirement | Half |
+| Missing | None |
+
+- Qualified candidates are sorted by score, best first. Ties go to the earlier applicant.
+- A qualified candidate needs no minimum score. The score only sets the order.
 - Code checks that each proof line really appears in the CV text.
 
-The list rule was changed on 2026-11-24. Before that, strict mode put a candidate with a missed must out, and lenient mode allowed one. The reason is in [decisions.md](decisions.md). Whether HR still picks strict or lenient in step 2 is open.
+**Dropped** means not visible to HR on any screen, except through the one option in step 8. A dropped candidate's record stays in the database until the job is closed, so a change by HR re-sorts for free.
 
-### Step 8: The best 5 go to HR
-Each candidate has a card: fact sheet details, every tick with its proof line, and why they ranked there. The full CV is one click away. The AI only recommends. It never rejects anyone.
+Changed on 2026-11-25. From 2026-11-24 a missed must moved a candidate to a second list and hid nobody; before that, strict mode put such a candidate out and lenient mode allowed one. The reasons are in [decisions.md](decisions.md).
+
+### Step 8: The qualified candidates go to HR
+- **The list.** HR sees every qualified candidate, best first. The page shows the first 10 and a "Show more" button shows the rest.
+- **The card.** Fact sheet details, every tick with its proof line, and why they ranked there. The full CV is one click away.
+- **The line of numbers.** Above the list, for example "Read 50 · 2 qualified · 48 dropped". Numbers only, no names.
+- **Strong candidates who were dropped.** Every dropped candidate still gets a score. Those with 60% or more of the highest possible score are offered behind one option ("3 strong candidates were dropped. See why"), each with the reason, such as "Missing must-have: 4 years of software engineering". At most 10% of the CVs read are offered, rounded up and best first: up to 5 for every 50 read. With nobody at 60% the option does not show. Dropped candidates under 60% are shown nowhere.
+- **What HR can do.**
+  - Move a requirement between must-have, preferred and nice to have. This is how HR makes the filter softer or harder; it changes the result for every candidate, with no AI cost.
+  - "Remove" on a qualified candidate: they leave the list and stay out.
+  - "Add to list" on an offered dropped candidate: only that person comes in, with a note "Added by HR. Missing: ...".
+
+The product filters: a candidate with a missing must-have is kept from HR. Until 2026-11-25 the rule was "the AI only recommends, it never rejects anyone". The must-haves are HR's own choice, and the option above is where HR can see who was dropped and why.
 
 There is **no second "careful check" with a stronger model** in the first version. See section 7 for the test that decides whether to add it.
 
 ## 4. Limits
 
 - **Date range:** only mail from the posting date onward.
-- **Round:** 50 CVs per round, oldest first. Then HR sees the result and is asked: "Read 50 of 340. Read the next 50?" After each further round the lists are built from everything read so far, and the candidates of the latest round are clearly marked as new. The lists change only when HR acts. Changed on 2026-11-24 from a round of 200; the reason is in [decisions.md](decisions.md).
+- **Round:** 50 CVs per round, oldest first. Then HR sees the result and is asked: "Read 50 of 340. Read the next 50?" After each further round the list is built from everything read so far, and the candidates of the latest round are clearly marked as new. The list changes only when HR acts. Changed on 2026-11-24 from a round of 200; the reason is in [decisions.md](decisions.md).
 - **Job budget:** a hard total per job as a safety net (starting guess 1,000 CVs).
 - **List cap:** the confirmation list in step 4 has its own limit, with a "narrow your subject or date" message past it.
 - HR always sees how many are still unread.
@@ -105,7 +139,7 @@ There is **no second "careful check" with a stronger model** in the first versio
 
 | Change | What happens | AI cost |
 |---|---|---|
-| Strict or lenient, must or nice to have | Code re-adds scores from saved ticks | None |
+| A requirement's kind (must-have, preferred, nice to have) or its "silent CV" mark | Code decides again who qualifies and re-adds scores, from saved ticks | None |
 | Requirement removed | Its tick is dropped, scores re-added | None |
 | Sort or filter on a fact sheet box ("prefer Lahore") | Code re-sorts | None |
 | Requirement added or reworded in any way (including 5 years to 7) | The small model gives one new tick per candidate from the saved CV text. Other ticks stay. Candidates already clearly out are skipped. | Small |
@@ -121,8 +155,8 @@ The rule behind this table: **the AI gives every tick, the code only adds up and
 
 **When HR closes the job:**
 - Reading stops.
-- **Kept:** candidates above the bar (all musts met, or one missed), with fact sheet, ticks, CV text and HR's notes. These are the saved candidates HR can bring into a future job in step 3.
-- **Deleted:** everyone below the bar.
+- **Kept:** candidates above the bar, with fact sheet, ticks, CV text and HR's notes. These are the saved candidates HR can bring into a future job in step 3. Since 2026-11-25 the bar is: qualified, or added by HR. Candidates HR removed by hand, and dropped ones that were offered and not added, are still to be decided when closing is built.
+- **Deleted:** everyone below the bar, which includes the dropped candidates.
 - **Also kept:** the email ID list, in case the job is reopened.
 - Kept data has a keep-until date (starting guess 12 months) and can be deleted on a candidate's request.
 
@@ -195,7 +229,7 @@ Once a first version exists, test with one real pilot mailbox:
 2. Confirm junk with attachments (an invoice PDF) is never shown as a candidate.
 3. Run a round. Check each tick's proof line against the real CV for 20 candidates.
 4. Have HR pick their own top 5 from the same CVs and compare with the product's top 5.
-5. Change a requirement, switch strict to lenient, and remove a requirement. Confirm no email is fetched again and only the added requirement triggers AI calls.
+5. Change a requirement, move one from must-have to preferred, and remove a requirement. Confirm no email is fetched again and only the added requirement triggers AI calls.
 6. Send a new test application. Confirm the daily check picks it up once and only once.
 7. Close the job. Confirm below-bar candidates are deleted and above-bar ones appear as saved candidates for a new job.
 8. Record the real AI cost per 200 CVs.

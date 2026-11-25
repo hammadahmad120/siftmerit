@@ -604,7 +604,7 @@ A job is one hiring job of a company: a title, the job description, the subject 
 - **Status.** A new job is a `draft`: its requirements are not confirmed yet. `open` is set when HR confirms them (task 16) and `closed` when HR closes the job (task 48). What is running at the moment, such as "reading 120 of 200", is not a job status; that is read from `work_runs`.
 - **Subject words.** One phrase is enough. Inside a phrase all its words must be in the subject, in any order (mailsift sends Gmail `subject:(Senior Accountant)`). A second phrase is for applicants who use other words for the same job. Picking an email that matches any one phrase is built in task 22.
 - **Two "allowed once" rules.** `(tenant_id, create_key)` is the one-time key. `(tenant_id, id)` looks pointless, since an ID is unique by itself; it exists so that a later table can point at a job together with its company, and the database then refuses a row that names one company and another company's job.
-- Columns that later steps need (strict or lenient, when the requirements were confirmed, when the mailbox was last checked, when the job was closed) are added by the tasks that first use them.
+- Columns that later steps need (when the requirements were confirmed, when the mailbox was last checked, when the job was closed) are added by the tasks that first use them.
 
 ### The addresses
 

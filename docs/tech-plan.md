@@ -8,7 +8,7 @@ The product flow (what the product does) is in [product-flow.md](product-flow.md
 
 ## 1. Context
 
-Small and mid-size companies receive CVs by email and sort them by hand. Siftmerit takes a job description, finds the matching CVs in the company mailbox, scores each one against the job's requirements, and shows the best five with a proof line for every tick.
+Small and mid-size companies receive CVs by email and sort them by hand. Siftmerit takes a job description, finds the matching CVs in the company mailbox, scores each one against the job's requirements, drops the ones that miss a must-have, and shows the rest best first, with a proof line for every tick.
 
 Two goals shape the technical choices:
 
@@ -110,9 +110,9 @@ Copied code counts toward a task's size and is explained as if the user has neve
 | Piece | Source | What changes |
 |---|---|---|
 | AI call wiring | `services/platform-api/src/lib/llm-provider.ts`, `match-llm.ts`, `services/ingestion-worker/src/lib/extraction-llm.ts` | One shared wrapper. Adds result checking, retry on "slow down", a limit on calls side by side, and a cost log |
-| Requirements from a job description | `packages/platform-core/src/matching/brief-split.ts` | Real must and nice to have. Scout's "essential" means something else. Field mapping is dropped |
+| Requirements from a job description | `packages/platform-core/src/matching/brief-split.ts` | Three kinds (must-have, preferred, nice to have) and the "silent CV" mark. Scout's "essential" means something else. Field mapping is dropped |
 | Fact sheet | `packages/platform-core/src/matching/field-extraction.ts` (prompt, `verifyFieldValues`, list and typed-value checks) | Fixed boxes instead of admin-defined fields. The 12,000 character trimming is not copied, because every CV is read in full |
-| Ticks | `packages/platform-core/src/matching/requirement-check.ts` (prompt reading rules, `verifyRequirementChecks`) | One CV per call, four statuses (met, mentioned only, not met, unclear), must and nice to have |
+| Ticks | `packages/platform-core/src/matching/requirement-check.ts` (prompt reading rules, `verifyRequirementChecks`) | One CV per call, four statuses (met, mentioned only, not met, unclear). The call does not see a requirement's kind |
 | Dashboard shell | `apps/web-app/src/components/dashboard-shell.tsx`, `dashboard-nav.tsx` | A top bar, not a sidebar, with our own menu items. Only the "which link is active" check and the two file names are taken; the sidebar frame, the icons and the folding group are not (decided in task 8) |
 | Candidate card look | The result card in `apps/web-app/src/components/collection-view.tsx` | Visual pattern only |
 
@@ -194,11 +194,11 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 | 11 | Create a job (step 1): form, list, job page, and the helper that always adds the company filter | Build | 8 | A new job with a title, a description, subject words and a posting date appears in the list and opens | Job statuses. A helper that always adds the company filter |
 | 12 | Test set: job descriptions, fact cards, CVs, junk files | Design | none | A folder of files with an answer sheet, and the emails sent to the test mailbox | Which jobs, where the files live (real CVs stay out of git), the form of the answer sheet |
 | 13 | AI wrapper: forced form, code check, cost log | Build | 3, 6 | A test call shows in the cost log | Starting model, the "no training on our data" provider rule, cost log columns. Check the current AI SDK docs first |
-| 14 | AI drafts requirements (step 2, first half) | Build | 11, 13 | The job page shows requirements, each marked must or nice to have | Inline call or work item |
+| 14 | AI drafts requirements (step 2, first half) | Build | 11, 13 | The job page shows requirements, each with its kind (must-have, preferred, nice to have) and its "silent CV" mark (ask the candidate, count as missing). A requirement holding two skills comes out as two | Inline call or work item |
 | 15 | Eval runner and the requirements eval | Build | 12, 14 | One command prints a score | How a score is counted, where results are kept, the pass mark |
-| 16 | Edit and confirm requirements (step 2, second half) | Build | 14 | HR adds, rewords, removes and re-marks requirements, picks strict or lenient, and confirms. Nothing later can start before confirmation | Limits on requirement count and length |
+| 16 | Edit and confirm requirements (step 2, second half) | Build | 14 | HR adds, rewords, removes and re-marks requirements (kind and "silent CV" mark), and confirms. A list with no must-have cannot be confirmed. Nothing later can start before confirmation | Limits on requirement count and length |
 | 17 | Chat panel with one read-only tool | Build | 13, 16 | The agent describes the job in a streamed reply | Agent model, step limit. Check the current AI SDK docs for tool calling first |
-| 18 | Tools that change requirements, and the confirm click | Build | 17 | A chat message changes a requirement, must or nice to have, or strict or lenient on screen | How the confirm click looks, which changes need it |
+| 18 | Tools that change requirements, and the confirm click | Build | 17 | A chat message changes a requirement, its kind or its "silent CV" mark on screen | How the confirm click looks, which changes need it |
 | 19 | Chat history saved per job | Build | 17 | History is still there after a page reload | What is saved (messages, tool calls), how much history is sent back to the model |
 
 ### Mailbox
@@ -225,8 +225,8 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 | 32 | Ticks with proof lines (step 6, second half) | Build | 16, 30 | The same call returns one tick per requirement with a proof line, shown on each card | Tick wording rules, what proof "unclear" and "not met" need |
 | 33 | Proof-line check and its tests | Build | 32 | A made-up proof line is downgraded, and the tests pass | How close a match must be (spaces, case, line breaks) |
 | 34 | Eval: ticks against the answer sheet | Build | 15, 33 | The command prints a score | How agreement is counted |
-| 35 | Scorer and its tests (step 7) | Build | 3 | Scores and rank are correct in strict and lenient, and the tests pass | Point values including "mentioned only", tie rules, whether an "unclear" must counts as the one missed must in lenient |
-| 36 | Shortlist (steps 7 and 8): best five cards, full CV one click away, HR's notes | Build | 33, 35 | The best five show with ticks, proof lines and the reason for each rank | Card layout, where HR's notes are saved |
+| 35 | Scorer and its tests (step 7) | Build | 3 | Who qualifies, who is dropped, the scores, the rank and which dropped candidates are offered (60% and the 10% limit) are correct, and the tests pass | Tie rules beyond "the earlier applicant". The rule itself was decided in task 54 |
+| 36 | The list of qualified candidates (steps 7 and 8): cards, the first 10 and "Show more", the line of numbers, the "strong candidates were dropped" option, "Remove" and "Add to list", full CV one click away, HR's notes | Build | 33, 35 | Qualified candidates show best first with ticks, proof lines and the reason for each rank; a dropped candidate shows only behind the option, with the reason | Card layout, where HR's notes and HR's "Remove" or "Add to list" choice are saved, whether a removal can be undone, the remark lines on a card |
 | 37 | Agent tool: explain a ranking | Build | 18, 36 | The agent explains why a candidate is third | None so far |
 | 38 | Eval: top five against a person's pick | Build | 15, 36 | The command prints the overlap | Who makes the person's pick |
 | 39 | Rounds and limits (section 4) | Build | 36 | A round stops at 50 CVs and asks "Read 50 of 340. Read the next 50?". The next round's lists are built from everything read so far, with the new candidates marked. The job budget is enforced, and HR sees how many are unread | How screens show progress, cap values |
@@ -235,7 +235,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 | # | Task | Kind | Needs | How to check | Decide then |
 |---|---|---|---|---|---|
-| 40 | Free changes (section 5, no AI cost): strict or lenient, must or nice to have, requirement removed | Build | 36 | The rank changes from saved ticks and the cost log stays empty | None so far |
+| 40 | Free changes (section 5, no AI cost): a requirement's kind, its "silent CV" mark, requirement removed | Build | 36 | The rank changes from saved ticks and the cost log stays empty | None so far |
 | 41 | Sort and filter on fact sheet boxes (section 5, no AI cost) | Build | 36 | "Prefer Lahore" re-sorts the list | Which fact sheet boxes can be filtered |
 | 42 | Agent tools for the free changes | Build | 18, 40, 41 | A chat message does the same as the buttons | None so far |
 | 43 | Re-tick for an added or reworded requirement (section 5, small AI cost) | Build | 36 | One new tick per candidate from saved CV text after a confirm click. Candidates clearly out are skipped | What counts as "clearly out" |
@@ -258,6 +258,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 ### Notes on the list
 
 - **A decision task was added on 2026-11-24, to be done right after task 12 and before task 13: how the lists are decided after each round.** It is task 54, so no other number changes. Kind: decision. Needs: 12. "Kept out" means not shown to HR in the relevant list. How to check: the rule is written in `decisions.md`, and applied by hand to the answer cards of the test set it puts the right people in the relevant list and leaves the right people out of it. Decide then: whether an unclear must counts as missing; where a must that is only mentioned puts a candidate; the point values; how many candidates each list shows first; what HR can keep or drop by hand; whether HR still picks strict or lenient. It takes these choices out of task 35, which then only builds the scorer.
+- **Task 54 was finished on 2026-11-25.** The rule is in `decisions.md` under that date and in steps 2, 7 and 8 of the product flow: three kinds of requirement, a "silent CV" mark on each, no strict or lenient, a candidate with a missing must-have is dropped, and the strong dropped ones are offered behind one option. The rows of tasks 14, 16, 18, 35, 36 and 40 were changed to match. **Task 36 grew** (the list, the line of numbers, the dropped option and two buttons) and is likely over the size ceiling; it is split in its plan step.
 - **The company separation test has no task.** It was planned for task 6, moved to task 11 on 2026-11-18 and taken out of task 11 on 2026-11-24. When it is built, and how it stays safe beside real data, are open points in `decisions.md`. Recommended: its own small task before task 26, the first task that stores CV text.
 - **Near the size ceiling:** tasks 2, 6, 26, 29 and 32. Any that prove too big are split in their plan step.
 - **Near the floor:** tasks 25 and 42. They can be merged into 24 and 40 when reached.

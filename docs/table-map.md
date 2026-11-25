@@ -16,7 +16,7 @@ tenants                      the company (Acme)
  ├── mailbox_connections     Acme's Gmail (only one per company)
  ├── candidates              Ali, a person known to Acme
  └── jobs                    the Accountant job
-      ├── job_requirements   "3 years experience" (must)
+      ├── job_requirements   "3 years experience" (must-have)
       ├── job_emails         every email we looked at for this job
       ├── work_runs          "reading round 1: running"
       ├── chat_messages      Sara's chat with the agent about this job
@@ -53,8 +53,8 @@ job_requirements ─────────────────────
 | `tenants` | Company name and short name (`slug`: lower case with dashes, allowed only once). A `settings` column is added when something first uses it, probably the limits in task 39 | Acme Trading, `acme-trading` | 6 (exists) |
 | `tenant_members` | Which sign-in account is in which company, and its role: `owner` or `member`. One user belongs to one company. Nothing is restricted by the role yet | Sara is in Acme, owner | 6 (exists) |
 | `mailbox_connections` | Mailbox address, the secret (encrypted), status, last error | hr@acme.com, connected | 21 |
-| `jobs` | Title (the job's short name on our screens, typed by HR), job description, subject words (a list of 1 to 10 phrases), posting date, status (`draft`, `open`, `closed`), the form's one-time key, and who created it. Added by later tasks when first used: strict or lenient, when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, draft | 11 (exists) |
-| `job_requirements` | Which job, the requirement text, must or nice to have, its place in the list | "3 years experience", must | 14 |
+| `jobs` | Title (the job's short name on our screens, typed by HR), job description, subject words (a list of 1 to 10 phrases), posting date, status (`draft`, `open`, `closed`), the form's one-time key, and who created it. Added by later tasks when first used: when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, draft | 11 (exists) |
+| `job_requirements` | Which job, the requirement text, its kind (must-have, preferred or nice to have), what a silent CV means for it (ask the candidate, or count as missing), its place in the list | "3 years experience", must-have, count as missing | 14 |
 | `job_emails` | Which job, Gmail's email ID, subject, sender, date, picked by HR or not, status, skip reason. No email body and no attachment | "Application for Accountant", 2 Nov, read | 22 |
 | `candidates` | The fact sheet (name, contact, city, total years, education, skills, current role, short summary, links), the CV text, the keep-until date | Ali, Lahore, 4 years | 26 to 29 |
 | `applications` | Which candidate, which job, where it came from (an email or a past job), date applied, reading status, HR's notes | Ali for Accountant, 2 Nov | 26 to 29 |

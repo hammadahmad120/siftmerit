@@ -1,6 +1,6 @@
 # Siftmerit
 
-AI hiring tool for small and mid-size companies. HR gives a job description. The product finds the matching CVs in the company mailbox, scores each one against the job's requirements, and shows the best five with a proof line for every tick.
+AI hiring tool for small and mid-size companies. HR gives a job description. The product finds the matching CVs in the company mailbox, scores each one against the job's requirements, drops the ones that miss a must-have, and shows the rest best first, with a proof line for every tick.
 
 Two goals: a working pilot product, and learning tool calling, MCP and agent building. The chat agent is a main part of the product and grows task by task.
 
