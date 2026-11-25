@@ -14,6 +14,7 @@
     "dev:web": "npm run dev --workspace @siftmerit/web",
     "company:create": "npm run company:create --workspace @siftmerit/api --",
     "company:add-user": "npm run company:add-user --workspace @siftmerit/api --",
+    "ai:check": "npm run ai:check --workspace @siftmerit/api --",
     "mailbox:connect": "npm run mailbox:connect --workspace @siftmerit/worker",
     "mailbox:check": "npm run mailbox:check --workspace @siftmerit/worker",
     "test-set:send": "npm run test-set:send --workspace @siftmerit/worker --",

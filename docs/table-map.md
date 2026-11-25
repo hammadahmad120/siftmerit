@@ -61,7 +61,7 @@ job_requirements ─────────────────────
 | `ticks` | Which application, which requirement, the result (met, mentioned only, not met, unclear), the proof line, whether the proof was checked | met, "Worked 4 years as accountant at XYZ" | 32 |
 | `work_runs` | The kind of work, status (`waiting`, `running`, `done`, `failed`), which try it is on, a short fixed word for why it failed, and the created, started, finished and updated times. Which job it belongs to (can be empty) is added when `jobs` exists | reading round 1, running, try 1 | 10 (exists) |
 | `chat_messages` | Which job, who wrote it (HR or the agent), the text, the time | "Why is Ali third?" | 19 |
-| `ai_calls` | Which job (can be empty), purpose, model, tokens used, cost, time | read one CV | 13 |
+| `ai_calls` | One row per AI call, written once: which job (can be empty), the purpose, the AI company, the model and its thinking level, tokens in and how many of them came from the cache, tokens out and how many of them were thinking, the cost in dollars (worked out at the moment of the call), the result (`ok`, `wrong_answer`, `failed`) with a short fixed word for why, how long it took, the ID of the request or work item, the time. No instructions, no CV text and no answer | read one CV, `gpt-6-luna`, 4,120 in, 1,380 out, $0.001021, ok | 13 (exists) |
 
 Rules the database keeps:
 - The same email ID cannot be added twice to the same job.
@@ -69,6 +69,7 @@ Rules the database keeps:
 - An application has at most one tick per requirement.
 - A company has at most one job per one-time key. The form makes the key once, so a double click or a repeated request cannot save the same job twice.
 - A job's ID together with its company is allowed once. This lets a later table point at "company and job" together, so the database refuses a row that names one company and another company's job.
+- An AI call's job must be a job of the same company, and a call that ended `ok` has no error word while every other call has one.
 - A company has at most one unfinished run (`waiting` or `running`) of a kind. This is what refuses the same work being queued twice. When `jobs` exists it becomes one per job and kind.
 
 ## 4. Why it is shaped this way
@@ -101,6 +102,7 @@ applications: 10 | Ali | Accountant        | 2 Nov  | from an email
 | A requirement is removed | The requirement and its ticks, for every candidate | Everything else |
 | A job is closed | Applications and ticks of weak candidates. A candidate with no application left goes too | Strong candidates, the email list |
 | A candidate asks to be deleted | The candidate, their applications and ticks | The email ID, so it is not read again |
+| A job is deleted | (decided by the task that builds it) | Its rows in `ai_calls`, with the job left empty: the money was spent, and the company's total must stay true |
 
 ## 6. Known trade-off
 
@@ -134,5 +136,7 @@ The same three lines go into the SQL file of every table:
 1. Row level security is switched on.
 2. The browser-side roles (`anon` and `authenticated`) get no rights and no policies.
 3. The server role (`service_role`, used by the secret key) gets its rights written out.
+
+One table gives the server less: on `ai_calls` it may read and add rows, and may not change or delete one, because a row of the cost log is written once.
 
 So only our API and worker reach the data. They hold the secret key, which goes past the row rules, and that is why every repository reaches a company table only through the helper `forTenant`, which adds the `tenant_id` filter itself. Deleting a company row removes everything the company owns; deleting a sign-in account removes its member row, never the company.

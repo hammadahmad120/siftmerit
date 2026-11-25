@@ -8,7 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * company itself and the lookup that finds a user's company, so they have no
  * company filter to add.
  */
-export type TenantTable = "jobs" | "work_runs";
+export type TenantTable = "ai_calls" | "jobs" | "work_runs";
 
 type Values = Record<string, unknown>;
 

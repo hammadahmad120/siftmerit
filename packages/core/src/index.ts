@@ -12,6 +12,15 @@ export { createSecretClient, DatabaseError, databaseEnvShape, toDatabaseError } 
 export type { DatabaseEnv } from "./database.js";
 export { forTenant } from "./tenant-db.js";
 export type { TenantTable } from "./tenant-db.js";
+export { AiCallRepository } from "./ai-calls.repository.js";
+export type { AiCallErrorCode, AiCallResult, AiCallRow, NewAiCall } from "./ai-calls.repository.js";
+export { AiCallError, createAiCaller } from "./ai/call.js";
+export type { AiCaller, AiCallInput } from "./ai/call.js";
+export type { OutsideText } from "./ai/data-block.js";
+export { costUsd, KNOWN_MODELS, MODEL_PRICES } from "./ai/prices.js";
+export type { AiModel, ModelPrice, TokenCounts } from "./ai/prices.js";
+export { AI_THINKING_LEVELS, aiEnvShape } from "./ai/settings.js";
+export type { AiEnv, AiPurpose, AiThinking } from "./ai/settings.js";
 export { JobCreateKeyUsedError, JobRepository } from "./jobs.repository.js";
 export type { JobRow, JobStatus, JobSummaryRow, NewJob } from "./jobs.repository.js";
 export { WorkRunAlreadyActiveError, WorkRunRepository } from "./work-runs.repository.js";

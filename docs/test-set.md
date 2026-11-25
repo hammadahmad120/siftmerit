@@ -248,7 +248,7 @@ The emails land in the user's real mailbox, between real mail. They can be found
 - Used as they are, with the person's name and contact details. The user's decision of 2026-11-24.
 - Never in git, never in a demo or a screenshot.
 - Deleted from the mailbox and the database before the first pilot company.
-- Not sent to the product's AI model before task 13 has settled the "no training on our data" rule for the provider.
+- Not sent to the product's AI model before task 13 has settled the "no training on our data" rule for the provider. Settled on 2026-11-25 for OpenAI: its written terms say API data is not used for training, every call is sent with storing off, and data sharing is off in the account (`docs/decisions.md`).
 
 ## 9. What the user approved
 

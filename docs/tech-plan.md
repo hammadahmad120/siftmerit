@@ -36,7 +36,8 @@ Two goals shape the technical choices:
 | Mail | mailsift stays a separate MCP server. Our backend calls it over HTTP. |
 | Workflow | Plain code plus the work queue. No chain library (no LangChain, no LangGraph). |
 | Queue | BullMQ on Redis. The worker takes work items from it. Postgres keeps everything HR sees. No RabbitMQ. Decided on 2026-11-16; the first plan used a Postgres table polled by the worker. |
-| AI library | Vercel AI SDK for model calls, the forced output form, tool calling, streaming and the MCP client. |
+| AI library | Vercel AI SDK for model calls, the forced output form, tool calling, streaming and the MCP client. Version 7 since task 13. |
+| AI model | OpenAI, `gpt-6-luna` for both AI steps, each with its own model and thinking-level setting. Decided in task 13 on 2026-11-25; the test set decides whether it stays. |
 | Agent | A real agent in the chat panel, built with AI SDK tool calling. Its tools are our own workflow actions. It also connects to mailsift as an MCP client for read-only mail questions. |
 | Core flow | Steps 1 to 8 stay a fixed workflow. Mail is found and picked by code, never by AI. |
 | Screens | Hand-written Tailwind components, as in InstantBot. No component library. |
