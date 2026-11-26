@@ -13,10 +13,10 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
-| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and the job screens: the list at `/jobs`, the form at `/jobs/new` and a job's page at `/jobs/<id>` (section 10). |
-| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, `/v1/jobs` (create, list, get one; section 10) and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users. |
-| Worker | `services/worker` | `@siftmerit/worker` | Keeps running, takes work items from the queue and runs them (section 9). So far there is one kind, a demo item. It also holds the two mailbox scripts (section 7). |
-| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader, the database connection, the helper that keeps companies apart, the `jobs` and `work_runs` repositories and the work queue. |
+| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and the job screens: the list at `/jobs`, the form at `/jobs/new` and a job's page at `/jobs/<id>` (section 10), which shows the job's requirements and the button that drafts them (section 13). |
+| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, `/v1/jobs` (create, list, get one; section 10), `/v1/jobs/:jobId/requirements` (the list, and `POST .../draft` to start a draft; section 13) and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users and two development commands for AI calls. |
+| Worker | `services/worker` | `@siftmerit/worker` | Keeps running, takes work items from the queue and runs them (section 9). There are two kinds: a demo item, and a requirements draft, which makes the product's first AI call (section 13). It also holds the mailbox scripts (section 7). |
+| Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader, the database connection, the helper that keeps companies apart, the repositories for `jobs`, `job_requirements`, `work_runs` and `ai_calls`, the AI wrapper, the requirements draft and the work queues. |
 
 How they talk today:
 
@@ -28,10 +28,11 @@ API, Worker  --->  Core                         imported as a package
 API  --->  Supabase                             the database and the sign-in check
 API  --->  Redis                                adds a work item to the queue
 Worker  --->  Redis                             takes work items out and runs them
-Worker  --->  Supabase                          saves the status of each run
+Worker  --->  Supabase                          saves the status of each run, and the work's results
+Worker  --->  OpenAI                            the AI calls, through the wrapper in core
 ```
 
-The API and the worker never talk to each other directly; the queue in Redis sits between them (section 9). The AI model is not connected yet. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The browser never reads the database: Supabase gives it a sign-in token, and every piece of data comes from the API.
+The API and the worker never talk to each other directly; the queue in Redis sits between them (section 9). Only the worker calls the AI model, always through the wrapper in core (section 12); the API never does. The mailbox is reached only by two development scripts (section 7); the API and the worker do not use it yet. The browser never reads the database: Supabase gives it a sign-in token, and every piece of data comes from the API.
 
 ## 2. Running it
 
@@ -40,12 +41,14 @@ Run from the repo root, each in its own terminal.
 | Command | What it starts |
 |---|---|
 | `npm run dev:api` | The API on port 4100. Health check: `http://localhost:4100/v1/health`. |
-| `npm run dev:worker` | The worker. It listens to the queue, runs work items and saves their status. Redis must be running. |
+| `npm run dev:worker` | The worker. It listens to the queues, runs work items and saves their status. Redis must be running, and `OPENAI_API_KEY` must be set. |
 | `npm run dev:web` | The web app on `http://localhost:3100`. |
 | `npm run typecheck` | The type check for all four parts. It must pass after every task. |
 | `npm run lint` | ESLint for the web app, with the Next.js rules. A warning fails it. It must pass after every task. |
 | `npm run company:create` | Creates a company and its first user (section 8). |
 | `npm run company:add-user` | Adds a user to a company (section 8). |
+| `npm run ai:check` | Development only. One tiny real AI call through the wrapper (section 12). It costs money. |
+| `npm run requirements:try` | Development only. Drafts one job's requirements without the queue (section 13). It costs money. |
 | `npm run mailbox:connect` | Development only. Gets the test mailbox's secret with one Allow click (section 7). |
 | `npm run mailbox:check` | Development only. Lists five emails from the test mailbox through mailsift (section 7). |
 
@@ -56,7 +59,7 @@ Redis is not started by any of these. It is a program installed on the machine t
 ### Settings
 
 - There is one `.env` file, at the repo root, for every part. `.env.example` lists every setting.
-- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` too, because it saves the status of its work; it does not start without them.
+- Most settings have a default. The three Supabase settings have none, and the API does not start without them. The two `NEXT_PUBLIC_SUPABASE_` settings have none either: the web app starts without them, but every page then shows "Sign-in is not set up". The mailbox settings have none and are needed only by the two mailbox scripts. The worker needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` too, because it saves the status of its work, and `OPENAI_API_KEY`, because it makes the AI calls; it does not start without the three. The API makes no AI call and starts without the key.
 - A setting already present in the shell wins over the file. For example, `LOG_LEVEL=debug npm run dev:api`.
 - A setting is added by the task that first uses it.
 
@@ -71,6 +74,8 @@ Redis is not started by any of these. It is a program installed on the machine t
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | API, worker, company scripts | none |
 | `SUPABASE_PUBLISHABLE_KEY` | API | none |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Web app (sign-in) | none. The same values as `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` |
+| `OPENAI_API_KEY` | Worker, `ai:check`, `requirements:try` | none |
+| `AI_MODEL_REQUIREMENTS`, `AI_MODEL_CV_READ`, `AI_THINKING_REQUIREMENTS`, `AI_THINKING_CV_READ`, `AI_TIMEOUT_MS` | Worker, `ai:check`, `requirements:try` | `gpt-6-luna`, `gpt-6-luna`, `none`, `none`, `60000` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Mailbox scripts | none |
 | `DEV_MAILBOX_REFRESH_TOKEN` | `mailbox:check` | none |
 | `MAILSIFT_URL` | `mailbox:check` | `http://127.0.0.1:3000/mcp` |
@@ -90,12 +95,14 @@ Core is a workspace package: a folder in the repo that the API and the worker im
 - `loadSettings(partName, schema)`: reads the root `.env` and checks the settings against a zod schema.
 - `sharedEnvSchema`: the settings both services use (`NODE_ENV`, `LOG_LEVEL`, `REDIS_URL`). A service adds its own with `sharedEnvSchema.extend({ ... })`.
 - The database (`src/database.ts`): `createSecretClient`, the client made with the secret key; `DatabaseError`, the error of a failed database call; and `databaseEnvShape`, the two database settings, which the API and the worker each add to their own settings.
-- `forTenant(db, tenantId)` (`src/tenant-db.ts`): the one door to a company's rows. It adds the company filter by itself. See section 8.
+- `forTenant(db, tenantId)` (`src/tenant-db.ts`): the one door to a company's rows. It adds the company filter by itself, and hands the company to a database function. See section 8.
 - `JobRepository` (`src/jobs.repository.ts`): the only code that touches the `jobs` table. See section 10.
+- `JobRequirementRepository` (`src/job-requirements.repository.ts`): the only code that touches the `job_requirements` table. See section 13.
+- `draftRequirements` and `checkDraft` (`src/requirements/draft.ts`): the instructions, the check by code and the function that drafts one job's requirements. See section 13.
 - `WorkRunRepository` (`src/work-runs.repository.ts`): the only code that touches the `work_runs` table. See section 9.
 - `AiCallRepository` (`src/ai-calls.repository.ts`): the only code that touches the cost log table `ai_calls`. See section 12.
 - The AI wrapper (`src/ai/`): `createAiCaller`, the one door to the AI model; `AiCallError`; `aiEnvShape`, the AI settings; and the price list. See section 12.
-- The work queue (`src/queue.ts`): the queue's name, the shape of a work item, `DemoQueue` for the API, `createDemoWorker` for the worker, `isFinalFailure` and `isWorkerLost` for telling how an item failed, and `createQueueTroubleLogger`. See section 9.
+- The work queues (`src/queue.ts`): the general class `WorkQueue`; for each of the two queues its name, the shape of its work item, the adding side for the API (`DemoQueue`, `RequirementsQueue`) and the running side for the worker (`createDemoWorker`, `createRequirementsWorker`); `NoMoreTriesError`, `isFinalFailure` and `isWorkerLost`; and `createQueueTroubleLogger`. See section 9.
 
 **Traps**
 
@@ -174,14 +181,15 @@ A browser hides an answer from a page on another address unless the answering si
 
 ## 5. Worker (`services/worker`)
 
-The worker loads its settings, builds the logger with `service: "worker"` and starts listening to the queue. That listening is what keeps the program running. It has no web address; nothing calls it. It only takes work items out of Redis.
+The worker loads its settings, builds the logger with `service: "worker"` and starts listening to its queues, with one listener per queue. That listening is what keeps the program running. It has no web address; nothing calls it. It only takes work items out of Redis.
 
-- `src/index.ts` starts the listener, logs when it connects, logs every failed item, and handles the stop signals.
-- `src/handlers/` holds one file per kind of work. A handler is the work itself. So far there is `demo.handler.ts`.
+- `src/index.ts` starts the listeners, puts the same three listeners on each through one function, `watch` (connected, connection trouble, a failed try), and handles the stop signals.
+- `src/handlers/` holds one file per kind of work. A handler is the work itself: `demo.handler.ts` and `requirements.handler.ts`.
+- It builds one AI caller at start and hands it to the handlers that make AI calls. So it reads the AI settings and does not start without `OPENAI_API_KEY`.
 
 How an item is run, the clean stop and the traps are in section 9.
 
-The folder `src/scripts/` holds the two mailbox scripts. They are tools a developer runs by hand, not part of the running worker, and they have their own settings file so the worker starts without any mailbox setting. See section 7.
+The folder `src/scripts/` holds the mailbox scripts. They are tools a developer runs by hand, not part of the running worker, and they have their own settings file so the worker starts without any mailbox setting. See section 7.
 
 ## 6. Web app (`apps/web`)
 
@@ -399,11 +407,22 @@ company.delete("jobs").eq("id", jobId);                              // filter a
 
 - Each function gives back the Supabase library's own query, so the caller goes on with `.eq(...)`, `.order(...)` or `.single()` as usual. A filter added later only narrows the result; it cannot widen it past the company.
 - `insert` sets `tenant_id` itself, whatever the values say. `update` refuses a change that sets `tenant_id`, and an empty company ID is refused at once.
-- The tables it may reach are a fixed list in that file, `TenantTable`: `jobs` and `work_runs`. A new table with company data adds its name there, and its repository uses the helper for every query.
+- The tables it may reach are a fixed list in that file, `TenantTable`: `ai_calls`, `job_requirements`, `jobs` and `work_runs`. A new table with company data adds its name there, and its repository uses the helper for every query.
+- A fifth door, `call`, runs a database function and always hands it the company as `p_tenant_id`, whatever the arguments say. The functions it may run are a second fixed list, `TenantFunction`. See "Database functions" below.
 - Every repository function takes the company's ID as its first argument. In the API that ID comes from the sign-in check; in the worker from a work item that passed its shape check.
 - `tenants` and `tenant_members` are not reached through it. They are the company itself and the lookup that finds a user's company, so there is no company filter to add.
 
 **There is no automatic separation test yet.** It was planned for task 6, then for task 11, and was taken out of task 11; it has no task now (open point in [decisions.md](decisions.md)). Until it exists, each task checks its new code by hand with a made-up company ID, which must find, change and delete nothing. That proves the filter is applied. It does not replace a test with two real companies and real sign-in tokens.
+
+### Database functions
+
+Our code normally sends the database one statement at a time. A database function runs several statements inside the database as one unit, a transaction: all of them happen or none does. It is used where two steps must never be seen half done. So far there is one, `replace_job_requirements` (section 13).
+
+- A function goes past the filter that `forTenant`'s other doors add. So every function takes the company's ID as `p_tenant_id` and uses it in every statement it runs. That is a rule for writing one, and it is checked by reading the SQL.
+- A repository calls it only through `forTenant(db, tenantId).call(name, args)`, never through the Supabase library's `rpc` directly.
+- Postgres lets everyone run a new function unless told otherwise. The SQL file takes the right away from `public`, `anon` and `authenticated` and gives it to `service_role` only.
+- It is written with `security invoker` (it has only the caller's rights) and `set search_path = ''` (every table name needs its schema written out).
+- In the Supabase dashboard it is under Database, then Functions, with the schema `public`. It is not an "Edge Function".
 
 ### SQL files
 
@@ -456,7 +475,32 @@ One run can have one work item or many. Reading 200 CVs will be one run with abo
 
 **What HR sees is always read from Postgres, never from Redis.**
 
-So far there is one queue, `demo`, with one kind of item that does no real work. It exists to prove the path and the failure cases. Everything with "demo" in its name is removed when the first real work exists (task 22); the table, the repository and the failure handling stay.
+There are two queues.
+
+| Queue | An item is | Tries | At the same time |
+|---|---|---|---|
+| `demo` | Pretend work, to prove the path and the failure cases | 3, waits of 2 and 4 seconds | 1 |
+| `requirements` | One requirements draft for one job (section 13) | 3, waits of 2 and 4 seconds | 5 |
+
+Each kind of work gets its own queue, because a queue hands out its items in the order they arrived and has its own setting for how many run at the same time. A draft that HR is watching must not wait behind hundreds of CVs.
+
+"At the same time" (BullMQ's `concurrency`) is how many items one worker program works on at the same moment. It is one program and one thread: a draft spends nearly all its time waiting for the AI service's answer, so the worker can wait for five answers as easily as for one. It fetches a sixth item only when one of the five is finished.
+
+Everything with "demo" in its name is removed in task 22; the table, the repository and the failure handling stay.
+
+### How a handler tells the queue how it went
+
+A handler never sends the queue a message. The signal is how the function ends, because BullMQ is the one that calls it:
+
+| The handler | What the queue does |
+|---|---|
+| Returns | Marks the item completed. It is never run again |
+| Throws an ordinary error | Counts one failed try. If tries are left, the item is kept aside for the wait and handed out again; if none are left, it is failed |
+| Throws a `NoMoreTriesError` | Fails the item at once, whatever number of tries is left |
+
+`NoMoreTriesError` is BullMQ's own `UnrecoverableError`, passed on by core under a name that says what it is for. A handler uses it when a second try cannot help or would cost money for nothing.
+
+The item's state in Redis and the run's row in Postgres are two records with two readers. BullMQ reads the first to decide about a retry and knows nothing about Postgres. HR's page reads the second, which only our handler writes. That is why a handler updates the row before it throws.
 
 ### The path of one click
 
@@ -508,11 +552,11 @@ The demo panel has one button for each.
 
 **A killed worker ("Slow").** A worker holds a 30-second lock on the item it runs and renews it while it lives. A killed worker stops renewing. The item is taken back and run again, by any worker, about a minute later: the lock must run out, and the check for stuck items runs every 30 seconds. This does not count as a try. It is allowed once. If the item's worker dies a second time, the next worker to pick the item up is told it failed, without running the handler, and marks the row `failed` with `worker_lost`.
 
-**Duplicates (any button, clicked twice).** A rule in the database allows a company only one unfinished run of a kind. The second click's row is refused, so no second row, no second ID and no second item exist, and the API answers 409 with the code `already_queued`. It is a database rule and not a check in our code, because two clicks at the same moment would both pass a check; the database lets only one row in.
+**Duplicates (any button, clicked twice).** A rule in the database allows only one unfinished run of a kind: per company for a run that belongs to no job (the demo), per job for a run that belongs to one (a requirements draft). Two jobs of one company can be drafted at the same moment, the same job never twice. The second click's row is refused, so no second row, no second ID and no second item exist, and the API answers 409 with the code `already_queued`. It is a database rule and not a check in our code, because two clicks at the same moment would both pass a check; the database lets only one row in.
 
 ### Stuck runs
 
-If a worker dies and no worker ever comes back, nothing updates the row, and it says `running` for ever. With the duplicate rule that would also block the company's next run. So before a new run is added, the API closes that company's unfinished runs of the same kind that have not changed for 10 minutes: `failed`, with the error `timed_out`.
+If a worker dies and no worker ever comes back, nothing updates the row, and it says `running` for ever. With the duplicate rule that would also block the company's next run. So before a new run is added, the API closes that company's unfinished runs of the same kind that have not changed for 10 minutes: `failed`, with the error `timed_out`. For a requirements draft it is that job's runs, after 5 minutes.
 
 This only happens when someone starts a new run. A check that runs by itself is an open point for task 22, and real work will pick its own time limit.
 
@@ -527,26 +571,26 @@ The worker's `failed` event fires after **every** failed try, not only the last.
 
 - **IDs only.** An item holds its run's ID, the company ID and the API's request ID, never names or text. It is saved in Redis and its fields are written to the logs. This is a rule for all code in `CLAUDE.md`. The demo's `mode` is one fixed word from a list and goes away with the demo.
 - **The company ID comes from the signed-in user,** never from the request.
-- **The shape is defined once,** as a zod shape in core (`demoWorkItemSchema`). The API builds an item from it and the worker checks every item against it before running it, because an item comes from Redis, not from our own memory.
+- **The shape is defined once per queue,** as a zod shape in core (`demoWorkItemSchema`, `requirementsWorkItemSchema`). The API builds an item from it and the worker checks every item against it before running it, because an item comes from Redis, not from our own memory.
 - **Every log line about an item carries four IDs:** the work item ID, the run ID, the request ID and the company ID. The request ID is the one the API logged for the click.
 - **Finished items are cleaned up in Redis.** The last 1,000 done and 5,000 failed are kept.
 
 ### The two sides
 
-**The adding side (`DemoQueue`, used by the API)** must never make a web request wait.
+**The adding side (the class `WorkQueue`, used by the API)** must never make a web request wait. `DemoQueue` and `RequirementsQueue` are that class with a name and a retry setting.
 
 - It is created once, when the API starts, with `enableOfflineQueue: false`: when Redis goes away, adding fails at once.
 - It keeps its own "ready" mark and refuses to add until its first connection is made. Without the mark, a queue created while Redis is down keeps the add waiting until Redis comes up.
 - A refused add throws `QueueUnavailableError`, which the API's service turns into a 503.
 - So the API starts even when Redis is stopped, and the queue starts working by itself when Redis comes up.
 
-**The running side (`createDemoWorker`, used by the worker)** waits patiently. When Redis cannot be reached it keeps trying and carries on when Redis is back. It runs one item at a time.
+**The running side (`createDemoWorker` and `createRequirementsWorker`, used by the worker)** waits patiently. When Redis cannot be reached it keeps trying and carries on when Redis is back. The demo side runs one item at a time, the requirements side five.
 
 Both sides report connection errors through `createQueueTroubleLogger`, which logs one line and then stays quiet for 30 seconds.
 
 ### The clean stop
 
-Ctrl+C sends the worker a signal (SIGINT). A restart after a file change, or a hosting service stopping the program, sends another (SIGTERM). On either the worker takes no new item, lets the running item finish, and then ends. An item still waiting stays in Redis for the next worker. A second signal ends the worker at once.
+Ctrl+C sends the worker a signal (SIGINT). A restart after a file change, or a hosting service stopping the program, sends another (SIGTERM). On either the worker takes no new item on any queue, lets the running items finish, and then ends. An item still waiting stays in Redis for the next worker. A second signal ends the worker at once.
 
 A clean stop is not a kill. To see the killed-worker case the worker must be ended hard. From the repo root, this ends every process of `npm run dev:worker`:
 
@@ -584,6 +628,8 @@ Looking inside with `redis-cli`, which comes with Redis:
 - **Every queue and worker needs an `error` listener.** Without one, a connection error stops the whole program.
 - **A read that only counts rows can hide a missing table.** With the Supabase library, `select(..., { head: true })` on a table that does not exist came back with no error and an empty count. Read one row to be sure.
 - **Redis saves to disk only from time to time.** A crash of the machine can lose the items added since the last snapshot. Fine for development; for production see the open points in [decisions.md](decisions.md).
+- **A handler that returns has told the queue "completed", whatever the run's row says.** The requirements handler returns after it marked a run failed for an empty list, because there is nothing to try again. Look at the row in Postgres, not at the queue, to know how a run ended.
+- **Until the SQL file `20261125140000_work_runs_job.sql` is applied, every read of `work_runs` fails,** because the repository asks for the column `job_id`.
 - **Items are handed out in the order they arrived.** One company's 200 items stand in front of another company's 5. Taking turns needs more than small items; it is an open point for task 30.
 - **This Redis is shared by everything on the machine that points at port 6379.** Another project using it with a queue also named `demo` would mix its items with ours. Nothing else uses it today.
 
@@ -644,7 +690,7 @@ A slow call can save the job and still lose its answer. HR sees an error, clicks
 - **The list** (`job-list.tsx`) shows each job as a card: the title, the status label, up to three subject phrases and then "+2 more", and the two dates. The whole card is one link. It asks the API each time the page appears.
 - **The form** (`job-form.tsx`) fills the posting date with "7 days ago" by the user's own computer. An emptied date field is not sent, and the API then uses 7 days back by its own clock.
 - **The chip field** (`subject-words-field.tsx`) is written by us; there is no component library. Its whole value (the chips, the text being typed, and the small line that says why a phrase was not added) is kept by the form, so the form can turn leftover text into a chip when the button is clicked. Enter adds a chip and does not send the form. A comma ends a phrase, typed or pasted. Backspace in the empty field removes the last chip. The cross is a real button.
-- **A job's page** (`job-details.tsx`) shows the description as plain text, never as HTML.
+- **A job's page** (`job-details.tsx`) shows the subject words, then the "Requirements" section (section 13), then the description as plain text, never as HTML. The requirements stand above the description because a long description would push them far down.
 - The "New job" page and a job's page have a "Back to jobs" button at the top (`back-to-jobs.tsx`).
 
 ### Traps
@@ -714,7 +760,7 @@ The product itself can only read mail; that is why sending is a separate script 
 
 ## 12. AI calls
 
-Every call to an AI model goes through one function in core, the wrapper. Nothing in the product calls it yet: the first real caller comes with task 14. Today the only caller is the check command at the end of this section.
+Every call to an AI model goes through one function in core, the wrapper. The product's first caller is the requirements draft (section 13), run by the worker. The other two callers are development commands: the check command at the end of this section, and `npm run requirements:try`.
 
 ### The pieces
 
@@ -778,10 +824,130 @@ It makes one tiny real call, booked on that company, and prints the checked answ
 - **A model must have a price in `prices.ts`.** The settings check refuses any other, so a cost is never unknown. A new model means one new entry there, read from the provider's price list.
 - **OpenAI retires models on short notice.** In November 2026 three cheap models on its price list were weeks from being switched off. Read its retirement list as well as its price list when choosing a model.
 - **The strict answer form allows no optional fields.** A field that can be empty is written as nullable (`z.string().nullable()`), not optional.
+- **The strict form takes a list of objects and a fixed list of words** (`z.array(z.object(...))`, `z.enum([...])`), seen with the requirements draft. It has no rule for a text's length or a list's size, so the caller's check by code keeps those. A nullable field has not been tried yet.
+- **The answer's structure is not written in the instructions.** It travels in its own part of the request, as the schema. The instructions only say what the fields mean and how to choose between the allowed values.
 - **The wrapper tries a call once.** A second try is the work item's own retry. The retry on "slow down" and the limit on calls side by side come with task 30.
 - **A failed call can cost nothing and is still logged**, with zero tokens. A wrong answer costs its full price.
 - **If the cost row cannot be written, the answer is still given back.** The numbers are then in an error log line, "ai call: the cost log row was not saved".
 - **The library's own error message can repeat what we sent.** It is kept in `AiCallError.cause` for a developer and never logged; the check command prints it in development only.
-- **The API and the worker do not read the AI settings yet.** The first task that makes an AI call adds `...aiEnvShape` to that part's settings, and from then on the part does not start without `OPENAI_API_KEY`.
+- **The worker reads the AI settings and does not start without `OPENAI_API_KEY`.** The API does not read them. A part that makes its first AI call adds `...aiEnvShape` to its own settings.
 - **CV text is not masked yet.** Masking is task 28 and must be in place before a real CV is sent through the wrapper by the product.
 - **The price list holds one more rule for `gpt-6-luna`:** a prompt of more than 272,000 tokens costs double on the input side and one and a half times on the output side. A CV is nowhere near that.
+
+## 13. Requirements
+
+A job's requirements are the list every CV is later checked against. The AI drafts the list from the job description when HR clicks "Draft requirements". HR cannot edit or confirm it yet (task 16).
+
+### The table
+
+`job_requirements` (SQL file `20261125130000_job_requirements.sql`):
+
+| Column | Holds |
+|---|---|
+| `job_id`, with `tenant_id` | The job. The pair points at the job's row, so the database refuses a row that names one company and another company's job |
+| `text` | The requirement, 1 to 500 characters |
+| `kind` | `must` (must-have: a candidate who misses it is dropped), `preferred` (strongly wanted) or `nice` (nice to have) |
+| `if_silent` | What a CV that says nothing about it means: `ask` (ask the candidate) or `missing` (count as missing) |
+| `position` | Its place in the list, from 1. Not kept unique; task 16 decides how reordering works |
+
+Deleting a job removes its requirements. The five words are the ones the test set uses, so the eval compares without translating.
+
+### The pieces
+
+- `packages/core/src/requirements/draft.ts`: the instructions, the answer form, `checkDraft` and `draftRequirements`.
+- `packages/core/src/job-requirements.repository.ts`: reads a job's list and swaps it.
+- `services/worker/src/handlers/requirements.handler.ts`: runs one draft as a work item.
+- `services/api/src/services/requirement.service.ts`: the two addresses.
+- `apps/web/src/components/job-requirements.tsx` and `apps/web/src/lib/use-ask-while.ts`: the section on the job's page, and the polling.
+
+### The addresses
+
+| Address | What it does | Answers |
+|---|---|---|
+| `GET /v1/jobs/:jobId/requirements` | The job's list in order, and its newest draft run or `null` | 200, or 404 `job_not_found` |
+| `POST /v1/jobs/:jobId/requirements/draft` | Starts a draft. No body | 202 with the run. 404 `job_not_found`. 409 `job_not_draft` or `already_drafting`. 503 `queue_unavailable` |
+
+Every user of the company may read and draft. One address gives the list and the run's status together on purpose: the page asks it while a draft runs, and the moment the run says `done` the new list is in the same answer.
+
+### The path of one click
+
+1. HR clicks "Draft requirements". The click is the go-ahead to spend one AI call. Creating a job drafts nothing.
+2. The API finds the job in HR's company and checks that it is a draft.
+3. It closes a run of this job that has not changed for 5 minutes, then saves a run with the kind `requirements_draft` and the status `waiting`. The database refuses a second unfinished run for the job, and the API answers 409.
+4. It adds an item to the `requirements` queue with four IDs (run, company, job, request) and answers 202.
+5. The worker takes the item, marks the run `running` and calls `draftRequirements`.
+6. That function reads the job, stops before any cost when the job is gone or not a draft, and calls the wrapper with the purpose `requirements`. The job's title and description go in as data between the markers. The run's ID is the call's trace ID, so one ID links the page, both logs and the cost log.
+7. The form is checked, then `checkDraft` runs.
+8. `replaceForJob` swaps the job's list through the database function.
+9. The handler marks the run `done`, or `failed` with a fixed word.
+10. The page, which asks every 3 seconds, gets the list.
+
+A draft is about 1,700 tokens in and 200 to 350 out, about $0.0004, and took 2.5 to 7 seconds in the first runs.
+
+### The instructions
+
+They are one text in `draft.ts`, in four steps: split a line that holds two skills, write each requirement, choose the kind, choose the "silent CV" mark.
+
+- **Splitting.** Only "A and B" where A and B are different skills that a person can have one without the other. Not "A or B", not one skill area with its examples, not tools after "such as", not a line with a condition inside.
+- **The kind.** Clear words about one line decide. A heading over the whole list does not, and neither do words of strength such as "strong" or "hands-on". Otherwise must-have is only for the years, the core skills the title names, a required degree, portfolio or licence, and the location. The model is told to expect three to five.
+- **The mark.** `ask` for a city, a language, a soft skill, a portfolio link. `missing` for a skill, a tool, the years, a degree.
+- A requirement is written in the advert's language. A range of years is a minimum.
+
+### The check by code
+
+`checkDraft` first tidies: spaces, an empty text, a text that is already in the list (capital letters do not make it different). Then it refuses the whole list when it is empty, has more than 30 requirements, or holds a requirement of more than 500 characters. A list with no must-have is accepted; the page says so, and confirming is refused later.
+
+A refused list was paid for. It shows in the cost log as `wrong_answer` with `check_failed`.
+
+### The swap
+
+`replace_job_requirements(p_tenant_id, p_job_id, p_requirements)` deletes the job's old rows and adds the new ones inside one transaction, so the list is always the whole old one or the whole new one. It locks the job's row first and checks that the job is still a draft, so a swap cannot cross a confirm. It answers with one word: `replaced`, `job_not_found` or `job_not_draft`. A second draft therefore replaces the first, and only while the job is a draft.
+
+### How a draft can end
+
+| What happened | Tried again | Word on the run | What HR reads |
+|---|---|---|---|
+| The list is saved | | (done) | The list |
+| Time-out, "slow down", an error at the AI company | Yes, 3 tries | `ai_unavailable` | "The AI service did not answer. Try again in a moment." |
+| An empty list | No | `no_requirements` | "No requirements could be found in the job description." |
+| Over 30, a line over 500, a broken or cut-off answer | No | `bad_draft` | "The draft could not be used. Try again." |
+| A wrong API key | No | `ai_setup` | "The AI service is not set up. Please tell support." |
+| The job was confirmed meanwhile | No | `job_not_draft` | "This job's requirements are already confirmed." |
+| Redis was away at the click | No | `queue_unavailable` | "The work queue could not be reached. Try again in a moment." |
+| Anything else on the last try, a lost worker, a stuck run | | `work_failed`, `worker_lost`, `timed_out` | "The draft did not finish. Try again." |
+
+A refused list is not tried again because it was paid for, so HR decides with a click whether to pay again. The most one click can cost is three calls.
+
+### The section on the job's page
+
+Four states, all read from the API: no list yet, drafting, the list in three groups (must-have, preferred, nice to have) with a small label for the "silent CV" mark on each line, and failed with the reason. The button reads "Draft requirements", "Draft again" or "Try again", and is shown only while the job is a draft.
+
+While a run is unfinished the page asks again every 3 seconds. `useAskWhile` holds every case:
+
+- **It stops** when the run is done or failed, when the page is left, when the sign-in has ended (401) or the job is gone (404), and after 5 minutes without an end. Then the page says "This is taking longer than usual", offers "Check again", and the button becomes "Try again".
+- **It holds back** while the tab is in the background, and asks once when the tab is shown again.
+- **Calls never pile up.** The 3 seconds count from the moment an answer arrives, not from a clock.
+- **One failed status call does not end the wait.** The page shows "Cannot reach the server. Trying again..." and goes on.
+- After a reload the page reads the status once, and asks again only if a run is unfinished.
+
+This is polling. Pushing the status to the page (server-sent events) was left for later: the draft sends one message, and the worker is another program than the API. The asking sits in one file so it can be swapped.
+
+### The development command
+
+```
+npm run requirements:try -- --company test-nextbridge --job <the job's ID>
+```
+
+It runs `draftRequirements` directly, without the queue, saves the list and prints it with the call's row in the cost log. The job's ID is the last part of the job page's address. It costs one draft. It stays until the eval runner of task 15 can do the same.
+
+### Traps
+
+- **The kinds are a first guess, and they change from run to run.** On the AI engineer advert of the test set two runs of the same instructions gave different must-haves, and one split a line that holds a condition. Most adverts do not say which line is a must-have. Measuring and tuning this is task 15; HR setting the kinds by hand is task 16.
+- **The examples inside the instructions are made up.** None is a line of the two adverts in `test-set/jobs/`. An advert the model was shown the answer for measures nothing in the eval.
+- **Instructions are tested like code.** The first version read well and still did not split the main case; a concrete shape ("in a line A and B or C, A is one requirement") fixed it.
+- **Both SQL files must be applied.** With only the first, every read of a run fails, and the section shows an error.
+- **One gap is accepted.** A worker that dies after the list is saved and before the run is marked done makes the next try draft again. The job still ends with one whole list, and it costs one more call.
+- **"Draft again" asks no "are you sure".** HR has nothing of their own in the list yet. Task 16 adds the warning, or offers a redraft only when the description changed.
+- **The limits are written twice:** 500 characters in `job-requirements.repository.ts` and in the SQL file. Change both together.
+- **A job description is not masked.** It is not CV text.
+- **A job cannot be edited yet,** so a wrong description means a new job.

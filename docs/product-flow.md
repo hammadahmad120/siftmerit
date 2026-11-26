@@ -41,16 +41,18 @@ HR enters:
 The title was added on 2026-11-24. The reason is in [decisions.md](decisions.md).
 
 ### Step 2: Requirements are agreed
-The AI pulls the requirements out of the job description and gives each one two marks:
+HR clicks "Draft requirements" on the job's page. Creating a job drafts nothing. The AI then pulls the requirements out of the job description and gives each one two marks:
 
 - **Its kind:** **must-have**, **preferred** (strongly wanted) or **nice to have** (an extra). Always exactly one of the three.
 - **What a silent CV means:** "ask the candidate" (a city, a language, a soft skill: things people leave off a CV and one question settles) or "count as missing" (a skill, the years of experience, the domain: things a CV must show).
 
-A requirement that holds two different skills ("Python, and TypeScript or JavaScript") is written as two requirements.
+A requirement that holds two different skills ("Python, and TypeScript or JavaScript") is written as two requirements. Alternatives ("n8n, Make or Zapier") and one skill area named with its examples stay one requirement. The AI keeps must-have for deal-breakers and usually gives three to five.
+
+While the job is a draft HR can draft again; the new list replaces the old one.
 
 HR edits the list, changes any kind or mark, adds or removes requirements, and confirms. The list needs at least one must-have. No CV is read before HR confirms.
 
-Changed on 2026-11-25. Before that there were two kinds (must, nice to have) and HR picked strict or lenient. The reasons are in [decisions.md](decisions.md).
+Changed on 2026-11-25. Before that there were two kinds (must, nice to have) and HR picked strict or lenient. The click, the redraft and the splitting rule were added on 2026-11-26 (task 14). The reasons are in [decisions.md](decisions.md).
 
 ### Step 3: Saved candidates from past jobs (HR's choice)
 When creating a job, HR can pick past jobs to bring saved candidates from. HR confirms before any AI is used. Those candidates are then scored against the new requirements from their saved CV text, before any mail is read. Nothing is checked automatically.

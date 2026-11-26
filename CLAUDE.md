@@ -93,13 +93,14 @@ Run from the repo root.
 
 - `npm install`: installs the libraries for every part.
 - `npm run dev:api`: starts the API on port 4100 and restarts it when a file changes. Health check: `http://localhost:4100/v1/health`.
-- `npm run dev:worker`: starts the worker and reruns it when a file changes. It listens to the work queue in Redis, runs each work item and saves its status in Postgres. Redis must be running; on the development machine it starts at boot (`redis-cli ping` answers `PONG`). It needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in `.env`.
+- `npm run dev:worker`: starts the worker and reruns it when a file changes. It listens to the work queue in Redis, runs each work item and saves its status in Postgres. Redis must be running; on the development machine it starts at boot (`redis-cli ping` answers `PONG`). It needs `SUPABASE_URL`, `SUPABASE_SECRET_KEY` and `OPENAI_API_KEY` in `.env`, because it makes the AI calls.
 - `npm run dev:web`: starts the web app on `http://localhost:3100` and reloads it when a file changes.
 - `npm run typecheck`: checks every part that has a `typecheck` script.
 - `npm run lint`: checks the web app's code with ESLint and the Next.js rules. A warning fails it. When a rule flags something that is fine, the line gets a short comment saying why, or that one rule is switched off after asking the user.
 - `npm run company:create -- --company "<name>" --email <email>`: creates a company and its first user, the owner. `--test` marks a test company, `--password` sets the password by hand, `--slug` sets the short name by hand.
 - `npm run company:add-user -- --company <short name> --email <email>`: adds a user to a company as a member.
 - `npm run ai:check -- --company <short name>`: development only. Makes one tiny real AI call through the wrapper, booked on that company (use the test company), and prints the checked answer and the call's row in the cost log. `--wrong` shows a refused answer. It needs `OPENAI_API_KEY` in `.env` and costs a small fraction of a cent.
+- `npm run requirements:try -- --company <short name> --job <job ID>`: development only. Drafts one job's requirements without the queue, saves them and prints them with the call's row in the cost log. The job's ID is the last part of the job page's address. It costs one draft, about $0.0004.
 - `npm run mailbox:connect`: development only. Gets the test mailbox's secret with one Allow click and prints the line to paste into `.env`. Needed again when the secret ends (after 7 days while the Google project is in "Testing").
 - `npm run mailbox:check`: development only. Lists five emails from the test mailbox through mailsift. mailsift must be running first, in its own terminal, from its own folder: `npm run dev:env -- --http` (port 3000).
 - `npm run test-set:send`: development only. Prints the emails of the test set in the order of sending and sends nothing. With `-- --send` it sends every email not sent yet to the test mailbox, from the Gmail account named in `.env`, and notes each one in `test-set/sent.json` (ignored by git), so a second run sends nothing twice. ID words after it (`-- --send ai-w01`) send only those.

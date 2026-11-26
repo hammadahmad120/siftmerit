@@ -1,6 +1,6 @@
 # Table map
 
-The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist. Updated on 2026-11-24 (tasks 10 and 11): `work_runs` and `jobs` exist.
+The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist. Updated on 2026-11-24 (tasks 10 and 11): `work_runs` and `jobs` exist. Updated on 2026-11-25 (task 13): `ai_calls` exists. Updated on 2026-11-26 (task 14): `job_requirements` exists, a run can belong to a job, and the first database function exists.
 
 This is a map, not the SQL. Each table's SQL is written in the task that first needs it. The columns below are a first sketch; the exact columns are settled in that task. This doc is updated whenever a table is added or its links change.
 
@@ -54,12 +54,12 @@ job_requirements ─────────────────────
 | `tenant_members` | Which sign-in account is in which company, and its role: `owner` or `member`. One user belongs to one company. Nothing is restricted by the role yet | Sara is in Acme, owner | 6 (exists) |
 | `mailbox_connections` | Mailbox address, the secret (encrypted), status, last error | hr@acme.com, connected | 21 |
 | `jobs` | Title (the job's short name on our screens, typed by HR), job description, subject words (a list of 1 to 10 phrases), posting date, status (`draft`, `open`, `closed`), the form's one-time key, and who created it. Added by later tasks when first used: when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, draft | 11 (exists) |
-| `job_requirements` | Which job, the requirement text, its kind (must-have, preferred or nice to have), what a silent CV means for it (ask the candidate, or count as missing), its place in the list | "3 years experience", must-have, count as missing | 14 |
+| `job_requirements` | Which job, the requirement text (up to 500 characters), its kind (`must`, `preferred` or `nice`: must-have, preferred, nice to have), what a silent CV means for it (`ask` the candidate, or count as `missing`), its place in the list | "3 years experience", must-have, count as missing | 14 (exists) |
 | `job_emails` | Which job, Gmail's email ID, subject, sender, date, picked by HR or not, status, skip reason. No email body and no attachment | "Application for Accountant", 2 Nov, read | 22 |
 | `candidates` | The fact sheet (name, contact, city, total years, education, skills, current role, short summary, links), the CV text, the keep-until date | Ali, Lahore, 4 years | 26 to 29 |
 | `applications` | Which candidate, which job, where it came from (an email or a past job), date applied, reading status, HR's notes | Ali for Accountant, 2 Nov | 26 to 29 |
 | `ticks` | Which application, which requirement, the result (met, mentioned only, not met, unclear), the proof line, whether the proof was checked | met, "Worked 4 years as accountant at XYZ" | 32 |
-| `work_runs` | The kind of work, status (`waiting`, `running`, `done`, `failed`), which try it is on, a short fixed word for why it failed, and the created, started, finished and updated times. Which job it belongs to (can be empty) is added when `jobs` exists | reading round 1, running, try 1 | 10 (exists) |
+| `work_runs` | The kind of work, status (`waiting`, `running`, `done`, `failed`), which try it is on, a short fixed word for why it failed, and the created, started, finished and updated times. Since task 14: which job it belongs to (empty for work that belongs to no job, such as the demo) | drafting requirements, running, try 1 | 10 (exists) |
 | `chat_messages` | Which job, who wrote it (HR or the agent), the text, the time | "Why is Ali third?" | 19 |
 | `ai_calls` | One row per AI call, written once: which job (can be empty), the purpose, the AI company, the model and its thinking level, tokens in and how many of them came from the cache, tokens out and how many of them were thinking, the cost in dollars (worked out at the moment of the call), the result (`ok`, `wrong_answer`, `failed`) with a short fixed word for why, how long it took, the ID of the request or work item, the time. No instructions, no CV text and no answer | read one CV, `gpt-6-luna`, 4,120 in, 1,380 out, $0.001021, ok | 13 (exists) |
 
@@ -70,7 +70,9 @@ Rules the database keeps:
 - A company has at most one job per one-time key. The form makes the key once, so a double click or a repeated request cannot save the same job twice.
 - A job's ID together with its company is allowed once. This lets a later table point at "company and job" together, so the database refuses a row that names one company and another company's job.
 - An AI call's job must be a job of the same company, and a call that ended `ok` has no error word while every other call has one.
-- A company has at most one unfinished run (`waiting` or `running`) of a kind. This is what refuses the same work being queued twice. When `jobs` exists it becomes one per job and kind.
+- At most one unfinished run (`waiting` or `running`) of a kind: per job for a run that belongs to a job, per company for a run that belongs to none. This is what refuses the same work being queued twice.
+- A requirement's job, and a run's job, must be a job of the same company.
+- A requirement's ID together with its company is allowed once, so that ticks can later point at "company and requirement" together.
 
 ## 4. Why it is shaped this way
 
@@ -102,7 +104,7 @@ applications: 10 | Ali | Accountant        | 2 Nov  | from an email
 | A requirement is removed | The requirement and its ticks, for every candidate | Everything else |
 | A job is closed | Applications and ticks of weak candidates. A candidate with no application left goes too | Strong candidates, the email list |
 | A candidate asks to be deleted | The candidate, their applications and ticks | The email ID, so it is not read again |
-| A job is deleted | (decided by the task that builds it) | Its rows in `ai_calls`, with the job left empty: the money was spent, and the company's total must stay true |
+| A job is deleted | Its requirements and its runs (set in task 14). The rest is decided by the task that builds deleting | Its rows in `ai_calls`, with the job left empty: the money was spent, and the company's total must stay true |
 
 ## 6. Known trade-off
 
@@ -138,5 +140,7 @@ The same three lines go into the SQL file of every table:
 3. The server role (`service_role`, used by the secret key) gets its rights written out.
 
 One table gives the server less: on `ai_calls` it may read and add rows, and may not change or delete one, because a row of the cost log is written once.
+
+A database function gets the same treatment. There is one, `replace_job_requirements`, which swaps a job's whole list of requirements in one step. Postgres lets everyone run a new function unless told otherwise, so its SQL file takes that right from `public`, `anon` and `authenticated` and gives it to `service_role` only. The function takes the company's ID and uses it in every statement, and our code calls it only through `forTenant`.
 
 So only our API and worker reach the data. They hold the secret key, which goes past the row rules, and that is why every repository reaches a company table only through the helper `forTenant`, which adds the `tenant_id` filter itself. Deleting a company row removes everything the company owns; deleting a sign-in account removes its member row, never the company.
