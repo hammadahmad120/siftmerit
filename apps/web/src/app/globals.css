@@ -11,8 +11,11 @@
  *
  *   navy        headings, body text and every button
  *   cream       the page background, and the label on a button
- *   purple      links, and the active menu item with the line under it. Never
- *               the border or outline of a button, a field or a card.
+ *   purple      links, and the active menu item with the line under it. Also
+ *               the colour of AI at work: the "Drafted by AI" tag, the
+ *               shimmer while the AI drafts, and the marker of the current
+ *               step on a job's page. Never the border or outline of a
+ *               button, a field or a card.
  *   light navy  small, less important text, and a button under the mouse.
  *               The guide's grey is too faint on cream (1.46:1) and is not
  *               used for text.
@@ -42,4 +45,57 @@
  */
 :root {
   color-scheme: light;
+}
+
+
+/*
+ * AI at work. While the AI drafts a list, lines of this look stand where the
+ * list will be: a pale purple band that moves from right to left. The colour
+ * is the brand purple, thinned, so it is written in one place only.
+ */
+.ai-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-brand-purple) 7%, transparent) 25%,
+    color-mix(in srgb, var(--color-brand-purple) 20%, transparent) 50%,
+    color-mix(in srgb, var(--color-brand-purple) 7%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: ai-shimmer 1.6s linear infinite;
+}
+
+@keyframes ai-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/*
+ * A line that fades in and moves up a little, once. The lines of a list get a
+ * growing `animation-delay`, so they appear one after another.
+ */
+.rise-in {
+  animation: rise-in 0.35s ease-out both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A person who asked the computer for less motion gets none of the two. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-shimmer,
+  .rise-in {
+    animation: none;
+  }
 }

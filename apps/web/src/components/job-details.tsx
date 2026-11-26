@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { ApiError, apiFailureMessage, getJob, type Job } from "@/lib/api";
 import { plainDate, StatusLabel } from "@/components/job-list";
+import { JobPath, type PathStep, type StepState } from "@/components/job-path";
 import { JobRequirements } from "@/components/job-requirements";
+import { JobStep } from "@/components/job-step";
 import { PhraseChip } from "@/components/subject-words-field";
 
 /** The answer of `GET /v1/jobs/<id>`: still on its way, arrived, not there, or failed. */
@@ -14,8 +16,14 @@ type JobState =
   | { kind: "failed"; message: string };
 
 /**
- * One job: its title, status, dates, subject words, requirements and
- * description. Later tasks add the emails and the candidates to this page.
+ * One job, as a guided path. A row of five steps stands at the top, and under
+ * it one card per step: a finished step is folded into one line, the current
+ * one is open, and a later one is locked and says what unlocks it. So HR
+ * always sees where she is, why the step matters and what comes next.
+ *
+ * Only the first two steps exist so far: the job itself, and its
+ * requirements. The other three show as locked; each later task switches its
+ * own step on.
  *
  * The ID comes from the address, so anyone can type any ID. That is safe: the
  * API looks for the job inside the signed-in user's company only, and answers
@@ -63,38 +71,99 @@ export function JobDetails({ jobId }: { jobId: string }) {
 
   const { job } = state;
 
+  // Where each step stands follows from the job's status alone. A draft has
+  // its requirements still to confirm; after that the job is open.
+  const confirmed = job.status !== "draft";
+  const requirementsState: StepState = confirmed ? "done" : "current";
+  const applicationsState: StepState = confirmed ? "current" : "locked";
+
+  const steps: PathStep[] = [
+    { key: "job", title: "Job", who: "Created", state: "done" },
+    {
+      key: "requirements",
+      number: 1,
+      title: "Requirements",
+      who: "AI drafts, you confirm",
+      state: requirementsState,
+    },
+    {
+      key: "applications",
+      number: 2,
+      title: "Applications",
+      who: "We find them in your mailbox",
+      state: applicationsState,
+    },
+    { key: "reading", number: 3, title: "CV reading", who: "AI reads every CV", state: "locked" },
+    {
+      key: "candidates",
+      number: 4,
+      title: "Candidates",
+      who: "Best first, with proof",
+      state: "locked",
+    },
+  ];
+
   return (
-    <>
+    <div className="max-w-4xl">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="min-w-0 text-2xl font-semibold break-words">{job.title}</h1>
         <StatusLabel status={job.status} />
       </div>
-      <p className="mt-2 text-sm text-brand-light-navy">
-        Mail from {plainDate(job.postingDate)} onward · Created{" "}
-        {new Date(job.createdAt).toLocaleDateString()}
-      </p>
 
-      <section className="mt-6 max-w-3xl rounded-xl border border-brand-navy/15 bg-white p-5">
-        <h2 className="font-medium">Subject words</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {job.subjectWords.map((phrase) => (
-            <PhraseChip key={phrase} phrase={phrase} />
-          ))}
-        </div>
-      </section>
+      <JobPath steps={steps} />
 
-      {/* Above the description on purpose: a long description would push the list far down. */}
-      <JobRequirements jobId={job.id} jobStatus={job.status} />
+      <div className="mt-6">
+        <JobStep
+          title="Job"
+          state="done"
+          summary={`Created ${new Date(job.createdAt).toLocaleDateString()} · Mail from ${plainDate(job.postingDate)} onward`}
+        >
+          <h3 className="text-sm font-medium">Subject words</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {job.subjectWords.map((phrase) => (
+              <PhraseChip key={phrase} phrase={phrase} />
+            ))}
+          </div>
 
-      <section className="mt-6 max-w-3xl rounded-xl border border-brand-navy/15 bg-white p-5">
-        <h2 className="font-medium">Job description</h2>
-        {/*
-          Shown as plain text, never as HTML: React writes the text out as it
-          is, so nothing inside it can run as code. `whitespace-pre-wrap`
-          keeps the line breaks HR typed.
-        */}
-        <p className="mt-3 text-sm break-words whitespace-pre-wrap">{job.description}</p>
-      </section>
-    </>
+          <h3 className="mt-5 text-sm font-medium">Job description</h3>
+          {/*
+            Shown as plain text, never as HTML: React writes the text out as
+            it is, so nothing inside it can run as code. `whitespace-pre-wrap`
+            keeps the line breaks HR typed.
+          */}
+          <p className="mt-2 text-sm break-words whitespace-pre-wrap">{job.description}</p>
+        </JobStep>
+
+        <JobStep number={1} title="Requirements" state={requirementsState} summary="Confirmed">
+          <JobRequirements jobId={job.id} jobStatus={job.status} />
+        </JobStep>
+
+        <JobStep
+          number={2}
+          title="Applications"
+          state={applicationsState}
+          what="We search your mailbox for the emails whose subject holds your subject words, and list them for you to pick."
+          unlocks="Confirm the requirements to unlock this step."
+        >
+          <p className="text-sm text-brand-light-navy">This step is not built yet.</p>
+        </JobStep>
+
+        <JobStep
+          number={3}
+          title="CV reading"
+          state="locked"
+          what="The AI reads every CV against your requirements and gives a tick for each one, with the line of the CV that proves it."
+          unlocks="Unlocks when the applications are picked."
+        />
+
+        <JobStep
+          number={4}
+          title="Candidates"
+          state="locked"
+          what="The candidates who meet every must-have, best first, with the proof for every tick."
+          unlocks="Unlocks when the CVs are read."
+        />
+      </div>
+    </div>
   );
 }
