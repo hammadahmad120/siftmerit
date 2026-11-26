@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "company:create": "tsx src/scripts/company.ts create",
     "company:add-user": "tsx src/scripts/company.ts add-user",
-    "ai:check": "tsx src/scripts/ai-check.ts"
+    "ai:check": "tsx src/scripts/ai-check.ts",
+    "requirements:try": "tsx src/scripts/requirements-try.ts"
   },
   "dependencies": {
     "@siftmerit/core": "*",

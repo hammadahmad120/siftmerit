@@ -185,6 +185,40 @@ export function getJob(jobId: string): Promise<{ job: Job }> {
   return apiFetch<{ job: Job }>(`/v1/jobs/${encodeURIComponent(jobId)}`);
 }
 
+/**
+ * How much a requirement counts: `must` is a must-have (a candidate who
+ * misses it is dropped), `preferred` is strongly wanted, `nice` is an extra.
+ */
+export type RequirementKind = "must" | "preferred" | "nice";
+
+/**
+ * What a CV that says nothing about a requirement means: `ask` the candidate
+ * (a city, a language, a soft skill) or count it as `missing` (a skill, the
+ * years, a degree).
+ */
+export type IfSilent = "ask" | "missing";
+
+/** One requirement of a job. */
+export type Requirement = {
+  id: string;
+  text: string;
+  kind: RequirementKind;
+  ifSilent: IfSilent;
+  /** Its place in the list, starting at 1. */
+  position: number;
+};
+
+/**
+ * A job's requirements, in the order of the list. A job that has none yet
+ * gives an empty list. A job that is not the company's gets an `ApiError`
+ * with status 404 and the code `job_not_found`.
+ */
+export function getRequirements(jobId: string): Promise<{ requirements: Requirement[] }> {
+  return apiFetch<{ requirements: Requirement[] }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements`,
+  );
+}
+
 /** One piece of background work, as the API reports it from Postgres. */
 export type WorkRun = {
   id: string;

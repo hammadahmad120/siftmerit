@@ -3,6 +3,7 @@ import {
   createSecretClient,
   DemoQueue,
   JobRepository,
+  JobRequirementRepository,
   WorkRunRepository,
   type Logger,
 } from "@siftmerit/core";
@@ -12,6 +13,7 @@ import type { Env } from "./config/env.js";
 import { createDemoWorkController } from "./controllers/demo-work.controller.js";
 import { createJobsController } from "./controllers/jobs.controller.js";
 import { createMeController } from "./controllers/me.controller.js";
+import { createRequirementsController } from "./controllers/requirements.controller.js";
 import { createAuthMiddleware, createRequireTenantMiddleware } from "./middleware/auth.middleware.js";
 import { createErrorMiddleware, notFoundMiddleware } from "./middleware/error.middleware.js";
 import { createRequestLogMiddleware } from "./middleware/request-log.middleware.js";
@@ -21,9 +23,11 @@ import { createDemoWorkRoutes } from "./routes/v1/demo-work.routes.js";
 import { healthRoutes } from "./routes/v1/health.routes.js";
 import { createJobsRoutes } from "./routes/v1/jobs.routes.js";
 import { createMeRoutes } from "./routes/v1/me.routes.js";
+import { createRequirementsRoutes } from "./routes/v1/requirements.routes.js";
 import { AuthService } from "./services/auth.service.js";
 import { DemoWorkService } from "./services/demo-work.service.js";
 import { JobService } from "./services/job.service.js";
+import { RequirementService } from "./services/requirement.service.js";
 import { TenantService } from "./services/tenant.service.js";
 
 /** Builds the Express app. The order below is the order a request passes through. */
@@ -38,6 +42,7 @@ export function createApp(env: Env, logger: Logger) {
   const tenantMemberRepository = new TenantMemberRepository(db);
   const workRunRepository = new WorkRunRepository(db);
   const jobRepository = new JobRepository(db);
+  const jobRequirementRepository = new JobRequirementRepository(db);
   const requireUser = createAuthMiddleware(new AuthService(env));
   const requireTenant = createRequireTenantMiddleware(tenantMemberRepository);
 
@@ -78,6 +83,15 @@ export function createApp(env: Env, logger: Logger) {
       requireUser,
       requireTenant,
       jobsController: createJobsController(new JobService(jobRepository)),
+    }),
+  );
+  v1.use(
+    createRequirementsRoutes({
+      requireUser,
+      requireTenant,
+      requirementsController: createRequirementsController(
+        new RequirementService(jobRepository, jobRequirementRepository),
+      ),
     }),
   );
   v1.use(

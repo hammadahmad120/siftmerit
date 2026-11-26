@@ -8,7 +8,15 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * company itself and the lookup that finds a user's company, so they have no
  * company filter to add.
  */
-export type TenantTable = "ai_calls" | "jobs" | "work_runs";
+export type TenantTable = "ai_calls" | "job_requirements" | "jobs" | "work_runs";
+
+/**
+ * Every database function our code may call. Each one takes the company's ID
+ * as `p_tenant_id` and uses it in every statement it runs, so it only ever
+ * touches rows of that company. A new function adds its name here, and its
+ * repository calls it only through `forTenant(...).call` below.
+ */
+export type TenantFunction = "replace_job_requirements";
 
 type Values = Record<string, unknown>;
 
@@ -27,6 +35,8 @@ type Values = Record<string, unknown>;
  * - `select`, `update` and `delete` always add "where tenant_id = this company".
  * - `insert` always sets `tenant_id` to this company, whatever the values say.
  * - `update` refuses to change `tenant_id`: a row never moves to another company.
+ * - `call` runs a database function and always hands it this company as
+ *   `p_tenant_id`, whatever the arguments say.
  *
  * Each function gives back the Supabase library's own query, so the caller
  * goes on as usual with `.eq(...)`, `.order(...)`, `.single()` and so on.
@@ -63,5 +73,13 @@ export function forTenant(db: SupabaseClient, tenantId: string) {
 
     /** Removes rows of this company only. */
     delete: (table: TenantTable) => db.from(table).delete().eq("tenant_id", tenantId),
+
+    /**
+     * Runs a database function for this company. A function does several
+     * steps as one: all of them happen or none does. It goes past the filter
+     * the four doors above add, so the function itself must keep to the
+     * company it is given; see `TenantFunction`.
+     */
+    call: (fn: TenantFunction, args: Values) => db.rpc(fn, { ...args, p_tenant_id: tenantId }),
   };
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ApiError, apiFailureMessage, getJob, type Job } from "@/lib/api";
 import { plainDate, StatusLabel } from "@/components/job-list";
+import { JobRequirements } from "@/components/job-requirements";
 import { PhraseChip } from "@/components/subject-words-field";
 
 /** The answer of `GET /v1/jobs/<id>`: still on its way, arrived, not there, or failed. */
@@ -13,8 +14,8 @@ type JobState =
   | { kind: "failed"; message: string };
 
 /**
- * One job: its title, status, dates, subject words and description. Later
- * tasks add the requirements, the emails and the candidates to this page.
+ * One job: its title, status, dates, subject words, requirements and
+ * description. Later tasks add the emails and the candidates to this page.
  *
  * The ID comes from the address, so anyone can type any ID. That is safe: the
  * API looks for the job inside the signed-in user's company only, and answers
@@ -81,6 +82,9 @@ export function JobDetails({ jobId }: { jobId: string }) {
           ))}
         </div>
       </section>
+
+      {/* Above the description on purpose: a long description would push the list far down. */}
+      <JobRequirements jobId={job.id} />
 
       <section className="mt-6 max-w-3xl rounded-xl border border-brand-navy/15 bg-white p-5">
         <h2 className="font-medium">Job description</h2>

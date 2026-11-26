@@ -3,7 +3,7 @@ import { UnauthorizedError } from "../lib/errors.js";
 import { createJobRequestSchema, type JobService } from "../services/job.service.js";
 
 /** Express can hand a part of the address back as one text or as a list. */
-function routeParam(value: string | string[] | undefined): string {
+export function routeParam(value: string | string[] | undefined): string {
   return (Array.isArray(value) ? value[0] : value) ?? "";
 }
 

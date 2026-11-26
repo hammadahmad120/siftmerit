@@ -32,6 +32,13 @@ The rules for what makes a task (size, kinds, when to split) are at the top of d
 - Only details that follow directly from the approved plan or from a pattern already in the code need no question. List them in the Explain step.
 - If unsure whether to ask, ask.
 
+## What Claude never does without approval
+The user's approval is needed for each run. A go-ahead for a plan or for a build is not that approval, also when the plan names the step.
+
+- **Nothing that costs money.** Claude never makes an AI call or uses any other paid service itself. Claude gives the exact command and says what it costs; the user runs it, or approves that one run first.
+- **No writes to the database.** Claude never adds, changes or deletes a row, and never runs SQL or a database function that can. This covers a script or command that writes on the way, such as an AI call (it adds a row to the cost log) or a queued work item (it changes a run's row). Reading is allowed.
+- When a check needs one of the two, Claude stops and asks, with the command, the cost and the rows it would touch.
+
 ## Wrap up
 Run this at the end of a task, or whenever the user says "wrap up" (mid-task: record what is finished and what is left).
 
