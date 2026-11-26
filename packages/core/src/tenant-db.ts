@@ -16,7 +16,11 @@ export type TenantTable = "ai_calls" | "job_requirements" | "jobs" | "work_runs"
  * touches rows of that company. A new function adds its name here, and its
  * repository calls it only through `forTenant(...).call` below.
  */
-export type TenantFunction = "replace_job_requirements";
+export type TenantFunction =
+  | "add_job_requirement"
+  | "change_job_requirement"
+  | "remove_job_requirement"
+  | "replace_job_requirements";
 
 type Values = Record<string, unknown>;
 

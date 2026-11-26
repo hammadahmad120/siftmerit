@@ -7,12 +7,12 @@ import {
   getRequirements,
   startRequirementsDraft,
   type DraftRun,
-  type IfSilent,
   type JobRequirementsAnswer,
   type JobStatus,
   type Requirement,
   type RequirementKind,
 } from "@/lib/api";
+import { RequirementList } from "@/components/requirement-list";
 import { BUTTON_CLASSES } from "@/lib/styles";
 import { useAskWhile } from "@/lib/use-ask-while";
 
@@ -53,53 +53,8 @@ async function loadRequirements(jobId: string): Promise<Loaded> {
   }
 }
 
-/**
- * The three kinds, in the order the list is sorted by: must-have first.
- * `label` is the word on the switch of a requirement. `means` says what the
- * kind does; it is shown once, above the list, so HR does not have to know
- * the rule by heart.
- */
-const KIND_CHOICES: { value: RequirementKind; label: string; means: string }[] = [
-  {
-    value: "must",
-    label: "Must-have",
-    // Not "is not shown to you": the strongest of them are still offered,
-    // in a list of their own.
-    means:
-      "A candidate who misses one is left out of your main list. Only the strongest of them are offered to you separately.",
-  },
-  {
-    value: "preferred",
-    label: "Preferred",
-    means:
-      "Strongly wanted, but not required. A candidate stays in the list without it, and each one they show moves them clearly higher.",
-  },
-  {
-    value: "nice",
-    label: "Nice to have",
-    means: "A small extra. It moves a candidate up a little.",
-  },
-];
-
-/** The place of each kind in the sorted list. */
-const KIND_RANK: Record<RequirementKind, number> = { must: 0, preferred: 1, nice: 2 };
-
-/**
- * What a CV that says nothing about a requirement means, as the two choices
- * that end the sentence "If the CV does not mention it:". The code and the
- * database call the second one `missing`; "not met" is the screen's word,
- * because "missing" alone did not say missing from what.
- */
-const IF_SILENT_CHOICES: { value: IfSilent; label: string }[] = [
-  { value: "ask", label: "Ask the candidate" },
-  { value: "missing", label: "Count as not met" },
-];
-
 /** How many placeholder lines stand in for the list while the AI drafts it. */
 const PLACEHOLDER_LINES = 5;
-
-/** Each line of a list fades in this much later than the one above it, in milliseconds. */
-const FADE_STEP_MS = 60;
 
 /**
  * What HR reads when a draft failed, by the short fixed word the API sends
@@ -125,123 +80,12 @@ function Spark() {
   );
 }
 
-/**
- * A row of choices with the chosen one filled in, as on a switch. For now it
- * only shows the choice: HR cannot change it yet, so nothing in it reacts to
- * the mouse. `says` is what a screen reader reads in its place.
- */
-function ChosenOf<Value extends string>(props: {
-  choices: { value: Value; label: string }[];
-  chosen: Value;
-  says: string;
-}) {
-  return (
-    <>
-      <span className="sr-only">{props.says}</span>
-      <span
-        aria-hidden="true"
-        className="inline-flex rounded-lg border border-brand-navy/20 bg-white p-0.5 text-xs"
-      >
-        {props.choices.map((choice) => (
-          <span
-            key={choice.value}
-            className={
-              choice.value === props.chosen
-                ? "rounded-md bg-brand-navy px-2.5 py-1 font-medium text-brand-cream"
-                : "px-2.5 py-1 text-brand-light-navy/60"
-            }
-          >
-            {choice.label}
-          </span>
-        ))}
-      </span>
-    </>
-  );
-}
-
-/**
- * One requirement as a card: its text, its kind, and what a CV that is
- * silent on it means, said as a sentence. The switch is the only place the
- * kind is written. `place` is the card's place in the list, which sets how
- * long after the first card it fades in.
- */
-function RequirementCard({ requirement, place }: { requirement: Requirement; place: number }) {
-  const kind = KIND_CHOICES.find((choice) => choice.value === requirement.kind);
-  const ifSilent = IF_SILENT_CHOICES.find((choice) => choice.value === requirement.ifSilent);
-
-  return (
-    <li
-      // A must-have has a dark left edge, so the eye finds the deal-breakers
-      // without reading every switch.
-      className={`rise-in rounded-lg border border-brand-navy/15 bg-white p-4 ${
-        requirement.kind === "must" ? "border-l-4 border-l-brand-navy" : ""
-      }`}
-      style={{ animationDelay: `${place * FADE_STEP_MS}ms` }}
-    >
-      {/* Plain text, never HTML: React writes the text out as it is. */}
-      <p className="text-sm font-medium break-words">{requirement.text}</p>
-      <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
-        <ChosenOf choices={KIND_CHOICES} chosen={requirement.kind} says={`Kind: ${kind?.label}.`} />
-        <span className="flex flex-wrap items-center gap-2 text-xs text-brand-light-navy">
-          <span aria-hidden="true">If the CV does not mention it:</span>
-          <ChosenOf
-            choices={IF_SILENT_CHOICES}
-            chosen={requirement.ifSilent}
-            says={`If the CV does not mention it: ${ifSilent?.label}.`}
-          />
-        </span>
-      </div>
-    </li>
-  );
-}
-
 /** One line that counts the list: "13 requirements · 6 must-have · 5 preferred · 2 nice to have". */
 function countLine(requirements: Requirement[]): string {
   const of = (kind: RequirementKind) =>
     requirements.filter((requirement) => requirement.kind === kind).length;
   const total = `${requirements.length} ${requirements.length === 1 ? "requirement" : "requirements"}`;
   return `${total} · ${of("must")} must-have · ${of("preferred")} preferred · ${of("nice")} nice to have`;
-}
-
-/**
- * The list. First, once, what the three kinds mean. Then every requirement
- * as a card, in one list that is always sorted: must-have first, then
- * preferred, then nice to have, and inside a kind in the order of the job
- * description.
- *
- * There are no group headings on purpose. A heading would say the kind a
- * second time, next to the switch on every card.
- */
-function RequirementList({ requirements }: { requirements: Requirement[] }) {
-  const sorted = [...requirements].sort(
-    (a, b) => KIND_RANK[a.kind] - KIND_RANK[b.kind] || a.position - b.position,
-  );
-  const hasMust = requirements.some((requirement) => requirement.kind === "must");
-
-  return (
-    <>
-      <dl className="mt-4 grid gap-x-6 gap-y-2 rounded-lg bg-brand-cream px-4 py-3 text-sm sm:grid-cols-3">
-        {KIND_CHOICES.map((kind) => (
-          <div key={kind.value}>
-            <dt className="font-medium">{kind.label}</dt>
-            <dd className="text-brand-light-navy">{kind.means}</dd>
-          </div>
-        ))}
-      </dl>
-
-      {hasMust ? null : (
-        <p className="mt-3 text-sm font-medium">
-          No must-have yet. A list needs at least one before it can be confirmed.
-        </p>
-      )}
-
-      <ul className="mt-4 space-y-2">
-        {sorted.map((requirement, index) => (
-          <RequirementCard key={requirement.id} requirement={requirement} place={index} />
-        ))}
-      </ul>
-    </>
-  );
 }
 
 /**
@@ -274,8 +118,9 @@ function DraftingPlaceholder() {
  * with the reason. While a draft is unfinished the page asks again every few
  * seconds; `useAskWhile` holds every case in which that asking stops.
  *
- * The button is shown only while the job is a draft. Editing and confirming
- * the list come with a later step.
+ * While the job is a draft HR edits the list here, and every change is saved
+ * at once; see `RequirementList`. The draft button shows only while the job
+ * has no requirements. Confirming the list comes with a later step.
  *
  * Like the job itself, everything is asked for inside the signed-in user's
  * company only; the API answers "not found" for another company's job.
@@ -363,6 +208,16 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
     giveUpAfterMs: GIVE_UP_AFTER_MS,
   });
 
+  /**
+   * HR changed the list: a new kind, a new text, a line added or removed.
+   * `update` makes the new list from the one that is on the page now.
+   */
+  const updateRequirements = useCallback((update: (current: Requirement[]) => Requirement[]) => {
+    setState((current) =>
+      current.kind === "ok" ? { ...current, requirements: update(current.requirements) } : current,
+    );
+  }, []);
+
   /** HR's click on the button. The click is the go-ahead to spend one AI call. */
   async function startDraft() {
     setStarting(true);
@@ -405,28 +260,28 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
   const canDraft = jobStatus === "draft";
   const stuck = unfinished && gaveUp;
   const drafting = starting || (unfinished && !gaveUp);
-  const failedRun = !drafting && draft?.status === "failed";
+  // A failed draft is only told while there is no list. With a list on the
+  // page there is nothing to try again.
+  const failedRun = !drafting && !hasList && draft?.status === "failed";
 
   return (
     <>
-      {/* The top of the step: what the AI did, and the way to a new draft. */}
+      {/*
+        The top of the step. There is no "Draft again" here on purpose: the
+        same job description gives nearly the same list, and a new draft
+        would wipe HR's own changes. The draft button is back when the list
+        is empty.
+      */}
       {hasList ? (
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-purple/10 px-2.5 py-0.5 text-xs font-medium text-brand-purple">
-              <Spark /> Drafted by AI
-            </p>
-            <p className="mt-2 text-sm text-brand-light-navy">{countLine(requirements)}</p>
-          </div>
+        <div>
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-purple/10 px-2.5 py-0.5 text-xs font-medium text-brand-purple">
+            <Spark /> Drafted by AI
+          </p>
+          <p className="mt-2 text-sm text-brand-light-navy">{countLine(requirements)}</p>
           {canDraft ? (
-            <button
-              type="button"
-              onClick={() => void startDraft()}
-              disabled={drafting}
-              className="rounded-lg border border-brand-navy/30 px-3 py-1.5 text-sm font-medium enabled:hover:border-brand-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy disabled:opacity-60"
-            >
-              {stuck || failedRun ? "Try again" : "Draft again"}
-            </button>
+            <p className="mt-1 text-sm">
+              Review the list and make it yours. Every change is saved at once.
+            </p>
           ) : null}
         </div>
       ) : null}
@@ -497,7 +352,13 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
         the list is drawn as new, and its lines fade in one after another.
       */}
       {hasList && !drafting ? (
-        <RequirementList key={draft?.id ?? "list"} requirements={requirements} />
+        <RequirementList
+          key={draft?.id ?? "list"}
+          jobId={jobId}
+          requirements={requirements}
+          canEdit={canDraft}
+          onChange={updateRequirements}
+        />
       ) : null}
     </>
   );

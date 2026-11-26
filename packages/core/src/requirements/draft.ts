@@ -20,13 +20,11 @@ import {
   IF_SILENT_MARKS,
   REQUIREMENT_KINDS,
   REQUIREMENT_TEXT_MAX,
+  REQUIREMENTS_MAX,
   type JobRequirementRepository,
   type NewRequirement,
 } from "../job-requirements.repository.js";
 import type { JobRepository } from "../jobs.repository.js";
-
-/** A list longer than this is refused: the model most likely cut the advert into too many pieces. */
-export const REQUIREMENTS_MAX = 30;
 
 /** How many the model is asked for at most. Lower than the limit above, to leave room. */
 const REQUIREMENTS_ASKED_MAX = 25;

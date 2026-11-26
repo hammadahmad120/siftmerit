@@ -253,6 +253,63 @@ export function startRequirementsDraft(jobId: string): Promise<{ draft: DraftRun
   );
 }
 
+/** What HR may set on a requirement she adds. */
+export type NewRequirement = {
+  text: string;
+  kind: RequirementKind;
+  ifSilent: IfSilent;
+};
+
+/** What HR may change on a requirement. Only the fields that change are sent. */
+export type RequirementChange = Partial<NewRequirement>;
+
+/**
+ * Adds one requirement to a job's list, at the end. An `ApiError` with status
+ * 409 means the text is already in the list (code `duplicate_requirement`),
+ * the list is full (`too_many_requirements`) or the job is not a draft any
+ * more (`job_not_draft`). Its message is a plain sentence for HR.
+ */
+export function addRequirement(
+  jobId: string,
+  requirement: NewRequirement,
+): Promise<{ requirement: Requirement }> {
+  return apiFetch<{ requirement: Requirement }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requirement),
+    },
+  );
+}
+
+/** Changes the text, the kind or the "silent CV" mark of one requirement, and gives it back. */
+export function changeRequirement(
+  jobId: string,
+  requirementId: string,
+  change: RequirementChange,
+): Promise<{ requirement: Requirement }> {
+  return apiFetch<{ requirement: Requirement }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements/${encodeURIComponent(requirementId)}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(change),
+    },
+  );
+}
+
+/** Removes one requirement from a job's list. */
+export function removeRequirement(
+  jobId: string,
+  requirementId: string,
+): Promise<{ removed: string }> {
+  return apiFetch<{ removed: string }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements/${encodeURIComponent(requirementId)}`,
+    { method: "DELETE" },
+  );
+}
+
 /** One piece of background work, as the API reports it from Postgres. */
 export type WorkRun = {
   id: string;

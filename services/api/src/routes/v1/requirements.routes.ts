@@ -4,7 +4,13 @@ import { Router, type RequestHandler } from "express";
 export function createRequirementsRoutes(deps: {
   requireUser: RequestHandler;
   requireTenant: RequestHandler;
-  requirementsController: { get: RequestHandler; startDraft: RequestHandler };
+  requirementsController: {
+    get: RequestHandler;
+    startDraft: RequestHandler;
+    add: RequestHandler;
+    change: RequestHandler;
+    remove: RequestHandler;
+  };
 }) {
   const router = Router();
 
@@ -19,6 +25,24 @@ export function createRequirementsRoutes(deps: {
     deps.requireUser,
     deps.requireTenant,
     deps.requirementsController.startDraft,
+  );
+  router.post(
+    "/jobs/:jobId/requirements",
+    deps.requireUser,
+    deps.requireTenant,
+    deps.requirementsController.add,
+  );
+  router.patch(
+    "/jobs/:jobId/requirements/:requirementId",
+    deps.requireUser,
+    deps.requireTenant,
+    deps.requirementsController.change,
+  );
+  router.delete(
+    "/jobs/:jobId/requirements/:requirementId",
+    deps.requireUser,
+    deps.requireTenant,
+    deps.requirementsController.remove,
   );
 
   return router;

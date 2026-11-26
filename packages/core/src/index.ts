@@ -28,15 +28,20 @@ export {
   JobRequirementRepository,
   REQUIREMENT_KINDS,
   REQUIREMENT_TEXT_MAX,
+  REQUIREMENTS_MAX,
 } from "./job-requirements.repository.js";
 export type {
+  AddRequirementResult,
+  ChangeRequirementResult,
   IfSilent,
   JobRequirementRow,
   NewRequirement,
+  RemoveRequirementResult,
   ReplaceRequirementsResult,
+  RequirementChange,
   RequirementKind,
 } from "./job-requirements.repository.js";
-export { checkDraft, draftRequirements, REQUIREMENTS_MAX } from "./requirements/draft.js";
+export { checkDraft, draftRequirements } from "./requirements/draft.js";
 export type {
   DraftRefusal,
   DraftRequirementsDeps,
