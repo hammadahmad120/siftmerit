@@ -84,7 +84,7 @@ export function JobDetails({ jobId }: { jobId: string }) {
       </section>
 
       {/* Above the description on purpose: a long description would push the list far down. */}
-      <JobRequirements jobId={job.id} />
+      <JobRequirements jobId={job.id} jobStatus={job.status} />
 
       <section className="mt-6 max-w-3xl rounded-xl border border-brand-navy/15 bg-white p-5">
         <h2 className="font-medium">Job description</h2>

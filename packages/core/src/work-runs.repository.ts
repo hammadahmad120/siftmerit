@@ -3,7 +3,11 @@ import { toDatabaseError } from "./database.js";
 import { forTenant } from "./tenant-db.js";
 
 /** What sort of work a run is. A new kind of work adds its name here. */
-export type WorkRunKind = "demo";
+export type WorkRunKind =
+  /** The pretend work of the queue demo. It belongs to no job. */
+  | "demo"
+  /** The AI drafts a job's requirements from its description. */
+  | "requirements_draft";
 
 export type WorkRunStatus = "waiting" | "running" | "done" | "failed";
 
@@ -19,11 +23,22 @@ export type WorkRunError =
   /** The worker running it died twice, and the queue gave up on it. */
   | "worker_lost"
   /** It did not move for too long and was closed when a new run was started. */
-  | "timed_out";
+  | "timed_out"
+  // --- the requirements draft ---
+  /** The AI service did not answer on any try: it was slow, said "slow down" or had an error. */
+  | "ai_unavailable"
+  /** The AI found no requirement: the text was most likely not a job description. */
+  | "no_requirements"
+  /** The AI's list could not be used: too many items, an item far too long, or a broken answer. */
+  | "bad_draft"
+  /** The AI service refused our key. A fault in our own setup. */
+  | "ai_setup"
+  /** The job's requirements were confirmed already, so the list was not changed. */
+  | "job_not_draft";
 
 /**
- * The company already has an unfinished run of this kind, so the database
- * refused a second one. See `insert`.
+ * The company, or the job, already has an unfinished run of this kind, so the
+ * database refused a second one. See `insert`.
  */
 export class WorkRunAlreadyActiveError extends Error {
   constructor() {
@@ -38,6 +53,8 @@ const UNIQUE_RULE_BROKEN = "23505";
 export type WorkRunRow = {
   id: string;
   tenant_id: string;
+  /** The job the run is for, or null for work that belongs to no job. */
+  job_id: string | null;
   kind: WorkRunKind;
   status: WorkRunStatus;
   /** Which try the run is on. 0 until a worker has started it. */
@@ -51,7 +68,7 @@ export type WorkRunRow = {
 };
 
 const COLUMNS =
-  "id, tenant_id, kind, status, attempt, error, created_at, started_at, finished_at, updated_at";
+  "id, tenant_id, job_id, kind, status, attempt, error, created_at, started_at, finished_at, updated_at";
 
 /** A run in one of these states can still change. `done` and `failed` are final. */
 const UNFINISHED: WorkRunStatus[] = ["waiting", "running"];
@@ -75,15 +92,19 @@ export class WorkRunRepository {
   /**
    * Adds a run with the status `waiting`. The database makes its ID.
    *
-   * A company may have only one unfinished run of a kind. That is a rule in
-   * the database (a unique index over unfinished rows), not a check made
-   * here first: two clicks at the same moment would both pass a check, but
-   * the database lets only one row in. The refused one gets a
-   * `WorkRunAlreadyActiveError`, and no row and no ID exist for it.
+   * With `jobId` the run belongs to that job, which must be a job of this
+   * company: the database refuses any other.
+   *
+   * Only one unfinished run of a kind is allowed: per job when the run has a
+   * job, per company when it has none. That is a rule in the database (a
+   * unique index over unfinished rows), not a check made here first: two
+   * clicks at the same moment would both pass a check, but the database lets
+   * only one row in. The refused one gets a `WorkRunAlreadyActiveError`, and
+   * no row and no ID exist for it.
    */
-  async insert(tenantId: string, kind: WorkRunKind): Promise<WorkRunRow> {
+  async insert(tenantId: string, kind: WorkRunKind, jobId?: string): Promise<WorkRunRow> {
     const { data, error } = await forTenant(this.db, tenantId)
-      .insert("work_runs", { kind })
+      .insert("work_runs", { kind, job_id: jobId ?? null })
       .select(COLUMNS)
       .single();
 
@@ -95,16 +116,22 @@ export class WorkRunRepository {
   /**
    * Closes a company's unfinished runs of one kind that have not changed for
    * `olderThanMs`: they are marked failed with the error `timed_out`.
-   * Answers how many were closed.
+   * Answers how many were closed. With `jobId` only that job's runs are
+   * looked at.
    *
    * Without this, one run stuck on `running`, for example because a worker
-   * died and no worker ever came back, would block that company's next run
-   * for ever, since only one unfinished run is allowed. It is called just
-   * before a new run is added.
+   * died and no worker ever came back, would block the next run for ever,
+   * since only one unfinished run is allowed. It is called just before a new
+   * run is added.
    */
-  async closeStale(tenantId: string, kind: WorkRunKind, olderThanMs: number): Promise<number> {
+  async closeStale(
+    tenantId: string,
+    kind: WorkRunKind,
+    olderThanMs: number,
+    jobId?: string,
+  ): Promise<number> {
     const cutoff = new Date(Date.now() - olderThanMs).toISOString();
-    const { data, error } = await forTenant(this.db, tenantId)
+    let stale = forTenant(this.db, tenantId)
       .update("work_runs", {
         status: "failed",
         error: "timed_out",
@@ -112,8 +139,10 @@ export class WorkRunRepository {
       })
       .eq("kind", kind)
       .in("status", UNFINISHED)
-      .lt("updated_at", cutoff)
-      .select("id");
+      .lt("updated_at", cutoff);
+    if (jobId) stale = stale.eq("job_id", jobId);
+
+    const { data, error } = await stale.select("id");
 
     if (error) throw toDatabaseError("work_runs close stale", error);
     return (data ?? []).length;
@@ -129,6 +158,27 @@ export class WorkRunRepository {
 
     if (error) throw toDatabaseError("work_runs list recent", error);
     return (data ?? []) as WorkRunRow[];
+  }
+
+  /**
+   * A job's newest run of one kind, or null when it never had one. `jobId`
+   * must have the form of an ID.
+   */
+  async findNewestForJob(
+    tenantId: string,
+    jobId: string,
+    kind: WorkRunKind,
+  ): Promise<WorkRunRow | null> {
+    const { data, error } = await forTenant(this.db, tenantId)
+      .select("work_runs", COLUMNS)
+      .eq("job_id", jobId)
+      .eq("kind", kind)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw toDatabaseError("work_runs find newest for job", error);
+    return data as WorkRunRow | null;
   }
 
   /**

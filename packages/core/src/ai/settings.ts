@@ -3,8 +3,8 @@
 //
 //   sharedEnvSchema.extend({ ...databaseEnvShape, ...aiEnvShape })
 //
-// Until task 14 only the check command (`npm run ai:check`) does, so the API
-// and the worker still start without an OpenAI key.
+// The worker does, since the requirements draft: it does not start without
+// an OpenAI key. The API makes no AI call and starts without one.
 
 import { z } from "zod";
 import { KNOWN_MODELS, type AiModel } from "./prices.js";

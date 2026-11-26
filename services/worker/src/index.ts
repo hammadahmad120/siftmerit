@@ -1,63 +1,76 @@
 import {
+  createAiCaller,
   createDemoWorker,
   createLogger,
   createQueueTroubleLogger,
+  createRequirementsWorker,
   createSecretClient,
   DEMO_QUEUE_NAME,
   demoWorkItemSchema,
   isFinalFailure,
   isWorkerLost,
+  JobRepository,
+  JobRequirementRepository,
+  REQUIREMENTS_QUEUE_NAME,
+  requirementsWorkItemSchema,
   WorkRunRepository,
+  type Logger,
 } from "@siftmerit/core";
 import { loadEnv } from "./config/env.js";
 import { runDemoWorkItem } from "./handlers/demo.handler.js";
+import { runRequirementsWorkItem } from "./handlers/requirements.handler.js";
 
-function start() {
-  const env = loadEnv();
-  const logger = createLogger({
-    service: "worker",
-    level: env.LOG_LEVEL,
-    style: env.NODE_ENV === "production" ? "json" : "readable",
-  });
+/** The IDs every work item carries, whatever its queue. */
+type ItemIds = { workRunId: string; requestId: string; tenantId: string };
 
-  // The worker saves the status of every run in Postgres, where the screens
-  // read it. It uses the secret key, so each update filters by the company.
-  const workRuns = new WorkRunRepository(createSecretClient(env));
+/** The part of a queue's listener (BullMQ's `Worker`) that `watch` and the clean stop use. */
+type Listener = {
+  on(event: "ready", listener: () => void): unknown;
+  on(event: "error", listener: (error: Error) => void): unknown;
+  on(
+    event: "failed",
+    listener: (
+      item: { id?: string; data: unknown; attemptsMade: number; opts: { attempts?: number } } | undefined,
+      error: Error,
+    ) => void,
+  ): unknown;
+  close(): Promise<void>;
+};
 
-  // The worker listens to the queue. This is what keeps the program running:
-  // it waits for the next work item for as long as it lives.
-  const worker = createDemoWorker(env.REDIS_URL, (item) =>
-    runDemoWorkItem(item, { logger, workRuns }),
-  );
+/**
+ * Puts the same three listeners on a queue's listener: connected, connection
+ * trouble, and a try that failed. `readIds` checks an item's shape and gives
+ * back its IDs, or null for an item of the wrong shape.
+ */
+function watch(
+  listener: Listener,
+  queue: string,
+  readIds: (data: unknown) => ItemIds | null,
+  deps: { logger: Logger; workRuns: WorkRunRepository },
+): void {
+  const { logger, workRuns } = deps;
 
   // Connected, or connected again after Redis was away.
-  worker.on("ready", () => {
-    logger.info("Worker connected to Redis. Waiting for work items.", { queue: DEMO_QUEUE_NAME });
+  listener.on("ready", () => {
+    logger.info("Worker connected to Redis. Waiting for work items.", { queue });
   });
 
   // Connection trouble. Without this listener an error would stop the worker.
-  worker.on("error", createQueueTroubleLogger(logger));
+  listener.on("error", createQueueTroubleLogger(logger));
 
   // A try that failed. This fires after every try, not only the last one.
   // `item` is missing only when the queue lost track of it, which should not
   // happen. The line holds IDs and the error, never the item's content. The
   // IDs inside the item are logged only when the item has the right shape: an
   // item with the wrong shape could hold anything in those fields.
-  worker.on("failed", (item, error) => {
-    const checked = demoWorkItemSchema.safeParse(item?.data);
+  listener.on("failed", (item, error) => {
+    const ids = item ? readIds(item.data) : null;
     const final = item ? isFinalFailure(item, error) : true;
-    const ids = checked.success
-      ? {
-          workRunId: checked.data.workRunId,
-          requestId: checked.data.requestId,
-          tenantId: checked.data.tenantId,
-        }
-      : {};
 
     logger.error(final ? "work item failed for good" : "work item failed, it will be tried again", {
-      queue: DEMO_QUEUE_NAME,
+      queue,
       workItemId: item?.id,
-      ...ids,
+      ...(ids ?? {}),
       attempt: item?.attemptsMade,
       allowed: item?.opts.attempts,
       errorName: error.name,
@@ -69,28 +82,84 @@ function start() {
     // the call below changes nothing. It matters when the queue gave up on an
     // item whose worker died twice: then no handler ran, and this is the only
     // place that learns of it.
-    if (final && checked.success) {
+    if (final && ids) {
       const reason = isWorkerLost(error) ? "worker_lost" : "work_failed";
-      workRuns
-        .markFailed(checked.data.tenantId, checked.data.workRunId, reason)
-        .catch((updateError: unknown) => {
-          logger.error("the run's row could not be marked failed", {
-            queue: DEMO_QUEUE_NAME,
-            workItemId: item?.id,
-            ...ids,
-            errorName: updateError instanceof Error ? updateError.name : "unknown",
-            errorMessage: updateError instanceof Error ? updateError.message : undefined,
-          });
+      workRuns.markFailed(ids.tenantId, ids.workRunId, reason).catch((updateError: unknown) => {
+        logger.error("the run's row could not be marked failed", {
+          queue,
+          workItemId: item?.id,
+          ...ids,
+          errorName: updateError instanceof Error ? updateError.name : "unknown",
+          errorMessage: updateError instanceof Error ? updateError.message : undefined,
         });
+      });
     }
   });
+}
 
-  logger.info("Worker started", { queue: DEMO_QUEUE_NAME });
+function start() {
+  const env = loadEnv();
+  const logger = createLogger({
+    service: "worker",
+    level: env.LOG_LEVEL,
+    style: env.NODE_ENV === "production" ? "json" : "readable",
+  });
+
+  // The worker saves the status of every run in Postgres, where the screens
+  // read it. It uses the secret key, so each repository filters by the company.
+  const db = createSecretClient(env);
+  const workRuns = new WorkRunRepository(db);
+
+  // What a requirements draft needs: the AI caller, the job it reads and the
+  // list it saves.
+  const draft = {
+    ai: createAiCaller({ db, env, logger }),
+    jobs: new JobRepository(db),
+    requirements: new JobRequirementRepository(db),
+  };
+
+  // The worker listens to its queues. This is what keeps the program running:
+  // it waits for the next work item for as long as it lives. Each queue has
+  // its own listener, so a slow queue never holds up another.
+  const demoListener = createDemoWorker(env.REDIS_URL, (item) =>
+    runDemoWorkItem(item, { logger, workRuns }),
+  );
+  const requirementsListener = createRequirementsWorker(env.REDIS_URL, (item) =>
+    runRequirementsWorkItem(item, { logger, workRuns, draft }),
+  );
+
+  watch(
+    demoListener,
+    DEMO_QUEUE_NAME,
+    (data) => {
+      const checked = demoWorkItemSchema.safeParse(data);
+      if (!checked.success) return null;
+      const { workRunId, requestId, tenantId } = checked.data;
+      return { workRunId, requestId, tenantId };
+    },
+    { logger, workRuns },
+  );
+  watch(
+    requirementsListener,
+    REQUIREMENTS_QUEUE_NAME,
+    (data) => {
+      const checked = requirementsWorkItemSchema.safeParse(data);
+      if (!checked.success) return null;
+      const { workRunId, requestId, tenantId } = checked.data;
+      return { workRunId, requestId, tenantId };
+    },
+    { logger, workRuns },
+  );
+
+  const listeners: Listener[] = [demoListener, requirementsListener];
+
+  logger.info("Worker started", { queues: [DEMO_QUEUE_NAME, REQUIREMENTS_QUEUE_NAME] });
 
   // A clean stop. Ctrl+C sends SIGINT; a restart after a file change, or a
   // hosting service stopping the program, sends SIGTERM. The worker takes no
-  // new item, lets the one it is running finish, and only then ends. A second
-  // signal ends it at once, for when Redis is away and the stop cannot finish.
+  // new item, lets the ones it is running finish, and only then ends. A
+  // second signal ends it at once, for when Redis is away and the stop cannot
+  // finish.
   let stopping = false;
   const stop = (signal: string) => {
     if (stopping) {
@@ -98,9 +167,8 @@ function start() {
       process.exit(1);
     }
     stopping = true;
-    logger.info("Worker stopping. A running work item is finished first.", { signal });
-    worker
-      .close()
+    logger.info("Worker stopping. Running work items are finished first.", { signal });
+    Promise.all(listeners.map((listener) => listener.close()))
       .then(() => {
         logger.info("Worker stopped");
         process.exit(0);

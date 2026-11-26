@@ -209,13 +209,47 @@ export type Requirement = {
 };
 
 /**
- * A job's requirements, in the order of the list. A job that has none yet
- * gives an empty list. A job that is not the company's gets an `ApiError`
- * with status 404 and the code `job_not_found`.
+ * One run of "draft this job's requirements", as the API reports it from
+ * Postgres. The AI call is made by the worker, so a run is `waiting`, then
+ * `running`, then `done` or `failed`.
  */
-export function getRequirements(jobId: string): Promise<{ requirements: Requirement[] }> {
-  return apiFetch<{ requirements: Requirement[] }>(
-    `/v1/jobs/${encodeURIComponent(jobId)}/requirements`,
+export type DraftRun = {
+  id: string;
+  status: "waiting" | "running" | "done" | "failed";
+  /** Which try the run is on. 0 until a worker has started it. */
+  attempt: number;
+  /** A short fixed word for why it failed, or null. */
+  error: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+};
+
+/** A job's requirements, and its newest draft run or null when it never had one. */
+export type JobRequirementsAnswer = {
+  requirements: Requirement[];
+  draft: DraftRun | null;
+};
+
+/**
+ * A job's requirements in the order of the list, with its newest draft run.
+ * A job that has no list yet gives an empty one. A job that is not the
+ * company's gets an `ApiError` with status 404 and the code `job_not_found`.
+ */
+export function getRequirements(jobId: string): Promise<JobRequirementsAnswer> {
+  return apiFetch<JobRequirementsAnswer>(`/v1/jobs/${encodeURIComponent(jobId)}/requirements`);
+}
+
+/**
+ * Starts a draft of a job's requirements. The API answers at once with the
+ * run, which is `waiting`; the list follows when the worker has made the AI
+ * call. An `ApiError` with status 409 means the job is not a draft any more
+ * (code `job_not_draft`) or a draft is already running (`already_drafting`).
+ */
+export function startRequirementsDraft(jobId: string): Promise<{ draft: DraftRun }> {
+  return apiFetch<{ draft: DraftRun }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements/draft`,
+    { method: "POST" },
   );
 }
 

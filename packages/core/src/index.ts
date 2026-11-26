@@ -47,12 +47,26 @@ export type { WorkRunError, WorkRunKind, WorkRunRow, WorkRunStatus } from "./wor
 export {
   createDemoWorker,
   createQueueTroubleLogger,
+  createRequirementsWorker,
   DEMO_QUEUE_NAME,
   DEMO_TRIES,
   DemoQueue,
   demoWorkItemSchema,
   isFinalFailure,
   isWorkerLost,
+  NoMoreTriesError,
   QueueUnavailableError,
+  REQUIREMENTS_AT_A_TIME,
+  REQUIREMENTS_QUEUE_NAME,
+  REQUIREMENTS_TRIES,
+  RequirementsQueue,
+  requirementsWorkItemSchema,
+  WorkQueue,
 } from "./queue.js";
-export type { DemoMode, DemoWorkItem, QueuedDemoWorkItem } from "./queue.js";
+export type {
+  DemoMode,
+  DemoWorkItem,
+  QueuedDemoWorkItem,
+  QueuedRequirementsWorkItem,
+  RequirementsWorkItem,
+} from "./queue.js";

@@ -4,6 +4,7 @@ import {
   DemoQueue,
   JobRepository,
   JobRequirementRepository,
+  RequirementsQueue,
   WorkRunRepository,
   type Logger,
 } from "@siftmerit/core";
@@ -46,10 +47,12 @@ export function createApp(env: Env, logger: Logger) {
   const requireUser = createAuthMiddleware(new AuthService(env));
   const requireTenant = createRequireTenantMiddleware(tenantMemberRepository);
 
-  // The work queue. The API only adds work items to it; the worker runs them.
-  // The API starts even when Redis cannot be reached: the queue connects in
-  // the background, and until it has, queuing answers 503.
-  const demoQueue = new DemoQueue(env.REDIS_URL, createQueueTroubleLogger(logger));
+  // The work queues. The API only adds work items to them; the worker runs
+  // them. The API starts even when Redis cannot be reached: a queue connects
+  // in the background, and until it has, queuing answers 503.
+  const onQueueTrouble = createQueueTroubleLogger(logger);
+  const demoQueue = new DemoQueue(env.REDIS_URL, onQueueTrouble);
+  const requirementsQueue = new RequirementsQueue(env.REDIS_URL, onQueueTrouble);
 
   // 1. Every request gets an ID and a logger that carries it.
   app.use(createRequestLogMiddleware(logger));
@@ -90,7 +93,12 @@ export function createApp(env: Env, logger: Logger) {
       requireUser,
       requireTenant,
       requirementsController: createRequirementsController(
-        new RequirementService(jobRepository, jobRequirementRepository),
+        new RequirementService(
+          jobRepository,
+          jobRequirementRepository,
+          workRunRepository,
+          requirementsQueue,
+        ),
       ),
     }),
   );

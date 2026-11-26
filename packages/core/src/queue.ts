@@ -7,8 +7,12 @@
 // The library is BullMQ. Its own word for a work item is "job". Ours is not:
 // in this product "job" always means a hiring job.
 //
-// For now there is one queue, `demo`, with one kind of item that does no real
-// work. Real queues are added by the tasks that first need them.
+// There are two queues. `demo` has one kind of item that does no real work
+// and goes away with the demo. `requirements` is the first real one: an item
+// is one requirements draft for one job. Each kind of work gets its own
+// queue, because a queue hands out its items in the order they arrived and
+// has its own setting for how many run at the same time: a draft that HR is
+// watching must not wait behind hundreds of CVs.
 
 import { Queue, UnrecoverableError, Worker, type Job } from "bullmq";
 import { z } from "zod";
@@ -70,7 +74,8 @@ export class QueueUnavailableError extends Error {
 }
 
 /**
- * The adding side of the demo queue, used by the API.
+ * The adding side of a queue, used by the API. `DemoQueue` and
+ * `RequirementsQueue` below are this class with a name and a retry setting.
  *
  * It is built for a web request, which must not wait: when Redis cannot be
  * reached, `add` fails at once with a `QueueUnavailableError` and never hangs.
@@ -87,19 +92,29 @@ export class QueueUnavailableError extends Error {
  * The API therefore starts with Redis stopped, and the queue starts working
  * by itself when Redis comes up.
  */
-export class DemoQueue {
-  private readonly queue: Queue<DemoWorkItem, void, typeof DEMO_QUEUE_NAME>;
+export class WorkQueue<Item> {
+  private readonly queue: Queue;
   private ready = false;
 
-  /** `onTrouble` is called for every connection error. Pass `createQueueTroubleLogger`. */
-  constructor(redisUrl: string, onTrouble: (error: Error) => void) {
-    this.queue = new Queue(DEMO_QUEUE_NAME, {
+  /**
+   * `tries` is how many times an item is tried in all. `firstWaitMs` is the
+   * wait before the second try; it doubles each time (BullMQ's "exponential"
+   * wait). `onTrouble` is called for every connection error: pass
+   * `createQueueTroubleLogger`.
+   */
+  constructor(
+    private readonly name: string,
+    redisUrl: string,
+    onTrouble: (error: Error) => void,
+    options: { tries: number; firstWaitMs: number },
+  ) {
+    this.queue = new Queue(name, {
       connection: { url: redisUrl, enableOfflineQueue: false },
       defaultJobOptions: {
         // Every work item has a retry limit. An item whose handler throws is
-        // tried again after a wait, three tries in all, then it is failed.
-        attempts: DEMO_TRIES,
-        backoff: { type: "exponential", delay: DEMO_FIRST_WAIT_MS },
+        // tried again after a wait, then it is failed.
+        attempts: options.tries,
+        backoff: { type: "exponential", delay: options.firstWaitMs },
         // BullMQ keeps every finished item forever unless told otherwise.
         // The last 1,000 done and 5,000 failed are kept, for looking at.
         removeOnComplete: 1000,
@@ -122,11 +137,11 @@ export class DemoQueue {
    * Adds one item and returns the ID the queue gave it. With `delayMs` the
    * item is kept aside for that long before any worker may take it.
    */
-  async add(item: DemoWorkItem, options?: { delayMs?: number }): Promise<string> {
+  async add(item: Item, options?: { delayMs?: number }): Promise<string> {
     if (!this.ready) throw new QueueUnavailableError();
 
     try {
-      const queued = await this.queue.add(DEMO_QUEUE_NAME, item, { delay: options?.delayMs });
+      const queued = await this.queue.add(this.name, item, { delay: options?.delayMs });
       if (!queued.id) throw new Error("The queue gave the item no ID");
       return queued.id;
     } catch (error) {
@@ -136,6 +151,16 @@ export class DemoQueue {
 
   close(): Promise<void> {
     return this.queue.close();
+  }
+}
+
+/** The adding side of the demo queue: three tries, with waits of 2 and 4 seconds. */
+export class DemoQueue extends WorkQueue<DemoWorkItem> {
+  constructor(redisUrl: string, onTrouble: (error: Error) => void) {
+    super(DEMO_QUEUE_NAME, redisUrl, onTrouble, {
+      tries: DEMO_TRIES,
+      firstWaitMs: DEMO_FIRST_WAIT_MS,
+    });
   }
 }
 
@@ -156,6 +181,87 @@ export function createDemoWorker(
   });
 }
 
+// ---------------------------------------------------------------------------
+// The requirements queue
+// ---------------------------------------------------------------------------
+
+/** The name of the requirements queue. In Redis its keys start with `bull:requirements:`. */
+export const REQUIREMENTS_QUEUE_NAME = "requirements";
+
+/**
+ * What a requirements work item carries: one draft for one job. IDs only. The
+ * job's title and description stay in Postgres, and the handler reads them by
+ * the job's ID.
+ *
+ * - `workRunId`: the row in `work_runs` that HR sees as "Drafting...".
+ * - `tenantId`: the company, taken by the API from the signed-in user.
+ * - `jobId`: the job whose requirements are drafted.
+ * - `requestId`: the ID of the API request that queued the item.
+ */
+export const requirementsWorkItemSchema = z.object({
+  workRunId: z.uuid(),
+  tenantId: z.uuid(),
+  jobId: z.uuid(),
+  requestId: z.uuid(),
+});
+
+export type RequirementsWorkItem = z.infer<typeof requirementsWorkItemSchema>;
+
+/** A requirements work item as the worker receives it. */
+export type QueuedRequirementsWorkItem = Job<RequirementsWorkItem, void, string>;
+
+/**
+ * How many times a draft is tried in all. Only trouble that a second try can
+ * cure is tried again (the AI service was slow or away); see the handler.
+ */
+export const REQUIREMENTS_TRIES = 3;
+
+/** The wait before the second try. It doubles: 2 seconds, then 4. */
+const REQUIREMENTS_FIRST_WAIT_MS = 2000;
+
+/**
+ * How many drafts one worker works on at the same moment. A draft spends
+ * nearly all its time waiting for the AI service's answer, so several side by
+ * side cost the worker almost nothing. The worker fetches a sixth item only
+ * when one of the five is finished. A starting number.
+ */
+export const REQUIREMENTS_AT_A_TIME = 5;
+
+/** The adding side of the requirements queue, used by the API. */
+export class RequirementsQueue extends WorkQueue<RequirementsWorkItem> {
+  constructor(redisUrl: string, onTrouble: (error: Error) => void) {
+    super(REQUIREMENTS_QUEUE_NAME, redisUrl, onTrouble, {
+      tries: REQUIREMENTS_TRIES,
+      firstWaitMs: REQUIREMENTS_FIRST_WAIT_MS,
+    });
+  }
+}
+
+/**
+ * The running side of the requirements queue, used by the worker. It hands
+ * each item to `run`, up to `REQUIREMENTS_AT_A_TIME` of them side by side.
+ */
+export function createRequirementsWorker(
+  redisUrl: string,
+  run: (item: QueuedRequirementsWorkItem) => Promise<void>,
+): Worker<RequirementsWorkItem, void, string> {
+  return new Worker<RequirementsWorkItem, void, string>(REQUIREMENTS_QUEUE_NAME, run, {
+    connection: { url: redisUrl },
+    concurrency: REQUIREMENTS_AT_A_TIME,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// For every queue
+// ---------------------------------------------------------------------------
+
+/**
+ * Thrown by a handler to say "do not try this item again". The queue fails
+ * the item at once, whatever number of tries is left. It is BullMQ's own
+ * error, passed on under a name that says what it is for.
+ */
+export { UnrecoverableError as NoMoreTriesError };
+
 /**
  * Whether a failed item will not be tried again. The worker's "failed" event
  * fires after every try, so this tells the last one from the others.
@@ -165,7 +271,7 @@ export function createDemoWorker(
  * - the queue gave up on the item, which it reports with an
  *   `UnrecoverableError` whatever the number of tries. See `isWorkerLost`.
  */
-export function isFinalFailure(item: QueuedDemoWorkItem, error: Error): boolean {
+export function isFinalFailure(item: Pick<Job, "attemptsMade" | "opts">, error: Error): boolean {
   if (error instanceof UnrecoverableError || error.name === "UnrecoverableError") return true;
   return item.attemptsMade >= (item.opts.attempts ?? 1);
 }
