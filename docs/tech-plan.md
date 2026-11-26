@@ -153,7 +153,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 ## 8. Task list
 
-53 tasks: 49 build, 2 design and 2 decision. The list runs top to bottom.
+53 tasks: 49 build, 2 design and 2 decision, and task 54 added later. Until 2026-11-26 the list ran top to bottom. Since then the tasks for a demo come first: see "The order since 2026-11-26" below. The task numbers did not change.
 
 ### Rules for a task
 
@@ -172,6 +172,38 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 - **Decision:** a choice that affects several tasks or needs a test to answer. The result is lines in `decisions.md`. Other choices are settled in the discuss step of the build task that needs them.
 
 "Needs" lists the tasks that must be finished first. "Decide then" lists the choices deliberately left for that task.
+
+### The order since 2026-11-26: the demo first
+
+The user wants a working product to show to their company as soon as possible. So the tasks on the path of the demo are done first, and everything else follows after the demo. The reason is in `decisions.md` under that date. Tasks 1 to 14 and 54 are finished.
+
+**The demo:** HR creates a job, drafts and confirms its requirements, the CVs are read from the mailbox, and the candidates are shown best first with a proof line for every tick.
+
+**1. Before the demo, in this order**
+
+| Step of the demo | Tasks |
+|---|---|
+| Edit and confirm the requirements | 16 |
+| Connect the mailbox and list the emails | 20, 21, 22 |
+| Group by subject, HR picks the groups | 23, 24 |
+| Fetch the CVs and drop junk | 26, 27 |
+| Read each CV with AI, with ticks and proof lines | 28, 29, 30, 32, 33 |
+| Score, rank and show the candidates | 35, 36 |
+
+Kept inside their tasks, not moved: masking (28), because the CV reading and the proof-line check are built around the masked text; and the small code tests of the scorer (35), masking (28) and the proof-line check (33), which cost no AI money.
+
+**2. After the demo**
+
+| Group | Tasks |
+|---|---|
+| The chat agent | 17, 18, 19, 37, 42, 47 |
+| Evals and the model comparison | 15, 31, 34, 38, 52 |
+| While the job is open | 25, 39, 40, 41, 43, 44, 45, 46 |
+| Closing, reuse and deployment | 48, 49, 50, 51, 53 |
+
+The order inside "after the demo" is decided when the demo is done. Task 15 was started on 2026-11-26 and stopped after two decisions; they are in `decisions.md`. The company separation test, which has no task, also waits until after the demo and must exist before any pilot company's data does. Editing a job while it is a draft, and the redraft of the requirements after a changed job description, have no task either and also wait until after the demo.
+
+A "Needs" entry still holds: no task before the demo needs a task after it.
 
 ### Foundation
 
