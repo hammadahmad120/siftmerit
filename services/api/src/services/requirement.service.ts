@@ -113,6 +113,17 @@ export type DraftRunView = {
   finishedAt: string | null;
 };
 
+/**
+ * Where a job stands after its requirements were confirmed or opened for
+ * editing again: the two fields of the job that such a step changes.
+ */
+export type JobStateView = {
+  /** `draft`, `open` or `closed`. */
+  status: string;
+  /** When HR confirmed the requirements. Null while the job is a draft. */
+  requirementsConfirmedAt: string | null;
+};
+
 /** A job's requirements, and its newest draft run or null when it never had one. */
 export type JobRequirementsView = {
   requirements: RequirementView[];
@@ -163,10 +174,11 @@ function isId(value: string): boolean {
 }
 
 /**
- * The requirements of a job: reading the list, starting a draft, and HR's
- * own edits (add a line, change one, remove one). Each edit is saved at once
- * and is allowed only while the job is a draft. Confirming comes with a later
- * step.
+ * The requirements of a job: reading the list, starting a draft, HR's own
+ * edits (add a line, change one, remove one), confirming the list and going
+ * back to editing it. Each edit is saved at once and is allowed only while
+ * the job is a draft. Confirming makes the job open, which is the gate for
+ * everything that comes later.
  *
  * This service makes no AI call itself. For a draft it saves a run's row and
  * adds a note to the queue; the worker, a separate program, makes the call a
@@ -337,5 +349,50 @@ export class RequirementService {
     if (result === "job_not_found") throw jobNotFound();
     if (result === "job_not_draft") throw jobNotDraft();
     throw requirementNotFound();
+  }
+
+  /**
+   * Confirms a job's requirements: the job becomes open. It costs no AI
+   * money. A list with no must-have is refused, because without one nobody
+   * could ever be left out and the filter would do nothing.
+   */
+  async confirm(tenantId: string, jobId: string): Promise<JobStateView> {
+    if (!isId(jobId)) throw jobNotFound();
+
+    const result = await this.requirements.confirmForJob(tenantId, jobId);
+
+    if (result === "job_not_found") throw jobNotFound();
+    if (result === "job_not_draft") throw jobNotDraft();
+    if (result === "no_must_have") {
+      throw new ConflictError(
+        "A list needs at least one must-have before it can be confirmed.",
+        "no_must_have",
+      );
+    }
+    return this.stateOf(tenantId, jobId);
+  }
+
+  /**
+   * Takes a confirmed job back to draft, so HR can edit the list again. The
+   * screen first tells HR what going back costs; today that is nothing,
+   * because no later step has used the list yet.
+   */
+  async reopen(tenantId: string, jobId: string): Promise<JobStateView> {
+    if (!isId(jobId)) throw jobNotFound();
+
+    const result = await this.requirements.reopenForJob(tenantId, jobId);
+
+    if (result === "job_not_found") throw jobNotFound();
+    if (result === "job_not_open") {
+      throw new ConflictError("This job's requirements are not confirmed.", "job_not_open");
+    }
+    return this.stateOf(tenantId, jobId);
+  }
+
+  /** The job's status and confirm time, read again after a step changed them. */
+  private async stateOf(tenantId: string, jobId: string): Promise<JobStateView> {
+    const job = await this.jobs.findById(tenantId, jobId);
+    if (!job) throw jobNotFound();
+    return { status: job.status, requirementsConfirmedAt: job.requirements_confirmed_at };
   }
 }

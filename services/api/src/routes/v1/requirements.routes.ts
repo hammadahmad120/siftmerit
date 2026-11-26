@@ -10,6 +10,8 @@ export function createRequirementsRoutes(deps: {
     add: RequestHandler;
     change: RequestHandler;
     remove: RequestHandler;
+    confirm: RequestHandler;
+    reopen: RequestHandler;
   };
 }) {
   const router = Router();
@@ -43,6 +45,18 @@ export function createRequirementsRoutes(deps: {
     deps.requireUser,
     deps.requireTenant,
     deps.requirementsController.remove,
+  );
+  router.post(
+    "/jobs/:jobId/requirements/confirm",
+    deps.requireUser,
+    deps.requireTenant,
+    deps.requirementsController.confirm,
+  );
+  router.post(
+    "/jobs/:jobId/requirements/reopen",
+    deps.requireUser,
+    deps.requireTenant,
+    deps.requirementsController.reopen,
   );
 
   return router;

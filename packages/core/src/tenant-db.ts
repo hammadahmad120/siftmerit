@@ -19,7 +19,9 @@ export type TenantTable = "ai_calls" | "job_requirements" | "jobs" | "work_runs"
 export type TenantFunction =
   | "add_job_requirement"
   | "change_job_requirement"
+  | "confirm_job_requirements"
   | "remove_job_requirement"
+  | "reopen_job_requirements"
   | "replace_job_requirements";
 
 type Values = Record<string, unknown>;

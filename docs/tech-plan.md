@@ -177,7 +177,7 @@ If this section differs from `CLAUDE.md`, `CLAUDE.md` wins.
 
 The user wants a working product to show to their company as soon as possible. So the tasks on the path of the demo are done first, and everything else follows after the demo. The reason is in `decisions.md` under that date. Tasks 1 to 14 and 54 are finished.
 
-**The demo:** HR creates a job, drafts and confirms its requirements, the CVs are read from the mailbox, and the candidates are shown best first with a proof line for every tick.
+**The demo:** HR creates a job, drafts and confirms its requirements, the CVs are read from the mailbox, and the candidates are shown best first with a proof line for every tick. Then HR changes a requirement and the ranking changes on the spot, at no AI cost (task 40, moved into the demo on 2026-11-26).
 
 **1. Before the demo, in this order**
 
@@ -189,6 +189,7 @@ The user wants a working product to show to their company as soon as possible. S
 | Fetch the CVs and drop junk | 26, 27 |
 | Read each CV with AI, with ticks and proof lines | 28, 29, 30, 32, 33 |
 | Score, rank and show the candidates | 35, 36 |
+| HR changes a kind, a "silent CV" mark or removes a requirement after CVs are read, with no AI cost | 40 |
 
 Kept inside their tasks, not moved: masking (28), because the CV reading and the proof-line check are built around the masked text; and the small code tests of the scorer (35), masking (28) and the proof-line check (33), which cost no AI money.
 
@@ -198,7 +199,7 @@ Kept inside their tasks, not moved: masking (28), because the CV reading and the
 |---|---|
 | The chat agent | 17, 18, 19, 37, 42, 47 |
 | Evals and the model comparison | 15, 31, 34, 38, 52 |
-| While the job is open | 25, 39, 40, 41, 43, 44, 45, 46 |
+| While the job is open | 25, 39, 41, 43, 44, 45, 46 |
 | Closing, reuse and deployment | 48, 49, 50, 51, 53 |
 
 The order inside "after the demo" is decided when the demo is done. Task 15 was started on 2026-11-26 and stopped after two decisions; they are in `decisions.md`. The company separation test, which has no task, also waits until after the demo and must exist before any pilot company's data does. Editing a job while it is a draft, and the redraft of the requirements after a changed job description, have no task either and also wait until after the demo.

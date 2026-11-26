@@ -20,6 +20,8 @@ export type JobRow = {
   /** A plain date, `YYYY-MM-DD`. Mail from this day onward is looked at. */
   posting_date: string;
   status: JobStatus;
+  /** When HR confirmed the requirements. Null while the job is a draft. */
+  requirements_confirmed_at: string | null;
   /** The one-time key the form sent. Allowed once per company. */
   create_key: string;
   /** The user who created the job, or null when that account was deleted. */
@@ -58,7 +60,9 @@ export class JobCreateKeyUsedError extends Error {
 const UNIQUE_RULE_BROKEN = "23505";
 
 const COLUMNS =
-  "id, tenant_id, title, description, subject_words, posting_date, status, create_key, created_by, created_at, updated_at";
+  // One text on one line on purpose: the Supabase library reads the column
+  // names out of this exact text to know the shape of a row.
+  "id, tenant_id, title, description, subject_words, posting_date, status, requirements_confirmed_at, create_key, created_by, created_at, updated_at";
 
 const SUMMARY_COLUMNS = "id, title, subject_words, status, posting_date, created_at";
 

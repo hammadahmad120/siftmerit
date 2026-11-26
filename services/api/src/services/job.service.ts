@@ -87,11 +87,13 @@ export type JobView = {
   subjectWords: string[];
   postingDate: string;
   status: string;
+  /** When HR confirmed the requirements. Null while the job is a draft. */
+  requirementsConfirmedAt: string | null;
   createdAt: string;
 };
 
-/** A job in the list: the short fields only. The description is left out. */
-export type JobSummaryView = Omit<JobView, "description">;
+/** A job in the list: the short fields only. The description and the confirm time are left out. */
+export type JobSummaryView = Omit<JobView, "description" | "requirementsConfirmedAt">;
 
 function toView(row: JobRow): JobView {
   return {
@@ -101,6 +103,7 @@ function toView(row: JobRow): JobView {
     subjectWords: row.subject_words,
     postingDate: row.posting_date,
     status: row.status,
+    requirementsConfirmedAt: row.requirements_confirmed_at,
     createdAt: row.created_at,
   };
 }

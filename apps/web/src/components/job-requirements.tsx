@@ -4,14 +4,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ApiError,
   apiFailureMessage,
+  confirmRequirements,
   getRequirements,
+  reopenRequirements,
   startRequirementsDraft,
   type DraftRun,
   type JobRequirementsAnswer,
+  type JobState,
   type JobStatus,
   type Requirement,
   type RequirementKind,
 } from "@/lib/api";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { RequirementList } from "@/components/requirement-list";
 import { BUTTON_CLASSES } from "@/lib/styles";
 import { useAskWhile } from "@/lib/use-ask-while";
@@ -51,6 +55,39 @@ async function loadRequirements(jobId: string): Promise<Loaded> {
     if (error instanceof ApiError && error.code === "job_not_found") return { kind: "missing" };
     return { kind: "failed", message: apiFailureMessage(error) };
   }
+}
+
+/**
+ * From this many must-haves on, a note stands beside "Confirm": every
+ * must-have is one more way for a good candidate to be left out. It is only
+ * a note; HR decides.
+ */
+const MANY_MUST_HAVES = 7;
+
+/**
+ * What going back to editing costs, as the lines of the popup that asks
+ * before it. Each line must be true at the moment it is shown.
+ *
+ * Today no later step has used a confirmed list, so going back costs
+ * nothing. A task that adds work after this step adds its own line here, for
+ * example how many CVs were read against the list and what a change to it
+ * would redo.
+ */
+function whatGoingBackCosts(): string[] {
+  return [
+    "Nothing has been done with this list yet, so going back costs nothing.",
+    "The next step, Applications, is locked again until you confirm.",
+  ];
+}
+
+/**
+ * The sentence HR reads when a step was refused. A refusal the API expects
+ * (the list has no must-have, the job changed meanwhile) is its own plain
+ * sentence. Anything else gets the usual line with the request ID.
+ */
+function whyRefused(error: unknown): string {
+  if (error instanceof ApiError && error.status === 409) return error.message;
+  return apiFailureMessage(error);
 }
 
 /** How many placeholder lines stand in for the list while the AI drafts it. */
@@ -120,13 +157,32 @@ function DraftingPlaceholder() {
  *
  * While the job is a draft HR edits the list here, and every change is saved
  * at once; see `RequirementList`. The draft button shows only while the job
- * has no requirements. Confirming the list comes with a later step.
+ * has no requirements.
+ *
+ * "Confirm requirements" ends the step: the job becomes open and the next
+ * step is unlocked. A confirmed list is read-only. "Edit requirements" takes
+ * the job back to a draft, after a popup that says what going back costs.
  *
  * Like the job itself, everything is asked for inside the signed-in user's
  * company only; the API answers "not found" for another company's job.
  */
-export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus: JobStatus }) {
+export function JobRequirements(props: {
+  jobId: string;
+  jobStatus: JobStatus;
+  /** When the requirements were confirmed, or null while the job is a draft. */
+  confirmedAt: string | null;
+  /** The job became open (confirmed) or a draft again (opened for editing). */
+  onJobState: (state: JobState) => void;
+}) {
+  const { jobId, jobStatus, confirmedAt, onJobState } = props;
   const [state, setState] = useState<RequirementsState>({ kind: "loading" });
+  // "Confirm requirements" is on its way, and the sentence when it was refused.
+  const [confirming, setConfirming] = useState(false);
+  const [confirmProblem, setConfirmProblem] = useState<string | null>(null);
+  // The popup in front of "Edit requirements": shown, being carried out, refused.
+  const [askingToReopen, setAskingToReopen] = useState(false);
+  const [reopening, setReopening] = useState(false);
+  const [reopenProblem, setReopenProblem] = useState<string | null>(null);
   // A status call failed while a draft runs. The asking goes on.
   const [cannotReach, setCannotReach] = useState(false);
   // The click's own call to the API is on its way.
@@ -241,6 +297,42 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
     }
   }
 
+  /**
+   * "Confirm requirements". One click, with no question in front of it,
+   * because it can be undone and costs no AI money. The job becomes open,
+   * this step folds, and the next one is unlocked.
+   */
+  async function confirm() {
+    setConfirming(true);
+    setConfirmProblem(null);
+    try {
+      const answer = await confirmRequirements(jobId);
+      if (shownRef.current) onJobState(answer.job);
+    } catch (error) {
+      if (!shownRef.current) return;
+      if (!(error instanceof ApiError && error.status === 401)) setConfirmProblem(whyRefused(error));
+    } finally {
+      if (shownRef.current) setConfirming(false);
+    }
+  }
+
+  /** The "yes" of the popup in front of "Edit requirements": the job is a draft again. */
+  async function reopen() {
+    setReopening(true);
+    setReopenProblem(null);
+    try {
+      const answer = await reopenRequirements(jobId);
+      if (!shownRef.current) return;
+      setAskingToReopen(false);
+      onJobState(answer.job);
+    } catch (error) {
+      if (!shownRef.current) return;
+      if (!(error instanceof ApiError && error.status === 401)) setReopenProblem(whyRefused(error));
+    } finally {
+      if (shownRef.current) setReopening(false);
+    }
+  }
+
   /** "Check again", after the page stopped asking: one call now, and a new round. */
   function checkAgain() {
     restart();
@@ -257,6 +349,8 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
 
   const { requirements } = state;
   const hasList = requirements.length > 0;
+  const mustCount = requirements.filter((requirement) => requirement.kind === "must").length;
+  // While the job is a draft, HR may draft the list and change it.
   const canDraft = jobStatus === "draft";
   const stuck = unfinished && gaveUp;
   const drafting = starting || (unfinished && !gaveUp);
@@ -280,8 +374,28 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
           <p className="mt-2 text-sm text-brand-light-navy">{countLine(requirements)}</p>
           {canDraft ? (
             <p className="mt-1 text-sm">
-              Review the list and make it yours. Every change is saved at once.
+              Review the list and make it yours. Every change is saved at once. When it is right,
+              confirm it to unlock the next step.
             </p>
+          ) : null}
+          {jobStatus === "open" ? (
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm">
+                Confirmed
+                {confirmedAt ? ` on ${new Date(confirmedAt).toLocaleDateString()}` : ""}. Every CV
+                is checked against this list.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setReopenProblem(null);
+                  setAskingToReopen(true);
+                }}
+                className="rounded-lg border border-brand-navy/30 px-3 py-1.5 text-sm font-medium hover:border-brand-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              >
+                Edit requirements
+              </button>
+            </div>
           ) : null}
         </div>
       ) : null}
@@ -360,6 +474,52 @@ export function JobRequirements({ jobId, jobStatus }: { jobId: string; jobStatus
           onChange={updateRequirements}
         />
       ) : null}
+
+      {/*
+        The foot of the step, while the list can still be changed: the one
+        button that ends the step. It is switched off without a must-have;
+        the line above the list says why.
+      */}
+      {hasList && canDraft && !drafting ? (
+        <div className="mt-6 border-t border-brand-navy/10 pt-4">
+          {mustCount >= MANY_MUST_HAVES ? (
+            <p className="mb-3 rounded-lg bg-brand-cream px-3 py-2 text-sm">
+              {mustCount} must-haves. A candidate who misses any one of them is left out of your
+              main list. Keep must-have for real deal-breakers.
+            </p>
+          ) : null}
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {confirmProblem ? (
+              <p role="alert" className="text-sm text-red-700">
+                {confirmProblem}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => void confirm()}
+              disabled={confirming || mustCount === 0}
+              className={`px-4 py-2 ${BUTTON_CLASSES}`}
+            >
+              {confirming ? "Confirming..." : "Confirm requirements"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <ConfirmDialog
+        open={askingToReopen}
+        title="Edit the requirements again?"
+        confirmLabel="Edit requirements"
+        busyLabel="Opening..."
+        busy={reopening}
+        problem={reopenProblem}
+        onConfirm={() => void reopen()}
+        onCancel={() => setAskingToReopen(false)}
+      >
+        {whatGoingBackCosts().map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </ConfirmDialog>
     </>
   );
 }

@@ -145,7 +145,12 @@ export type JobSummary = {
 /** One job in full. */
 export type Job = JobSummary & {
   description: string;
+  /** When HR confirmed the requirements. Null while the job is a draft. */
+  requirementsConfirmedAt: string | null;
 };
+
+/** The two fields of a job that confirming its requirements, or going back, changes. */
+export type JobState = Pick<Job, "status" | "requirementsConfirmedAt">;
 
 /** What the form sends to create a job. */
 export type NewJob = {
@@ -307,6 +312,27 @@ export function removeRequirement(
   return apiFetch<{ removed: string }>(
     `/v1/jobs/${encodeURIComponent(jobId)}/requirements/${encodeURIComponent(requirementId)}`,
     { method: "DELETE" },
+  );
+}
+
+/**
+ * Confirms a job's requirements. The job becomes `open`, which unlocks the
+ * next step. It costs no AI money. An `ApiError` with status 409 and the code
+ * `no_must_have` means the list has no must-have; its message is a plain
+ * sentence for HR.
+ */
+export function confirmRequirements(jobId: string): Promise<{ job: JobState }> {
+  return apiFetch<{ job: JobState }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements/confirm`,
+    { method: "POST" },
+  );
+}
+
+/** Takes a confirmed job back to `draft`, so its requirements can be edited again. */
+export function reopenRequirements(jobId: string): Promise<{ job: JobState }> {
+  return apiFetch<{ job: JobState }>(
+    `/v1/jobs/${encodeURIComponent(jobId)}/requirements/reopen`,
+    { method: "POST" },
   );
 }
 

@@ -90,6 +90,35 @@ export type ChangeRequirementResult =
 /** How removing a requirement ended. */
 export type RemoveRequirementResult = "removed" | "not_found" | "job_not_found" | "job_not_draft";
 
+/**
+ * How confirming a job's requirements ended.
+ *
+ *   confirmed      the job is open now
+ *   job_not_found  this company has no such job
+ *   job_not_draft  the requirements are confirmed already
+ *   no_must_have   the list has no must-have, so it cannot be confirmed
+ */
+export type ConfirmRequirementsResult =
+  | "confirmed"
+  | "job_not_found"
+  | "job_not_draft"
+  | "no_must_have";
+
+const CONFIRM_RESULTS: readonly string[] = [
+  "confirmed",
+  "job_not_found",
+  "job_not_draft",
+  "no_must_have",
+];
+
+/**
+ * How going back to editing ended. `job_not_open`: the job is a draft
+ * already, or it is closed.
+ */
+export type ReopenRequirementsResult = "reopened" | "job_not_found" | "job_not_open";
+
+const REOPEN_RESULTS: readonly string[] = ["reopened", "job_not_found", "job_not_open"];
+
 /** The small JSON object the three edit functions of the database answer with. */
 type EditAnswer = { result?: unknown; requirement?: unknown };
 
@@ -249,5 +278,36 @@ export class JobRequirementRepository {
       "job_not_draft",
     ]);
     return answer.result as RemoveRequirementResult;
+  }
+
+  /**
+   * Confirms a job's requirements: the job goes from draft to open. The
+   * database function checks in the same step that the list has a must-have,
+   * with the job's row locked, so the last must-have cannot be removed
+   * between the check and the confirm.
+   */
+  async confirmForJob(tenantId: string, jobId: string): Promise<ConfirmRequirementsResult> {
+    const { data, error } = await forTenant(this.db, tenantId).call("confirm_job_requirements", {
+      p_job_id: jobId,
+    });
+
+    if (error) throw toDatabaseError("job_requirements confirm for job", error);
+    if (typeof data !== "string" || !CONFIRM_RESULTS.includes(data)) {
+      throw new Error("confirm_job_requirements gave an answer that is not one of its words");
+    }
+    return data as ConfirmRequirementsResult;
+  }
+
+  /** Takes a job back from open to draft, so its requirements can be edited again. */
+  async reopenForJob(tenantId: string, jobId: string): Promise<ReopenRequirementsResult> {
+    const { data, error } = await forTenant(this.db, tenantId).call("reopen_job_requirements", {
+      p_job_id: jobId,
+    });
+
+    if (error) throw toDatabaseError("job_requirements reopen for job", error);
+    if (typeof data !== "string" || !REOPEN_RESULTS.includes(data)) {
+      throw new Error("reopen_job_requirements gave an answer that is not one of its words");
+    }
+    return data as ReopenRequirementsResult;
   }
 }

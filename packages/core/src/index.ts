@@ -33,10 +33,12 @@ export {
 export type {
   AddRequirementResult,
   ChangeRequirementResult,
+  ConfirmRequirementsResult,
   IfSilent,
   JobRequirementRow,
   NewRequirement,
   RemoveRequirementResult,
+  ReopenRequirementsResult,
   ReplaceRequirementsResult,
   RequirementChange,
   RequirementKind,

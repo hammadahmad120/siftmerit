@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ApiError, apiFailureMessage, getJob, type Job } from "@/lib/api";
+import {
+  ApiError,
+  apiFailureMessage,
+  getJob,
+  type Job,
+  type JobState as JobStatusChange,
+} from "@/lib/api";
 import { plainDate, StatusLabel } from "@/components/job-list";
 import { JobPath, type PathStep, type StepState } from "@/components/job-path";
 import { JobRequirements } from "@/components/job-requirements";
@@ -71,6 +77,13 @@ export function JobDetails({ jobId }: { jobId: string }) {
 
   const { job } = state;
 
+  // The requirements were confirmed, or opened for editing again. Only the
+  // two fields that such a step changes are put into the job on the page.
+  const onJobState = (change: JobStatusChange) =>
+    setState((current) =>
+      current.kind === "ok" ? { kind: "ok", job: { ...current.job, ...change } } : current,
+    );
+
   // Where each step stands follows from the job's status alone. A draft has
   // its requirements still to confirm; after that the job is open.
   const confirmed = job.status !== "draft";
@@ -134,8 +147,22 @@ export function JobDetails({ jobId }: { jobId: string }) {
           <p className="mt-2 text-sm break-words whitespace-pre-wrap">{job.description}</p>
         </JobStep>
 
-        <JobStep number={1} title="Requirements" state={requirementsState} summary="Confirmed">
-          <JobRequirements jobId={job.id} jobStatus={job.status} />
+        <JobStep
+          number={1}
+          title="Requirements"
+          state={requirementsState}
+          summary={
+            job.requirementsConfirmedAt
+              ? `Confirmed on ${new Date(job.requirementsConfirmedAt).toLocaleDateString()}`
+              : "Confirmed"
+          }
+        >
+          <JobRequirements
+            jobId={job.id}
+            jobStatus={job.status}
+            confirmedAt={job.requirementsConfirmedAt}
+            onJobState={onJobState}
+          />
         </JobStep>
 
         <JobStep
@@ -145,7 +172,10 @@ export function JobDetails({ jobId }: { jobId: string }) {
           what="We search your mailbox for the emails whose subject holds your subject words, and list them for you to pick."
           unlocks="Confirm the requirements to unlock this step."
         >
-          <p className="text-sm text-brand-light-navy">This step is not built yet.</p>
+          <p className="text-sm">
+            The requirements are confirmed, so this step is open. It is not built yet: finding
+            the applications in your mailbox comes next.
+          </p>
         </JobStep>
 
         <JobStep

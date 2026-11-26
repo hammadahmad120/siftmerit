@@ -140,5 +140,45 @@ export function createRequirementsController(requirementService: RequirementServ
         next(error);
       }
     },
+
+    /**
+     * `POST /v1/jobs/:jobId/requirements/confirm`: confirms the job's
+     * requirements. The job becomes open. It needs no body and costs no AI
+     * money. 409 when the list has no must-have or the job is not a draft.
+     */
+    confirm: async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        if (!req.tenantId) {
+          throw new UnauthorizedError();
+        }
+
+        const jobId = routeParam(req.params.jobId);
+        const job = await requirementService.confirm(req.tenantId, jobId);
+        req.log.info("requirements confirmed", { jobId });
+        res.json({ job });
+      } catch (error) {
+        next(error);
+      }
+    },
+
+    /**
+     * `POST /v1/jobs/:jobId/requirements/reopen`: takes a confirmed job back
+     * to draft, so its requirements can be edited again. 409 when the job is
+     * not open.
+     */
+    reopen: async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        if (!req.tenantId) {
+          throw new UnauthorizedError();
+        }
+
+        const jobId = routeParam(req.params.jobId);
+        const job = await requirementService.reopen(req.tenantId, jobId);
+        req.log.info("requirements opened for editing", { jobId });
+        res.json({ job });
+      } catch (error) {
+        next(error);
+      }
+    },
   };
 }
