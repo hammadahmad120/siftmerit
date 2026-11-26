@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, type KeyboardEvent, type PointerEvent } from "react";
-import type { IfSilent, Requirement, RequirementChange, RequirementKind } from "@/lib/api";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
+import type { Requirement, RequirementChange, RequirementKind } from "@/lib/api";
 import { BUTTON_CLASSES, FIELD_CLASSES } from "@/lib/styles";
 
 /** The longest a requirement's text may be. The API and the database keep the same limit. */
 export const REQUIREMENT_TEXT_MAX = 500;
 
 /**
- * The three kinds, in the order the list is sorted by: must-have first.
- * `label` is the word on the switch of a requirement. `means` says what the
- * kind does; it is shown once, above the list, so HR does not have to know
- * the rule by heart.
+ * The three kinds, in the order of the board's columns: must-have first.
+ * `label` is the heading of the column. `means` says what the kind does; it
+ * stands under the heading, so HR does not have to know the rule by heart.
  */
 export const KIND_CHOICES: { value: RequirementKind; label: string; means: string }[] = [
   {
@@ -36,97 +35,23 @@ export const KIND_CHOICES: { value: RequirementKind; label: string; means: strin
 ];
 
 /**
- * What a CV that says nothing about a requirement means, as the two choices
- * that end the sentence "If the CV does not mention it:". The code and the
- * database call the second one `missing`; "not met" is the screen's word,
- * because "missing" alone did not say missing from what.
+ * The words of the "silent CV" mark. When a CV says nothing on a
+ * requirement, it is either left for HR to check with the candidate (`ask`),
+ * or counted as not met (`missing`, the usual case, which a card does not
+ * write out).
  */
-export const IF_SILENT_CHOICES: { value: IfSilent; label: string }[] = [
-  { value: "ask", label: "Ask the candidate" },
-  { value: "missing", label: "Count as not met" },
-];
+// The user's own words for it: not present means it needs confirmation with
+  // the candidate. Said as something HR does, because the product never
+  // contacts a candidate.
+export const ASK_TAG = "Not on the CV? Confirm it with the candidate.";
+/** The second line of the mark on a card: what it means until HR has done so. */
+export const ASK_TAG_MEANS = "It stays open until you do.";
+export const ASK_CHOICE = "If a CV does not mention this, I will confirm it with the candidate myself.";
+/** Under the tick: what leaving it empty means. */
+export const ASK_CHOICE_WITHOUT = "Without the tick, a CV that does not mention it counts as not met.";
 
-/** The words in front of the "silent CV" choice, on a card and in the form that adds one. */
-export const IF_SILENT_LEAD = "If the CV does not mention it:";
-
-/**
- * A switch: a row of choices with the chosen one filled in. A click on
- * another choice picks it.
- *
- * Without `onPick` it only shows the choice and does not react, for a list
- * that cannot be changed. `name` says what is being chosen, for a screen
- * reader: "Kind" or the sentence about a silent CV.
- */
-export function ChoiceSwitch<Value extends string>(props: {
-  name: string;
-  choices: { value: Value; label: string }[];
-  chosen: Value;
-  onPick?: (value: Value) => void;
-}) {
-  const { name, choices, chosen, onPick } = props;
-
-  if (!onPick) {
-    const label = choices.find((choice) => choice.value === chosen)?.label;
-    return (
-      <>
-        <span className="sr-only">
-          {name} {label}.
-        </span>
-        <span
-          aria-hidden="true"
-          className="inline-flex rounded-lg border border-brand-navy/20 bg-white p-0.5 text-xs"
-        >
-          {choices.map((choice) => (
-            <span
-              key={choice.value}
-              className={
-                choice.value === chosen
-                  ? "rounded-md bg-brand-navy px-2.5 py-1 font-medium text-brand-cream"
-                  : "px-2.5 py-1 text-brand-light-navy/60"
-              }
-            >
-              {choice.label}
-            </span>
-          ))}
-        </span>
-      </>
-    );
-  }
-
-  return (
-    // A group of radio buttons: exactly one is chosen at any time.
-    <span
-      role="radiogroup"
-      aria-label={name}
-      className="inline-flex rounded-lg border border-brand-navy/20 bg-white p-0.5 text-xs"
-    >
-      {choices.map((choice) => {
-        const isChosen = choice.value === chosen;
-        return (
-          <button
-            key={choice.value}
-            type="button"
-            role="radio"
-            aria-checked={isChosen}
-            onClick={() => {
-              if (!isChosen) onPick(choice.value);
-            }}
-            className={`rounded-md px-2.5 py-1 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-navy ${
-              isChosen
-                ? "bg-brand-navy font-medium text-brand-cream"
-                : "text-brand-light-navy hover:bg-brand-cream"
-            }`}
-          >
-            {choice.label}
-          </button>
-        );
-      })}
-    </span>
-  );
-}
-
-/** A small icon button at the edge of a card. `label` is what a screen reader says. */
-function IconButton(props: { label: string; onClick: () => void; children: React.ReactNode }) {
+/** A small icon button at the foot of a card. `label` is what a screen reader says, and the tooltip. */
+function IconButton(props: { label: string; onClick: () => void; children: ReactNode }) {
   return (
     <button
       type="button"
@@ -140,94 +65,113 @@ function IconButton(props: { label: string; onClick: () => void; children: React
   );
 }
 
-/** A pencil, for "reword". Drawn here because the product uses no icon library. */
-function PencilIcon() {
+/** One of the small drawings on a card's buttons. Drawn here because the product uses no icon library. */
+function Icon({ path }: { path: string }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M13.5 3.5l3 3L7 16l-4 1 1-4 9.5-9.5z" />
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={path} />
     </svg>
   );
 }
 
-/** A bin, for "remove". */
-function BinIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10" />
-    </svg>
-  );
-}
+const PENCIL = "M13.5 3.5l3 3L7 16l-4 1 1-4 9.5-9.5z";
+const BIN = "M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10";
+const ARROW_LEFT = "M16 10H4M9 5l-5 5 5 5";
+const ARROW_RIGHT = "M4 10h12M11 5l5 5-5 5";
 
 /** What a card is doing besides showing its requirement. */
-type Mode = "view" | "rewording" | "removing";
+type Mode = "view" | "editing" | "removing";
+
+/** A column a card can move to, with the words for its arrow. */
+export type MoveTarget = { kind: RequirementKind; label: string };
 
 /**
- * One requirement as a card: its text, its kind as a switch, and what a CV
- * that is silent on it means, said as a sentence. The switch is the only
- * place the kind is written, and a must-have has a dark left edge so the eye
- * finds the deal-breakers.
+ * One requirement as a card on the board. The column it stands in says how
+ * much it counts, so the card itself does not: it holds the requirement's
+ * text, and one small line only when a silent CV means "ask the candidate".
  *
- * With `onChange` and `onRemove` HR can edit it, and every change is saved at
- * once: one click on a kind or a mark, a new text with Enter or "Save", and
- * "Remove" after one question on the card itself. Both functions answer with
- * `null` when the change was saved, or with a sentence that says why not; the
- * card shows that sentence.
+ * With `onChange` and `onRemove` HR can change it:
  *
- * Without them the card only shows the requirement.
+ * - the arrows move it to the column on its left or right, which changes its
+ *   kind; the board draws the move;
+ * - the pencil opens the text and the "ask the candidate" tick, saved with
+ *   Enter or "Save";
+ * - the bin removes it, after one question on the card itself.
+ *
+ * Both functions answer with `null` when the change was saved, or with a
+ * sentence that says why not; the card shows that sentence. Without them the
+ * card only shows the requirement.
  *
  * `fadeInAfterMs` is how long after the first card this one fades in when
- * the list appears. It is kept from the card's first moment: a card that
- * moves to another place later does not fade in again.
+ * the board appears. It is kept from the card's first moment: a card that
+ * moves to another column later does not fade in again.
  */
 export function RequirementCard(props: {
   requirement: Requirement;
   fadeInAfterMs: number;
-  /** The card just moved to a new place in the list. It is lit softly for a moment. */
+  /** The card just moved to another column. It is lit softly for a moment. */
   landed?: boolean;
-  /** The name the browser follows this card by when the list is sorted again. */
+  /** The name the browser follows this card by when it moves. */
   moveName?: string;
-  domId?: string;
+  /** The columns on the left and on the right of the card's own, if any. */
+  moveLeft?: MoveTarget;
+  moveRight?: MoveTarget;
   onChange?: (change: RequirementChange) => Promise<string | null>;
   onRemove?: () => Promise<string | null>;
-  onPointerEnter?: (event: PointerEvent<HTMLLIElement>) => void;
-  onPointerLeave?: (event: PointerEvent<HTMLLIElement>) => void;
 }) {
-  const { requirement, landed, moveName, domId, onChange, onRemove } = props;
+  const { requirement, landed, moveName, moveLeft, moveRight, onChange, onRemove } = props;
 
   const [mode, setMode] = useState<Mode>("view");
   const [draftText, setDraftText] = useState(requirement.text);
+  const [draftAsk, setDraftAsk] = useState(requirement.ifSilent === "ask");
   const [saving, setSaving] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   // Kept from the first moment; see the comment above.
   const [fadeInAfterMs] = useState(props.fadeInAfterMs);
 
-  /** One click on a kind or a mark. The list shows it at once; a failure comes back as a sentence. */
-  async function pick(change: RequirementChange) {
+  /** An arrow: the card moves to the next column. A failure comes back as a sentence. */
+  async function moveTo(target: MoveTarget) {
     if (!onChange) return;
     setProblem(null);
-    setProblem(await onChange(change));
+    setProblem(await onChange({ kind: target.kind }));
   }
 
-  function startRewording() {
+  function startEditing() {
     setDraftText(requirement.text);
+    setDraftAsk(requirement.ifSilent === "ask");
     setProblem(null);
-    setMode("rewording");
+    setMode("editing");
   }
 
-  async function saveText() {
+  /** "Save" in the edit view. Only what really changed is sent. */
+  async function saveEdit() {
     if (!onChange || saving) return;
     const text = draftText.replace(/\s+/g, " ").trim();
     if (text === "") {
       setProblem("A requirement cannot be empty.");
       return;
     }
-    if (text === requirement.text) {
+
+    const change: RequirementChange = {};
+    if (text !== requirement.text) change.text = text;
+    if (draftAsk !== (requirement.ifSilent === "ask")) change.ifSilent = draftAsk ? "ask" : "missing";
+    if (Object.keys(change).length === 0) {
       setMode("view");
       return;
     }
+
     setSaving(true);
     setProblem(null);
-    const failed = await onChange({ text });
+    const failed = await onChange(change);
     setSaving(false);
     if (failed) setProblem(failed);
     else setMode("view");
@@ -237,7 +181,7 @@ export function RequirementCard(props: {
     // A requirement is one line, so Enter saves it and adds no line break.
     if (event.key === "Enter") {
       event.preventDefault();
-      void saveText();
+      void saveEdit();
     }
     if (event.key === "Escape") {
       setProblem(null);
@@ -262,17 +206,13 @@ export function RequirementCard(props: {
 
   return (
     <li
-      id={domId}
-      onPointerEnter={props.onPointerEnter}
-      onPointerLeave={props.onPointerLeave}
-      // A must-have has a dark left edge. A card that just moved has a soft
-      // purple ring around it, which fades away again.
-      className={`rise-in rounded-lg border border-brand-navy/15 bg-white p-4 ring-brand-purple/25 transition-shadow duration-700 ${
-        requirement.kind === "must" ? "border-l-4 border-l-brand-navy" : ""
-      } ${landed ? "ring-4" : "ring-0"}`}
+      // A card that just moved has a soft purple ring, which fades away again.
+      className={`rise-in rounded-lg border border-brand-navy/15 bg-white p-3 ring-brand-purple/30 transition-shadow duration-700 ${
+        landed ? "ring-4" : "ring-0"
+      }`}
       style={{ animationDelay: `${fadeInAfterMs}ms`, viewTransitionName: moveName }}
     >
-      {mode === "rewording" ? (
+      {mode === "editing" ? (
         <div>
           <label className="block text-xs font-medium text-brand-light-navy">
             Requirement
@@ -281,16 +221,29 @@ export function RequirementCard(props: {
               onChange={(event) => setDraftText(event.target.value)}
               onKeyDown={onTextKey}
               maxLength={REQUIREMENT_TEXT_MAX}
-              rows={2}
+              rows={3}
               autoFocus
               disabled={saving}
               className={`text-sm ${FIELD_CLASSES}`}
             />
           </label>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
+          <label className="mt-2 flex items-start gap-2 text-xs">
+            <input
+              type="checkbox"
+              checked={draftAsk}
+              onChange={(event) => setDraftAsk(event.target.checked)}
+              disabled={saving}
+              className="mt-0.5 h-4 w-4 accent-brand-navy"
+            />
+            <span>
+              {ASK_CHOICE}
+              <span className="mt-0.5 block text-brand-light-navy">{ASK_CHOICE_WITHOUT}</span>
+            </span>
+          </label>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => void saveText()}
+              onClick={() => void saveEdit()}
               disabled={saving}
               className={`px-3 py-1.5 ${BUTTON_CLASSES}`}
             >
@@ -307,36 +260,27 @@ export function RequirementCard(props: {
             >
               Cancel
             </button>
-            <span className="text-xs text-brand-light-navy">Enter saves, Esc cancels.</span>
           </div>
         </div>
       ) : (
-        <div className="flex items-start justify-between gap-3">
+        <>
           {/* Plain text, never HTML: React writes the text out as it is. */}
-          <p className="min-w-0 text-sm font-medium break-words">{requirement.text}</p>
-          {canEdit && mode === "view" ? (
-            <div className="-mt-1 -mr-1 flex shrink-0">
-              <IconButton label="Reword this requirement" onClick={startRewording}>
-                <PencilIcon />
-              </IconButton>
-              <IconButton
-                label="Remove this requirement"
-                onClick={() => {
-                  setProblem(null);
-                  setMode("removing");
-                }}
-              >
-                <BinIcon />
-              </IconButton>
-            </div>
+          <p className="text-sm break-words">{requirement.text}</p>
+          {requirement.ifSilent === "ask" ? (
+            // Two short lines: silence is not a miss here, and HR is the one
+            // who settles it.
+            <p className="mt-2 rounded-md bg-brand-cream px-2 py-1 text-xs">
+              <span className="block font-medium">{ASK_TAG}</span>
+              <span className="block text-brand-light-navy">{ASK_TAG_MEANS}</span>
+            </p>
           ) : null}
-        </div>
+        </>
       )}
 
       {mode === "removing" ? (
-        // Asked on the card itself: a removed line is gone.
+        // Asked on the card itself: a removed requirement is gone.
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-          <span className="font-medium">Remove this requirement?</span>
+          <span className="w-full font-medium">Remove this requirement?</span>
           <button
             type="button"
             onClick={() => void remove()}
@@ -355,25 +299,39 @@ export function RequirementCard(props: {
             Cancel
           </button>
         </div>
-      ) : (
-        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
-          <ChoiceSwitch
-            name="Kind:"
-            choices={KIND_CHOICES}
-            chosen={requirement.kind}
-            onPick={canEdit ? (kind) => void pick({ kind }) : undefined}
-          />
-          <span className="flex flex-wrap items-center gap-2 text-xs text-brand-light-navy">
-            <span aria-hidden="true">{IF_SILENT_LEAD}</span>
-            <ChoiceSwitch
-              name={IF_SILENT_LEAD}
-              choices={IF_SILENT_CHOICES}
-              chosen={requirement.ifSilent}
-              onPick={canEdit ? (ifSilent) => void pick({ ifSilent }) : undefined}
-            />
+      ) : null}
+
+      {canEdit && mode === "view" ? (
+        <div className="mt-2 -mb-1 flex items-center justify-between">
+          {/* The arrow to the left stands on the left, the one to the right on the right. */}
+          <span className="-ml-1.5">
+            {moveLeft ? (
+              <IconButton label={`Move to ${moveLeft.label}`} onClick={() => void moveTo(moveLeft)}>
+                <Icon path={ARROW_LEFT} />
+              </IconButton>
+            ) : null}
+          </span>
+          <span className="-mr-1.5 flex">
+            <IconButton label="Edit this requirement" onClick={startEditing}>
+              <Icon path={PENCIL} />
+            </IconButton>
+            <IconButton
+              label="Remove this requirement"
+              onClick={() => {
+                setProblem(null);
+                setMode("removing");
+              }}
+            >
+              <Icon path={BIN} />
+            </IconButton>
+            {moveRight ? (
+              <IconButton label={`Move to ${moveRight.label}`} onClick={() => void moveTo(moveRight)}>
+                <Icon path={ARROW_RIGHT} />
+              </IconButton>
+            ) : null}
           </span>
         </div>
-      )}
+      ) : null}
 
       {/* `role="alert"` makes a screen reader read the sentence when it appears. */}
       {problem ? (

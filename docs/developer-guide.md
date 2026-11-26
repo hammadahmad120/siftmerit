@@ -13,8 +13,8 @@ One repo with four parts, joined by npm workspaces. One `npm install` at the rep
 
 | Part | Folder | Name | What it does today |
 |---|---|---|---|
-| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and the job screens: the list at `/jobs`, the form at `/jobs/new` and a job's page at `/jobs/<id>` (section 10), which shows the job's requirements and the button that drafts them (section 13). |
-| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, `/v1/jobs` (create, list, get one; section 10), `/v1/jobs/:jobId/requirements` (the list, and `POST .../draft` to start a draft; section 13) and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users and two development commands for AI calls. |
+| Web app | `apps/web` | `@siftmerit/web` | Sign-in and sign-out, a top bar with the menu and the company name around every signed-in page, a home page at `/`, and the job screens: the list at `/jobs`, the form at `/jobs/new` and a job's pages under `/jobs/<id>`, one per step of the job, inside one frame (section 10). The first step, the requirements, is built: HR lets the AI draft them, edits them on a board and confirms them (section 13). |
+| API | `services/api` | `@siftmerit/api` | Checks who is calling and which company they belong to. Addresses: `/v1/health`, `/v1/me`, `/v1/jobs` (create, list, get one; section 10), `/v1/jobs/:jobId/requirements` (the list; `POST .../draft` to start a draft; add, change and remove a requirement; `POST .../confirm` and `.../reopen`; section 13) and `/v1/demo-work` (`POST` starts a demo run, `GET` lists the last runs). Also holds the script that creates companies and users and two development commands for AI calls. |
 | Worker | `services/worker` | `@siftmerit/worker` | Keeps running, takes work items from the queue and runs them (section 9). There are two kinds: a demo item, and a requirements draft, which makes the product's first AI call (section 13). It also holds the mailbox scripts (section 7). |
 | Core | `packages/core` | `@siftmerit/core` | Shared code for the API and the worker: the logger, the settings loader, the database connection, the helper that keeps companies apart, the repositories for `jobs`, `job_requirements`, `work_runs` and `ai_calls`, the AI wrapper, the requirements draft and the work queues. |
 
@@ -202,8 +202,11 @@ A Next.js 16 app with React 19 and Tailwind 4, using the App Router and a `src` 
 - `src/app/signin/page.tsx`: the sign-in page at `/signin`. It is the one page that needs no signed-in user.
 - `src/app/(dashboard)/layout.tsx`: puts the guard, and inside it the shell, around every page in the `(dashboard)` folder. A folder name in brackets is not part of the address.
 - `src/app/(dashboard)/page.tsx`: the home page at `/`, where a signed-in user lands. It holds a "Jobs" section.
-- `src/app/(dashboard)/jobs/page.tsx`, `jobs/new/page.tsx`, `jobs/[jobId]/page.tsx`: the job list, the "New job" form and a job's own page (section 10).
-- `src/components/job-list.tsx`, `job-form.tsx`, `subject-words-field.tsx`, `job-details.tsx`, `back-to-jobs.tsx`: the browser parts of those three pages.
+- `src/app/(dashboard)/jobs/page.tsx`, `jobs/new/page.tsx`: the job list and the "New job" form (section 10).
+- `src/app/(dashboard)/jobs/[jobId]/layout.tsx` and the small `page.tsx` files beside it (`details`, `requirements`, `applications`, `reading`, `candidates`): the frame of one job and one page per step (section 10).
+- `src/components/job-list.tsx`, `job-form.tsx`, `subject-words-field.tsx`, `back-to-jobs.tsx`: the browser parts of the list and the form.
+- `src/components/job-frame.tsx`, `job-path.tsx`, `step-bar.tsx`, `job-landing.tsx`, `job-details.tsx`, `step-placeholder.tsx` and `src/lib/job-steps.ts`: a job's frame, the row of steps, the bar at the bottom, and the steps that need little (section 10).
+- `src/components/job-requirements.tsx`, `requirement-list.tsx`, `requirement-card.tsx`, `requirement-add.tsx`, `confirm-dialog.tsx` and `src/lib/use-ask-while.ts`: the requirements step (section 13).
 - `src/components/auth-guard.tsx`: the guard.
 - `src/components/dashboard-shell.tsx`, `dashboard-nav.tsx`: the top bar with the page area below it, and the menu.
 - `src/components/me-context.tsx`: asks `/v1/me` once and shares the answer.
@@ -416,7 +419,7 @@ company.delete("jobs").eq("id", jobId);                              // filter a
 
 ### Database functions
 
-Our code normally sends the database one statement at a time. A database function runs several statements inside the database as one unit, a transaction: all of them happen or none does. It is used where two steps must never be seen half done. So far there is one, `replace_job_requirements` (section 13).
+Our code normally sends the database one statement at a time. A database function runs several statements inside the database as one unit, a transaction: all of them happen or none does. It is used where two steps must never be seen half done, and most of all for "check, then write": check that the job is still a draft, then change its list. Done as two requests from our code, something else could happen between them. There are six, all for a job's requirements (section 13).
 
 - A function goes past the filter that `forTenant`'s other doors add. So every function takes the company's ID as `p_tenant_id` and uses it in every statement it runs. That is a rule for writing one, and it is checked by reading the SQL.
 - A repository calls it only through `forTenant(db, tenantId).call(name, args)`, never through the Supabase library's `rpc` directly.
@@ -648,13 +651,14 @@ A job is one hiring job of a company: a title, the job description, the subject 
 | `subject_words` | The phrases looked for in email subjects, as a Postgres list (`text[]`), 1 to 10 phrases |
 | `posting_date` | A plain date. Mail from this day onward is looked at |
 | `status` | `draft`, `open` or `closed` |
+| `requirements_confirmed_at` | When HR confirmed the requirements. Empty while the job is a draft; a rule in the database ties the two together |
 | `create_key` | The one-time key the form sent. Allowed once per company |
 | `created_by` | The user who created the job. Empty when that account was deleted |
 
-- **Status.** A new job is a `draft`: its requirements are not confirmed yet. `open` is set when HR confirms them (task 16) and `closed` when HR closes the job (task 48). What is running at the moment, such as "reading 120 of 200", is not a job status; that is read from `work_runs`.
+- **Status.** A new job is a `draft`: its requirements are not confirmed yet. `open` is set when HR confirms them, and the job goes back to `draft` when HR opens them for editing again (section 13). `closed` is set when HR closes the job (task 48). What is running at the moment, such as "reading 120 of 200", is not a job status; that is read from `work_runs`.
 - **Subject words.** One phrase is enough. Inside a phrase all its words must be in the subject, in any order (mailsift sends Gmail `subject:(Senior Accountant)`). A second phrase is for applicants who use other words for the same job. Picking an email that matches any one phrase is built in task 22.
 - **Two "allowed once" rules.** `(tenant_id, create_key)` is the one-time key. `(tenant_id, id)` looks pointless, since an ID is unique by itself; it exists so that a later table can point at a job together with its company, and the database then refuses a row that names one company and another company's job.
-- Columns that later steps need (when the requirements were confirmed, when the mailbox was last checked, when the job was closed) are added by the tasks that first use them.
+- Columns that later steps need (when the mailbox was last checked, when the job was closed) are added by the tasks that first use them.
 
 ### The addresses
 
@@ -690,8 +694,29 @@ A slow call can save the job and still lose its answer. HR sees an error, clicks
 - **The list** (`job-list.tsx`) shows each job as a card: the title, the status label, up to three subject phrases and then "+2 more", and the two dates. The whole card is one link. It asks the API each time the page appears.
 - **The form** (`job-form.tsx`) fills the posting date with "7 days ago" by the user's own computer. An emptied date field is not sent, and the API then uses 7 days back by its own clock.
 - **The chip field** (`subject-words-field.tsx`) is written by us; there is no component library. Its whole value (the chips, the text being typed, and the small line that says why a phrase was not added) is kept by the form, so the form can turn leftover text into a chip when the button is clicked. Enter adds a chip and does not send the form. A comma ends a phrase, typed or pasted. Backspace in the empty field removes the last chip. The cross is a real button.
-- **A job's page** (`job-details.tsx`) shows the subject words, then the "Requirements" section (section 13), then the description as plain text, never as HTML. The requirements stand above the description because a long description would push them far down.
+- **A job's pages** are described below, under "A job's pages: the stepper".
 - The "New job" page and a job's page have a "Back to jobs" button at the top (`back-to-jobs.tsx`).
+
+### A job's pages: the stepper
+
+A job is worked on in steps: Job, Requirements, Applications, CV reading, Candidates. Each step has its own page and its own address, and one frame stays around them.
+
+```
+/jobs/<id>               sends HR on to the step the job is at
+/jobs/<id>/details       the "Job" step: the description and the subject words
+/jobs/<id>/requirements  step 1 (section 13)
+/jobs/<id>/applications  step 2, not built yet
+/jobs/<id>/reading       step 3, not built yet
+/jobs/<id>/candidates    step 4, not built yet
+```
+
+- **The steps are written once,** in `src/lib/job-steps.ts`: name, address, who does the work, what the step is for, and which step a job is at. Today that follows from the job's status alone: a draft is at Requirements, an open job at Applications. A task that builds a step adds its page and, if needed, its rule there.
+- **The frame** (`[jobId]/layout.tsx` and `job-frame.tsx`) loads the job once and shares it with every step through `useJob()`. Moving between steps does not load the job again. It shows the title, the status and the row of steps.
+- **Each step loads its own data when it is opened.** A step that is not on the screen calls nothing.
+- **The row of steps** (`job-path.tsx`) shows what is done (a tick), which step the job is at (a purple number) and what is locked. Done steps and the job's own step are links. The step on the screen has a soft ring around its marker and a dark, heavy name.
+- **The bar at the bottom** (`step-bar.tsx`) is fixed to the bottom of the window. Left: "Back". Middle: one line, a count or the reason the button is off. Right: the step's own action, named for what it does ("Confirm requirements"), or "Next" on a step that is already done. Every step puts the bar at the end of its content and hands it its action; the bar works out "Back" and "Next" itself.
+- **Four rules.** The button says what it does, because finishing a step changes the job. "Back" only looks and never undoes. Opening a job lands on the step it is at. The step is part of the address, so a reload stays on it and the browser's back button works.
+- **A step with no screen yet** shows `step-placeholder.tsx`: what the step will do, and either what unlocks it or that it is not built.
 
 ### Traps
 
@@ -702,6 +727,9 @@ A slow call can save the job and still lose its answer. HR sees an error, clicks
 - **A date written as `2026-11-17` must not be read with `new Date("2026-11-17")`.** That reads it as midnight in UTC, which is the day before in some time zones. `plainDate` in `job-list.tsx` hands the three numbers over one by one.
 - **Two such dates compare correctly as plain text,** which is how the API checks the range.
 - **A text with a NUL character is refused with 400.** Postgres cannot store that character.
+- **A step's page must be inside the frame.** `useJob()` throws outside it. The frame draws a step only once the job has arrived, so a step never deals with "still loading".
+- **`/jobs/<id>` itself has no content.** It replaces its own address with the step's, so it does not stay in the browser's history.
+- **Until the SQL file `20261126130000_requirements_confirm.sql` is applied, no job loads and none can be created,** because the repository asks for the column `requirements_confirmed_at`.
 - **A job cannot be edited or deleted yet.** A typo in the title stays. Later tasks bring the edits: subject words (25), the description (44), closing (48).
 - **The list is capped at 100 and has no paging.** The page says so when the cap is reached.
 - **`crypto.randomUUID()` in the browser needs a secure page:** `https`, or `localhost` in development.
@@ -836,7 +864,7 @@ It makes one tiny real call, booked on that company, and prints the checked answ
 
 ## 13. Requirements
 
-A job's requirements are the list every CV is later checked against. The AI drafts the list from the job description when HR clicks "Draft requirements". HR cannot edit or confirm it yet (task 16).
+A job's requirements are the list every CV is later checked against. The AI drafts the list from the job description when HR clicks "Draft requirements". HR then makes the list hers on a board of three columns, and confirms it. The confirm opens the job, and nothing later may start before it.
 
 ### The table
 
@@ -855,19 +883,24 @@ Deleting a job removes its requirements. The five words are the ones the test se
 ### The pieces
 
 - `packages/core/src/requirements/draft.ts`: the instructions, the answer form, `checkDraft` and `draftRequirements`.
-- `packages/core/src/job-requirements.repository.ts`: reads a job's list and swaps it.
+- `packages/core/src/job-requirements.repository.ts`: reads a job's list, and every write to it, each through a database function.
 - `services/worker/src/handlers/requirements.handler.ts`: runs one draft as a work item.
-- `services/api/src/services/requirement.service.ts`: the two addresses.
-- `apps/web/src/components/job-requirements.tsx` and `apps/web/src/lib/use-ask-while.ts`: the section on the job's page, and the polling.
+- `services/api/src/services/requirement.service.ts`: the rules behind every address. Its functions are the actions behind the screen's buttons; a later chat agent calls the same ones.
+- `apps/web/src/components/job-requirements.tsx`: the step. `requirement-list.tsx`: the board. `requirement-card.tsx`: one card. `requirement-add.tsx`: the form at the foot of a column. `confirm-dialog.tsx`: the popup. `apps/web/src/lib/use-ask-while.ts`: the polling.
 
 ### The addresses
 
 | Address | What it does | Answers |
 |---|---|---|
 | `GET /v1/jobs/:jobId/requirements` | The job's list in order, and its newest draft run or `null` | 200, or 404 `job_not_found` |
-| `POST /v1/jobs/:jobId/requirements/draft` | Starts a draft. No body | 202 with the run. 404 `job_not_found`. 409 `job_not_draft` or `already_drafting`. 503 `queue_unavailable` |
+| `POST /v1/jobs/:jobId/requirements/draft` | Starts a draft. No body | 202 with the run. 409 `job_not_draft`, `requirements_exist` or `already_drafting`. 503 `queue_unavailable` |
+| `POST /v1/jobs/:jobId/requirements` | Adds a requirement: text, kind, mark | 201 with it. 400 for a bad text. 409 `duplicate_requirement`, `too_many_requirements` or `job_not_draft` |
+| `PATCH /v1/jobs/:jobId/requirements/:requirementId` | Changes the text, the kind or the mark. Only what changes is sent | 200 with it. 404 `requirement_not_found`. 409 as above |
+| `DELETE /v1/jobs/:jobId/requirements/:requirementId` | Removes one | 200 |
+| `POST /v1/jobs/:jobId/requirements/confirm` | Confirms the list: the job becomes `open` | 200 with the job's status and confirm time. 409 `no_must_have` or `job_not_draft` |
+| `POST /v1/jobs/:jobId/requirements/reopen` | Takes the job back to `draft` | 200, as above. 409 `job_not_open` |
 
-Every user of the company may read and draft. One address gives the list and the run's status together on purpose: the page asks it while a draft runs, and the moment the run says `done` the new list is in the same answer.
+Every user of the company may do all of it. A refusal carries a plain sentence that the screen shows as it is. One address gives the list and the run's status together on purpose: the page asks it while a draft runs, and the moment the run says `done` the new list is in the same answer.
 
 ### The path of one click
 
@@ -899,9 +932,37 @@ They are one text in `draft.ts`, in four steps: split a line that holds two skil
 
 A refused list was paid for. It shows in the cost log as `wrong_answer` with `check_failed`.
 
-### The swap
+### The database functions
 
-`replace_job_requirements(p_tenant_id, p_job_id, p_requirements)` deletes the job's old rows and adds the new ones inside one transaction, so the list is always the whole old one or the whole new one. It locks the job's row first and checks that the job is still a draft, so a swap cannot cross a confirm. It answers with one word: `replaced`, `job_not_found` or `job_not_draft`. A second draft therefore replaces the first, and only while the job is a draft.
+Every write to a job's requirements is a database function (SQL files `20261125130000`, `20261126120000` and `20261126130000`). Each one locks the job's row, checks where the job stands, and only then writes, all in one step. So two edits of one job run one after the other, and an edit cannot cross a confirm.
+
+| Function | What it does | Its answers |
+|---|---|---|
+| `replace_job_requirements` | Swaps the whole list for a drafted one | `replaced`, `job_not_found`, `job_not_draft` |
+| `add_job_requirement` | Adds one at the end. The limit of 30 is handed in by our code | `added`, `too_many`, `duplicate`, and the two above |
+| `change_job_requirement` | Changes the text, the kind or the mark. A value handed in as null stays | `changed`, `not_found`, `duplicate`, and the two above |
+| `remove_job_requirement` | Removes one | `removed`, `not_found`, and the two above |
+| `confirm_job_requirements` | Sets the job to `open` with the time, if the list has a must-have | `confirmed`, `no_must_have`, and the two above |
+| `reopen_job_requirements` | Sets the job back to `draft` and empties the time | `reopened`, `job_not_found`, `job_not_open` |
+
+- The first, the fifth and the sixth answer with one word. The three in the middle answer with a small JSON object, the word and the saved row, because the page needs the row back.
+- A rule in the database keeps "no text twice in one job", where capital letters do not make a text different. A second such text makes a function answer `duplicate`.
+- The list is always the whole old one or the whole new one, never empty in between.
+
+### Editing
+
+While the job is a draft, every change HR makes is saved at once. There is no "Save" for the list.
+
+- The board changes first and the API is called after. If the API refuses, that one change is taken back and the card shows the sentence.
+- A text is tidied the same way for HR and for the AI's draft (spaces around it go, several inside become one), so "the same text" means the same for both.
+- A draft is offered only while the job has no requirements. The same job description gives nearly the same list again, and a new draft would wipe HR's changes. The API refuses it too (`requirements_exist`).
+- The limits: 500 characters for a text, 30 requirements in a list.
+
+### Confirm and going back
+
+- **"Confirm requirements"** is the step's action in the bar. It asks nothing first, because it can be undone and costs no AI money. It is switched off without a must-have, and the bar says why. From 7 must-haves on a note says that each one is one more way for a candidate to be left out; it never blocks.
+- After the confirm the job is `open`, HR is taken to the next step, and the list is read-only.
+- **"Edit requirements"**, on a confirmed list, opens a popup that says what going back costs, and then takes the job back to `draft`. The popup's lines come from one function, `whatGoingBackCosts` in `job-requirements.tsx`. Today they say that nothing was done with the list yet. A task that adds work after this step adds its line there, and the task that first reads a CV adds its check to `reopen_job_requirements`.
 
 ### How a draft can end
 
@@ -918,11 +979,18 @@ A refused list was paid for. It shows in the cost log as `wrong_answer` with `ch
 
 A refused list is not tried again because it was paid for, so HR decides with a click whether to pay again. The most one click can cost is three calls.
 
-### The section on the job's page
+### The step on the screen
 
-Four states, all read from the API: no list yet, drafting, the list in three groups (must-have, preferred, nice to have) with a small label for the "silent CV" mark on each line, and failed with the reason. The button reads "Draft requirements", "Draft again" or "Try again", and is shown only while the job is a draft.
+**Before a list exists:** one card that says why the step matters ("every CV is later checked against this list"), with the button. **While the AI drafts:** "AI is reading your job description..." over lines that shimmer. **With a list:** the board.
 
-While a run is unfinished the page asks again every 3 seconds. `useAskWhile` holds every case:
+The board has three columns: Must-have, Preferred, Nice to have. The column a card stands in is how much the requirement counts, so no card says it; the heading of a column says once what its kind does.
+
+- The arrows on a card move it to the column on its left or right. The browser draws the move (a "view transition"), so the card glides across, and it is lit for a moment where it lands. `drawTheMove` in `requirement-list.tsx` wraps that; where the browser cannot do it, or the person asked for less motion, the card is simply at its new place.
+- The pencil opens the text and one tick for the "silent CV" mark. The bin removes the card after one question on the card.
+- Each column has its own "+ Add", which adds a requirement of that kind.
+- Only a card whose mark is `ask` shows a line: "Not on the CV? Confirm it with the candidate." One sentence above the board says the usual case, and that the product never contacts a candidate.
+
+While a draft run is unfinished the page asks again every 3 seconds. `useAskWhile` holds every case:
 
 - **It stops** when the run is done or failed, when the page is left, when the sign-in has ended (401) or the job is gone (404), and after 5 minutes without an end. Then the page says "This is taking longer than usual", offers "Check again", and the button becomes "Try again".
 - **It holds back** while the tab is in the background, and asks once when the tab is shown again.
@@ -945,9 +1013,14 @@ It runs `draftRequirements` directly, without the queue, saves the list and prin
 - **The kinds are a first guess, and they change from run to run.** On the AI engineer advert of the test set two runs of the same instructions gave different must-haves, and one split a line that holds a condition. Most adverts do not say which line is a must-have. Measuring and tuning this is task 15; HR setting the kinds by hand is task 16.
 - **The examples inside the instructions are made up.** None is a line of the two adverts in `test-set/jobs/`. An advert the model was shown the answer for measures nothing in the eval.
 - **Instructions are tested like code.** The first version read well and still did not split the main case; a concrete shape ("in a line A and B or C, A is one requirement") fixed it.
-- **Both SQL files must be applied.** With only the first, every read of a run fails, and the section shows an error.
+- **All the SQL files must be applied.** Without `20261125140000_work_runs_job.sql` every read of a run fails; without `20261126120000_requirement_edits.sql` every edit fails; without `20261126130000_requirements_confirm.sql` no job loads.
 - **One gap is accepted.** A worker that dies after the list is saved and before the run is marked done makes the next try draft again. The job still ends with one whole list, and it costs one more call.
-- **"Draft again" asks no "are you sure".** HR has nothing of their own in the list yet. Task 16 adds the warning, or offers a redraft only when the description changed.
-- **The limits are written twice:** 500 characters in `job-requirements.repository.ts` and in the SQL file. Change both together.
+- **No screen says "ask the candidate" without saying who asks.** The product only reads mail. The mark is named `ask` in the code and "ask the candidate" in the docs; on a screen it is something HR does herself.
+- **The words `must`, `preferred`, `nice`, `ask` and `missing` never show on a screen.** The screen has its own words for each, in `requirement-card.tsx`.
+- **A card moves at once when an arrow is clicked,** and the save follows. If the save fails, the card glides back and says why.
+- **The move is drawn by the browser,** and every card needs its own `view-transition-name`. Two elements with the same name make the browser skip the whole move.
+- **The popup is the browser's `<dialog>`, opened with `showModal()`.** Only that dims the page behind it and keeps the Tab key inside. Showing it with a class does neither.
+- **The limits are written three times:** 500 and 30 in `job-requirements.repository.ts`, 500 in the SQL file of the table, and both again in the web app (`requirement-card.tsx`, `requirement-list.tsx`), which cannot import server code. Change them together.
+- **Capital letters are folded by JavaScript for the AI's draft and by Postgres for the rule in the database.** For nearly every text the two agree. Where they do not, the swap of a drafted list fails with a database error and the run ends as `work_failed`.
 - **A job description is not masked.** It is not CV text.
 - **A job cannot be edited yet,** so a wrong description means a new job.

@@ -1,49 +1,43 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import type { IfSilent, NewRequirement, RequirementKind } from "@/lib/api";
+import type { NewRequirement, RequirementKind } from "@/lib/api";
 import {
-  ChoiceSwitch,
-  IF_SILENT_CHOICES,
-  IF_SILENT_LEAD,
-  KIND_CHOICES,
+  ASK_CHOICE,
+  ASK_CHOICE_WITHOUT,
   REQUIREMENT_TEXT_MAX,
 } from "@/components/requirement-card";
 import { BUTTON_CLASSES, FIELD_CLASSES } from "@/lib/styles";
 
-/** A new requirement starts with these two; HR changes them with one click. */
-const START_KIND: RequirementKind = "preferred";
-const START_IF_SILENT: IfSilent = "missing";
-
 /**
- * "Add a requirement", at the end of the list. Closed, it is one quiet
- * button. Open, it is a small form: the text, the kind, and what a silent CV
- * means.
+ * "Add a requirement", at the foot of a column of the board. The column
+ * says the kind, so the form asks only for the text and for the "ask the
+ * candidate" tick. Closed, it is one quiet button; open, a small form.
  *
  * `onAdd` saves the requirement and answers with `null` when that worked, or
  * with a sentence that says why not, for example that the text is already in
  * the list. The form then stays open with the sentence under it.
  *
- * When the list is `full`, the button is switched off and says why.
+ * When the list is `full`, the button is switched off. The board says why,
+ * once, under its three columns.
  */
 export function RequirementAdd(props: {
+  kind: RequirementKind;
+  /** The column's name, for a screen reader: "Add a must-have". */
+  columnLabel: string;
   full: boolean;
-  /** How many requirements a list may hold, for the sentence shown when it is full. */
-  max: number;
   onAdd: (requirement: NewRequirement) => Promise<string | null>;
 }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
-  const [kind, setKind] = useState<RequirementKind>(START_KIND);
-  const [ifSilent, setIfSilent] = useState<IfSilent>(START_IF_SILENT);
+  const [ask, setAsk] = useState(false);
   const [saving, setSaving] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
 
   function close() {
     setOpen(false);
     setText("");
-    setKind(START_KIND);
-    setIfSilent(START_IF_SILENT);
+    setAsk(false);
     setProblem(null);
   }
 
@@ -60,7 +54,11 @@ export function RequirementAdd(props: {
 
     setSaving(true);
     setProblem(null);
-    const failed = await props.onAdd({ text: tidy, kind, ifSilent });
+    const failed = await props.onAdd({
+      text: tidy,
+      kind: props.kind,
+      ifSilent: ask ? "ask" : "missing",
+    });
     setSaving(false);
     if (failed) setProblem(failed);
     else close();
@@ -68,36 +66,38 @@ export function RequirementAdd(props: {
 
   if (!open) {
     return (
-      <div className="mt-3">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          disabled={props.full}
-          className="w-full rounded-lg border border-dashed border-brand-navy/30 px-4 py-3 text-left text-sm font-medium enabled:hover:border-brand-navy enabled:hover:bg-brand-cream/50 focus-visible:outline-2 focus-visible:outline-brand-navy disabled:opacity-60"
-        >
-          + Add a requirement
-        </button>
-        {props.full ? (
-          <p className="mt-2 text-sm text-brand-light-navy">
-            A list can have at most {props.max} requirements. Remove one to add another.
-          </p>
-        ) : null}
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        disabled={props.full}
+        aria-label={`Add a requirement to ${props.columnLabel}`}
+        className="mt-2 w-full rounded-lg border border-dashed border-brand-navy/30 px-3 py-2 text-left text-sm font-medium text-brand-light-navy enabled:hover:border-brand-navy enabled:hover:text-brand-navy focus-visible:outline-2 focus-visible:outline-brand-navy disabled:opacity-50"
+      >
+        + Add
+      </button>
     );
   }
 
   return (
-    <form onSubmit={(event) => void submit(event)} className="mt-3 rounded-lg border border-brand-navy/30 bg-white p-4">
+    <form
+      onSubmit={(event) => void submit(event)}
+      className="mt-2 rounded-lg border border-brand-navy/30 bg-white p-3"
+    >
       <label className="block text-xs font-medium text-brand-light-navy">
         New requirement
-        <input
-          type="text"
+        <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Escape") close();
+            // A requirement is one line, so Enter sends the form.
+            if (event.key === "Enter") {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
           }}
           maxLength={REQUIREMENT_TEXT_MAX}
+          rows={3}
           placeholder="For example: 3 or more years of sales experience"
           autoFocus
           disabled={saving}
@@ -105,20 +105,21 @@ export function RequirementAdd(props: {
         />
       </label>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
-        <ChoiceSwitch name="Kind:" choices={KIND_CHOICES} chosen={kind} onPick={setKind} />
-        <span className="flex flex-wrap items-center gap-2 text-xs text-brand-light-navy">
-          <span aria-hidden="true">{IF_SILENT_LEAD}</span>
-          <ChoiceSwitch
-            name={IF_SILENT_LEAD}
-            choices={IF_SILENT_CHOICES}
-            chosen={ifSilent}
-            onPick={setIfSilent}
-          />
+      <label className="mt-2 flex items-start gap-2 text-xs">
+        <input
+          type="checkbox"
+          checked={ask}
+          onChange={(event) => setAsk(event.target.checked)}
+          disabled={saving}
+          className="mt-0.5 h-4 w-4 accent-brand-navy"
+        />
+        <span>
+          {ASK_CHOICE}
+          <span className="mt-0.5 block text-brand-light-navy">{ASK_CHOICE_WITHOUT}</span>
         </span>
-      </div>
+      </label>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <button type="submit" disabled={saving} className={`px-3 py-1.5 ${BUTTON_CLASSES}`}>
           {saving ? "Adding..." : "Add"}
         </button>

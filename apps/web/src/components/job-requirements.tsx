@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ApiError,
@@ -10,13 +11,14 @@ import {
   startRequirementsDraft,
   type DraftRun,
   type JobRequirementsAnswer,
-  type JobState,
-  type JobStatus,
   type Requirement,
   type RequirementKind,
 } from "@/lib/api";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { useJob } from "@/components/job-frame";
 import { RequirementList } from "@/components/requirement-list";
+import { StepBar } from "@/components/step-bar";
+import { stepPath } from "@/lib/job-steps";
 import { BUTTON_CLASSES } from "@/lib/styles";
 import { useAskWhile } from "@/lib/use-ask-while";
 
@@ -144,10 +146,9 @@ function DraftingPlaceholder() {
 }
 
 /**
- * The content of the "Requirements" step of a job's page: the card that asks
- * HR to let the AI draft the list, what the draft is doing, and the list
- * itself in three groups. The step's own card and heading come from
- * `JobStep`, which wraps this.
+ * The "Requirements" step of a job: the card that asks HR to let the AI
+ * draft the list, what the draft is doing, the list itself, and at the bottom
+ * the bar with the step's action. It loads the list when the step is opened.
  *
  * The draft is not made by this page and not by the API. The click only asks
  * the API to queue it; the worker makes the AI call. So the page shows one of
@@ -159,22 +160,22 @@ function DraftingPlaceholder() {
  * at once; see `RequirementList`. The draft button shows only while the job
  * has no requirements.
  *
- * "Confirm requirements" ends the step: the job becomes open and the next
- * step is unlocked. A confirmed list is read-only. "Edit requirements" takes
- * the job back to a draft, after a popup that says what going back costs.
+ * "Confirm requirements", in the bar, ends the step: the job becomes open,
+ * the next step is unlocked and HR is taken to it. A confirmed list is
+ * read-only. "Edit requirements" takes the job back to a draft, after a
+ * popup that says what going back costs.
  *
  * Like the job itself, everything is asked for inside the signed-in user's
  * company only; the API answers "not found" for another company's job.
  */
-export function JobRequirements(props: {
-  jobId: string;
-  jobStatus: JobStatus;
-  /** When the requirements were confirmed, or null while the job is a draft. */
-  confirmedAt: string | null;
-  /** The job became open (confirmed) or a draft again (opened for editing). */
-  onJobState: (state: JobState) => void;
-}) {
-  const { jobId, jobStatus, confirmedAt, onJobState } = props;
+export function JobRequirements() {
+  // The job comes from the frame around every step. `setJobState` tells the
+  // frame that this step changed where the job stands.
+  const { job, setJobState } = useJob();
+  const jobId = job.id;
+  const jobStatus = job.status;
+  const confirmedAt = job.requirementsConfirmedAt;
+  const router = useRouter();
   const [state, setState] = useState<RequirementsState>({ kind: "loading" });
   // "Confirm requirements" is on its way, and the sentence when it was refused.
   const [confirming, setConfirming] = useState(false);
@@ -300,14 +301,16 @@ export function JobRequirements(props: {
   /**
    * "Confirm requirements". One click, with no question in front of it,
    * because it can be undone and costs no AI money. The job becomes open,
-   * this step folds, and the next one is unlocked.
+   * the next step is unlocked, and HR is taken there.
    */
   async function confirm() {
     setConfirming(true);
     setConfirmProblem(null);
     try {
       const answer = await confirmRequirements(jobId);
-      if (shownRef.current) onJobState(answer.job);
+      if (!shownRef.current) return;
+      setJobState(answer.job);
+      router.push(stepPath(jobId, "applications"));
     } catch (error) {
       if (!shownRef.current) return;
       if (!(error instanceof ApiError && error.status === 401)) setConfirmProblem(whyRefused(error));
@@ -324,7 +327,7 @@ export function JobRequirements(props: {
       const answer = await reopenRequirements(jobId);
       if (!shownRef.current) return;
       setAskingToReopen(false);
-      onJobState(answer.job);
+      setJobState(answer.job);
     } catch (error) {
       if (!shownRef.current) return;
       if (!(error instanceof ApiError && error.status === 401)) setReopenProblem(whyRefused(error));
@@ -339,12 +342,29 @@ export function JobRequirements(props: {
     void askAgain();
   }
 
-  if (state.kind === "loading") {
-    return <p className="text-sm text-brand-light-navy">Loading the requirements...</p>;
-  }
-  if (state.kind === "failed") return <p className="text-sm text-red-700">{state.message}</p>;
-  if (state.kind === "missing") {
-    return <p className="text-sm text-brand-light-navy">This job does not exist.</p>;
+  const heading = (
+    <>
+      <h2 className="text-lg font-semibold">
+        <span className="font-normal text-brand-light-navy">Step 1: </span>Requirements
+      </h2>
+      <p className="mt-1 mb-5 text-sm text-brand-light-navy">AI drafts, you confirm</p>
+    </>
+  );
+
+  if (state.kind !== "ok") {
+    return (
+      <>
+        {heading}
+        {state.kind === "loading" ? (
+          <p className="text-sm text-brand-light-navy">Loading the requirements...</p>
+        ) : null}
+        {state.kind === "failed" ? <p className="text-sm text-red-700">{state.message}</p> : null}
+        {state.kind === "missing" ? (
+          <p className="text-sm text-brand-light-navy">This job does not exist.</p>
+        ) : null}
+        <StepBar step="requirements" />
+      </>
+    );
   }
 
   const { requirements } = state;
@@ -358,8 +378,20 @@ export function JobRequirements(props: {
   // page there is nothing to try again.
   const failedRun = !drafting && !hasList && draft?.status === "failed";
 
+  // What the bar at the bottom says and offers. While the list can still be
+  // changed, its button is the step's own action, "Confirm requirements",
+  // and the line beside it says why the button is off when it is. Once the
+  // list is confirmed there is nothing left to do here: the bar offers "Edit
+  // requirements" and, by itself, "Next".
+  let barNote: string = countLine(requirements);
+  if (drafting) barNote = "The AI is drafting the list.";
+  else if (!hasList) barNote = "Draft the requirements to go on.";
+  else if (mustCount === 0) barNote = "Add at least one must-have to confirm.";
+
   return (
     <>
+      {heading}
+
       {/*
         The top of the step. There is no "Draft again" here on purpose: the
         same job description gives nearly the same list, and a new draft
@@ -371,32 +403,18 @@ export function JobRequirements(props: {
           <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-purple/10 px-2.5 py-0.5 text-xs font-medium text-brand-purple">
             <Spark /> Drafted by AI
           </p>
-          <p className="mt-2 text-sm text-brand-light-navy">{countLine(requirements)}</p>
           {canDraft ? (
-            <p className="mt-1 text-sm">
+            <p className="mt-2 text-sm">
               Review the list and make it yours. Every change is saved at once. When it is right,
               confirm it to unlock the next step.
             </p>
-          ) : null}
-          {jobStatus === "open" ? (
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm">
-                Confirmed
-                {confirmedAt ? ` on ${new Date(confirmedAt).toLocaleDateString()}` : ""}. Every CV
-                is checked against this list.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setReopenProblem(null);
-                  setAskingToReopen(true);
-                }}
-                className="rounded-lg border border-brand-navy/30 px-3 py-1.5 text-sm font-medium hover:border-brand-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
-              >
-                Edit requirements
-              </button>
-            </div>
-          ) : null}
+          ) : (
+            <p className="mt-2 text-sm">
+              Confirmed
+              {confirmedAt ? ` on ${new Date(confirmedAt).toLocaleDateString()}` : ""}. Every CV is
+              checked against this list.
+            </p>
+          )}
         </div>
       ) : null}
 
@@ -475,36 +493,45 @@ export function JobRequirements(props: {
         />
       ) : null}
 
-      {/*
-        The foot of the step, while the list can still be changed: the one
-        button that ends the step. It is switched off without a must-have;
-        the line above the list says why.
-      */}
-      {hasList && canDraft && !drafting ? (
-        <div className="mt-6 border-t border-brand-navy/10 pt-4">
-          {mustCount >= MANY_MUST_HAVES ? (
-            <p className="mb-3 rounded-lg bg-brand-cream px-3 py-2 text-sm">
-              {mustCount} must-haves. A candidate who misses any one of them is left out of your
-              main list. Keep must-have for real deal-breakers.
-            </p>
-          ) : null}
-          <div className="flex flex-wrap items-center justify-end gap-3">
-            {confirmProblem ? (
-              <p role="alert" className="text-sm text-red-700">
-                {confirmProblem}
-              </p>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => void confirm()}
-              disabled={confirming || mustCount === 0}
-              className={`px-4 py-2 ${BUTTON_CLASSES}`}
-            >
-              {confirming ? "Confirming..." : "Confirm requirements"}
-            </button>
-          </div>
-        </div>
+      {/* Only a note. It never stops the confirm; HR decides. */}
+      {hasList && canDraft && !drafting && mustCount >= MANY_MUST_HAVES ? (
+        <p className="mt-6 rounded-lg bg-brand-cream px-3 py-2 text-sm">
+          {mustCount} must-haves. A candidate who misses any one of them is left out of your main
+          list. Keep must-have for real deal-breakers.
+        </p>
       ) : null}
+
+      {canDraft ? (
+        <StepBar
+          step="requirements"
+          note={
+            confirmProblem ? <span className="text-red-700">{confirmProblem}</span> : barNote
+          }
+          action={{
+            label: "Confirm requirements",
+            busyLabel: "Confirming...",
+            busy: confirming,
+            disabled: drafting || !hasList || mustCount === 0,
+            onClick: () => void confirm(),
+          }}
+        />
+      ) : (
+        <StepBar
+          step="requirements"
+          note={countLine(requirements)}
+          secondary={
+            jobStatus === "open"
+              ? {
+                  label: "Edit requirements",
+                  onClick: () => {
+                    setReopenProblem(null);
+                    setAskingToReopen(true);
+                  },
+                }
+              : undefined
+          }
+        />
+      )}
 
       <ConfirmDialog
         open={askingToReopen}

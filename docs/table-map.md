@@ -1,6 +1,6 @@
 # Table map
 
-The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist. Updated on 2026-11-24 (tasks 10 and 11): `work_runs` and `jobs` exist. Updated on 2026-11-25 (task 13): `ai_calls` exists. Updated on 2026-11-26 (task 14): `job_requirements` exists, a run can belong to a job, and the first database function exists.
+The tables Siftmerit needs and how they link. Agreed on 2026-11-17 (task 1). Updated on 2026-11-18 (task 6): the first three tables exist. Updated on 2026-11-24 (tasks 10 and 11): `work_runs` and `jobs` exist. Updated on 2026-11-25 (task 13): `ai_calls` exists. Updated on 2026-11-26 (task 14): `job_requirements` exists, a run can belong to a job, and the first database function exists. Updated on 2026-11-26 (task 16): a job keeps when its requirements were confirmed, a requirement's text is allowed once per job, and five more database functions exist.
 
 This is a map, not the SQL. Each table's SQL is written in the task that first needs it. The columns below are a first sketch; the exact columns are settled in that task. This doc is updated whenever a table is added or its links change.
 
@@ -53,7 +53,7 @@ job_requirements ─────────────────────
 | `tenants` | Company name and short name (`slug`: lower case with dashes, allowed only once). A `settings` column is added when something first uses it, probably the limits in task 39 | Acme Trading, `acme-trading` | 6 (exists) |
 | `tenant_members` | Which sign-in account is in which company, and its role: `owner` or `member`. One user belongs to one company. Nothing is restricted by the role yet | Sara is in Acme, owner | 6 (exists) |
 | `mailbox_connections` | Mailbox address, the secret (encrypted), status, last error | hr@acme.com, connected | 21 |
-| `jobs` | Title (the job's short name on our screens, typed by HR), job description, subject words (a list of 1 to 10 phrases), posting date, status (`draft`, `open`, `closed`), the form's one-time key, and who created it. Added by later tasks when first used: when requirements were confirmed, when the mailbox was last checked, closed date | Accountant, draft | 11 (exists) |
+| `jobs` | Title (the job's short name on our screens, typed by HR), job description, subject words (a list of 1 to 10 phrases), posting date, status (`draft`, `open`, `closed`), when the requirements were confirmed (empty while the job is a draft), the form's one-time key, and who created it. Added by later tasks when first used: when the mailbox was last checked, closed date | Accountant, draft | 11 (exists) |
 | `job_requirements` | Which job, the requirement text (up to 500 characters), its kind (`must`, `preferred` or `nice`: must-have, preferred, nice to have), what a silent CV means for it (`ask` the candidate, or count as `missing`), its place in the list | "3 years experience", must-have, count as missing | 14 (exists) |
 | `job_emails` | Which job, Gmail's email ID, subject, sender, date, picked by HR or not, status, skip reason. No email body and no attachment | "Application for Accountant", 2 Nov, read | 22 |
 | `candidates` | The fact sheet (name, contact, city, total years, education, skills, current role, short summary, links), the CV text, the keep-until date | Ali, Lahore, 4 years | 26 to 29 |
@@ -72,6 +72,8 @@ Rules the database keeps:
 - An AI call's job must be a job of the same company, and a call that ended `ok` has no error word while every other call has one.
 - At most one unfinished run (`waiting` or `running`) of a kind: per job for a run that belongs to a job, per company for a run that belongs to none. This is what refuses the same work being queued twice.
 - A requirement's job, and a run's job, must be a job of the same company.
+- A job has no requirement text twice. Capital letters do not make a text different.
+- A draft job has no confirm time, and an open or closed job has one.
 - A requirement's ID together with its company is allowed once, so that ticks can later point at "company and requirement" together.
 
 ## 4. Why it is shaped this way
@@ -141,6 +143,6 @@ The same three lines go into the SQL file of every table:
 
 One table gives the server less: on `ai_calls` it may read and add rows, and may not change or delete one, because a row of the cost log is written once.
 
-A database function gets the same treatment. There is one, `replace_job_requirements`, which swaps a job's whole list of requirements in one step. Postgres lets everyone run a new function unless told otherwise, so its SQL file takes that right from `public`, `anon` and `authenticated` and gives it to `service_role` only. The function takes the company's ID and uses it in every statement, and our code calls it only through `forTenant`.
+A database function gets the same treatment. There are six, all for a job's requirements: `replace_job_requirements` swaps the whole list in one step; `add_job_requirement`, `change_job_requirement` and `remove_job_requirement` are HR's edits; `confirm_job_requirements` opens the job and `reopen_job_requirements` takes it back to a draft. Each locks the job's row and checks where the job stands before it writes. Postgres lets everyone run a new function unless told otherwise, so the SQL file of a function takes that right from `public`, `anon` and `authenticated` and gives it to `service_role` only. Each function takes the company's ID and uses it in every statement, and our code calls it only through `forTenant`.
 
 So only our API and worker reach the data. They hold the secret key, which goes past the row rules, and that is why every repository reaches a company table only through the helper `forTenant`, which adds the `tenant_id` filter itself. Deleting a company row removes everything the company owns; deleting a sign-in account removes its member row, never the company.

@@ -48,11 +48,15 @@ HR clicks "Draft requirements" on the job's page. Creating a job drafts nothing.
 
 A requirement that holds two different skills ("Python, and TypeScript or JavaScript") is written as two requirements. Alternatives ("n8n, Make or Zapier") and one skill area named with its examples stay one requirement. The AI keeps must-have for deal-breakers and usually gives three to five.
 
-While the job is a draft HR can draft again; the new list replaces the old one.
+A draft is offered only while the job has no requirements: the same job description gives nearly the same list again, and a new draft would wipe HR's own changes.
 
-HR edits the list, changes any kind or mark, adds or removes requirements, and confirms. The list needs at least one must-have. No CV is read before HR confirms.
+HR edits the list, changes any kind or mark, adds or removes requirements, and confirms. Every change is saved at once. The list needs at least one must-have. No CV is read before HR confirms.
 
-Changed on 2026-11-25. Before that there were two kinds (must, nice to have) and HR picked strict or lenient. The click, the redraft and the splitting rule were added on 2026-11-26 (task 14). The reasons are in [decisions.md](decisions.md).
+The confirm opens the job and unlocks the next step. A confirmed list is read-only. Until a CV is read, HR can go back to editing; a popup first says what going back costs. After CVs are read, the list is changed as section 5 describes.
+
+On the screen a job is worked on in steps, one at a time: Job, Requirements, Applications, CV reading, Candidates. A step that waits for an earlier one is shown as locked.
+
+Changed on 2026-11-25. Before that there were two kinds (must, nice to have) and HR picked strict or lenient. The click and the splitting rule were added on 2026-11-26 (task 14); the editing, the confirm, going back and the steps on the same day (task 16), which also took back the redraft of task 14. The reasons are in [decisions.md](decisions.md).
 
 ### Step 3: Saved candidates from past jobs (HR's choice)
 When creating a job, HR can pick past jobs to bring saved candidates from. HR confirms before any AI is used. Those candidates are then scored against the new requirements from their saved CV text, before any mail is read. Nothing is checked automatically.
